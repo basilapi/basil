@@ -1,12 +1,18 @@
-= StoneR =
+# StoneR #
 
 
-== Build with Maven ==
+## Build with Maven ##
 
-   $ mvn install
+```
+#!shell
+
+$ mvn install
+```
 
 == Run with Maven ==
 
-   $ mvn jetty:run
+```
+#!shell
 
-
+$ mvn jetty:run
+```
