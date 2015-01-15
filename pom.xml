@@ -13,6 +13,10 @@
     <description>
         Tool for building Web APIs on top of SPARQL endpoints
     </description>
+
+    <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
