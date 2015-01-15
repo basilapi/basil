@@ -9,7 +9,7 @@
 $ mvn install
 ```
 
-== Run with Maven ==
+## Run with Maven ##
 
 ```
 #!shell
