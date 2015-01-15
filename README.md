@@ -1,5 +1,5 @@
 # StoneR #
-
+Tool for building Web APIs on top of SPARQL endpoints.
 
 ## Build with Maven ##
 
