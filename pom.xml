@@ -1,37 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>stoner</groupId>
-    <artifactId>stoner</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+	<groupId>stoner</groupId>
+	<artifactId>stoner</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>war</packaging>
 
-    <name>StoneR</name>
-    <description>
+	<name>StoneR</name>
+
+	<description>
         Tool for building Web APIs on top of SPARQL endpoints
     </description>
 
-    <properties>
-      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>2.14</version>
-        </dependency>
-    </dependencies>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+	<dependencies>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet</artifactId>
+			<version>2.14</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<configuration>
+					<scanIntervalSeconds>2</scanIntervalSeconds>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
 
