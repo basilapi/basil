@@ -1,12 +1,18 @@
-= StoneR =
+# StoneR #
+Tool for building Web APIs on top of SPARQL endpoints.
 
+## Build with Maven ##
 
-== Build with Maven ==
+```
+#!shell
 
-   $ mvn install
+$ mvn install
+```
 
-== Run with Maven ==
+## Run with Maven ##
 
-   $ mvn jetty:run
+```
+#!shell
 
-
+$ mvn jetty:run
+```
