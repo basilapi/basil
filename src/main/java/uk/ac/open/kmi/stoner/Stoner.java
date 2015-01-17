@@ -12,6 +12,7 @@ public class Stoner extends Application {
     public Set<Class<?>> getClasses() {
         Set<Class<?>> s = new HashSet<Class<?>>();
         s.add(HelloWorldResource.class);
+        s.add(SpecificationResource.class);
         return s;
     }
 }
