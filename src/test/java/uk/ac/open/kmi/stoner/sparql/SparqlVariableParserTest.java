@@ -57,7 +57,7 @@ public class SparqlVariableParserTest {
 			try {
 				actual = new SparqlVariableParser(entry.getKey())
 						.getParameterName();
-			} catch (NotAParameterException e) {
+			} catch (ParameterException e) {
 				Assert.assertTrue(false);
 				log.error("", e);
 			}
@@ -81,7 +81,7 @@ public class SparqlVariableParserTest {
 		for (String var : negatives) {
 			try {
 				new SparqlVariableParser(var).getParameterName();
-			} catch (NotAParameterException e) {
+			} catch (ParameterException e) {
 				continue;
 			}
 			log.error("NotAParameterException was expected: {}", var);
@@ -105,10 +105,110 @@ public class SparqlVariableParserTest {
 			try {
 				actual = new SparqlVariableParser(var.getKey()).isForcedIri();
 				Assert.assertEquals(expected, actual);
-			} catch (NotAParameterException e) {
+			} catch (ParameterException e) {
 				Assert.assertTrue(false);
 				log.error("", e);
 			}
 		}
+	}
+
+	@Test
+	public void isForcedLiteral() throws ParameterException {
+		log.info("Test {}", method.getMethodName());
+		Assert.assertTrue(new SparqlVariableParser("?_name_literal")
+				.isForcedPlainLiteral());
+		Assert.assertTrue(new SparqlVariableParser("$_type_literal")
+				.isForcedPlainLiteral());
+		Assert.assertTrue(new SparqlVariableParser("?_literal_literal")
+				.isForcedPlainLiteral());
+
+		Assert.assertFalse(new SparqlVariableParser("$_literal_iri")
+				.isForcedPlainLiteral());
+		Assert.assertFalse(new SparqlVariableParser("?_literal")
+				.isForcedPlainLiteral());
+	}
+
+	@Test
+	public void isForcedTypedLiteral() throws ParameterException {
+		log.info("Test {}", method.getMethodName());
+		Assert.assertTrue(new SparqlVariableParser("?_name_rdf_HTML")
+				.isForcedTypedLiteral());
+		Assert.assertTrue(new SparqlVariableParser("$_type_ex_bob")
+				.isForcedTypedLiteral());
+		Assert.assertTrue(new SparqlVariableParser("?_literal_xsd_string")
+				.isForcedTypedLiteral());
+
+		Assert.assertTrue(new SparqlVariableParser("?_param_string")
+				.isForcedTypedLiteral());
+		Assert.assertTrue(new SparqlVariableParser("?_param_boolean")
+				.isForcedTypedLiteral());
+		Assert.assertTrue(new SparqlVariableParser("?_param_int")
+				.isForcedTypedLiteral());
+		Assert.assertTrue(new SparqlVariableParser("?_param_integer")
+				.isForcedTypedLiteral());
+
+		Assert.assertFalse(new SparqlVariableParser("$_literal_xsd")
+				.isForcedTypedLiteral());
+		Assert.assertFalse(new SparqlVariableParser("?_literal")
+				.isForcedTypedLiteral());
+	}
+
+	@Test
+	public void isPlain() throws ParameterException {
+		log.info("Test {}", method.getMethodName());
+		Assert.assertTrue(new SparqlVariableParser("?_name").isPlain());
+		Assert.assertTrue(new SparqlVariableParser("?_name______").isPlain());
+		Assert.assertTrue(new SparqlVariableParser("?_name_accipicchia___")
+				.isPlain());
+
+		Assert.assertFalse(new SparqlVariableParser("?_literal_xsd_string")
+				.isPlain());
+		Assert.assertFalse(new SparqlVariableParser("$_literal_xsd_string")
+				.isPlain());
+		Assert.assertFalse(new SparqlVariableParser("$_iri_iri").isPlain());
+		Assert.assertFalse(new SparqlVariableParser("?_literal_iri").isPlain());
+		Assert.assertFalse(new SparqlVariableParser("?_rdf_html_html")
+				.isPlain()); // this is var named 'rdf' with datatype html:html
+								// ...
+	}
+
+	@Test
+	public void isForcedLangedLiteral() throws ParameterException {
+		log.info("Test {}", method.getMethodName());
+		// True:
+		Assert.assertTrue(new SparqlVariableParser("?_name_en")
+				.isForcedLangedLiteral());
+		Assert.assertTrue(new SparqlVariableParser("?_name_it")
+				.isForcedLangedLiteral());
+		Assert.assertTrue(new SparqlVariableParser("?_name_es")
+				.isForcedLangedLiteral());
+		Assert.assertTrue(new SparqlVariableParser("?_name_ab")
+				.isForcedLangedLiteral());
+		// False:
+		Assert.assertFalse(new SparqlVariableParser("?_name_abc")
+				.isForcedLangedLiteral());
+		Assert.assertFalse(new SparqlVariableParser("?_name_a")
+				.isForcedLangedLiteral());
+		Assert.assertFalse(new SparqlVariableParser("?_name_literal")
+				.isForcedLangedLiteral());
+		Assert.assertFalse(new SparqlVariableParser("$_type_literal")
+				.isForcedLangedLiteral());
+		Assert.assertFalse(new SparqlVariableParser("?_literal_literal")
+				.isForcedLangedLiteral());
+
+		Assert.assertFalse(new SparqlVariableParser("$_literal_iri")
+				.isForcedPlainLiteral());
+		Assert.assertFalse(new SparqlVariableParser("?_literal")
+				.isForcedPlainLiteral());
+	}
+	
+	@Test
+	public void getDatatypePrefix() throws ParameterException{
+		log.info("Test {}", method.getMethodName());
+		
+		Assert.assertTrue(new SparqlVariableParser("$_paramname_xsd_string").getDatatypePrefix().equals("xsd"));
+		Assert.assertTrue(new SparqlVariableParser("$_paramname_xsd_boolean").getDatatypePrefix().equals("xsd"));
+		Assert.assertTrue(new SparqlVariableParser("$_paramname_en_string").getDatatypePrefix().equals("en"));
+		Assert.assertTrue(new SparqlVariableParser("$_paramname_xsd_string").getDatatypePrefix().equals("xsd"));
 	}
 }
