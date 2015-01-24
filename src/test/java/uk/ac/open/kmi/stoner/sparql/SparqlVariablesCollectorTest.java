@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -22,6 +23,8 @@ public class SparqlVariablesCollectorTest {
 	private static Logger log = LoggerFactory
 			.getLogger(SparqlVariablesCollectorTest.class);
 
+	private SparqlVariablesCollector collector = new SparqlVariablesCollector();
+	
 	@Rule
 	public TestName testName = new TestName();
 
@@ -29,19 +32,50 @@ public class SparqlVariablesCollectorTest {
 	public void before(){
 		log.info("{}", testName.getMethodName());
 	}
+
+	@After
+	public void after(){
+		collector.reset();
+	}
 	
-	@Test
-	public void test() throws IOException {
-		String query = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("./sparql/select-1.txt"), "UTF-8");
+	private String loadQuery(String qname) throws IOException{
+		return IOUtils.toString(getClass().getClassLoader().getResourceAsStream("./sparql/" + qname + ".txt"), "UTF-8");
+	}
+	
+	private Set<String> extractVars(String query){
 		log.info(" {}", query);
 		Query q = QueryFactory.create(query);
-		Element element = q.getQueryPattern();
-		SparqlVariablesCollector collector = new SparqlVariablesCollector();
+		Element element = q.getQueryPattern();		
 		ElementWalker.walk(element, collector);
 		Set<String> vars = collector.getVariables();
 		log.info(" > {}", vars);
-        Assert.assertTrue(vars.contains("?course"));
+        return vars;
+	} 
+
+	@Test
+	public void select_1() throws IOException {
+		Set<String> vars = extractVars(loadQuery(testName.getMethodName()));
+		Assert.assertTrue(vars.contains("?course"));
         Assert.assertTrue(vars.contains("?location"));
         Assert.assertTrue(vars.contains("?_geoid"));
+	}
+
+	@Test
+	public void select_2() throws IOException {
+		Set<String> vars = extractVars(loadQuery(testName.getMethodName()));
+		Assert.assertTrue(vars.contains("?description"));
+        Assert.assertTrue(vars.contains("?thing"));
+        Assert.assertTrue(vars.contains("?_term"));
+	}
+
+	@Test
+	public void select_3() throws IOException {
+		Set<String> vars = extractVars(loadQuery(testName.getMethodName()));
+		Assert.assertTrue(vars.contains("?x"));
+        Assert.assertTrue(vars.contains("?code"));
+        Assert.assertTrue(vars.contains("?title"));
+        Assert.assertTrue(vars.contains("?url"));
+        Assert.assertTrue(vars.contains("?apply"));
+        Assert.assertTrue(vars.contains("?description"));
 	}
 }

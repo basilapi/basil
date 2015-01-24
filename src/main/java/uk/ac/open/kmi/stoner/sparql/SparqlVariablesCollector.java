@@ -27,7 +27,7 @@ import com.hp.hpl.jena.sparql.syntax.ElementUnion;
 import com.hp.hpl.jena.sparql.syntax.ElementVisitor;
 
 public class SparqlVariablesCollector implements ElementVisitor {
-
+	//private static Logger log = LoggerFactory.getLogger(SparqlVariablesCollector.class);
 	private Set<String> variables = new HashSet<String>();
 
 	public Set<String> getVariables() {
@@ -64,7 +64,17 @@ public class SparqlVariablesCollector implements ElementVisitor {
 
 	public void visit(ElementPathBlock el) {
 		for (TriplePath triple : el.getPattern().getList()) {
-			collectFromTriple(triple.asTriple());
+			if(triple.isTriple()){
+				collectFromTriple(triple.asTriple());
+			}else{
+				// is a path
+				if (triple.getSubject().isVariable()) {
+					variables.add(triple.getSubject().toString());
+				}
+				if (triple.getObject().isVariable()) {
+					variables.add(triple.getObject().toString());
+				}
+			}
 		}
 	}
 
