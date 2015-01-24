@@ -19,25 +19,27 @@ public class SparqlVariableParser {
 	private String lang = null;
 	private String datatypeLocalName = null;
 	private boolean isNeat = true;
+	private boolean isOptional;
 
 	public SparqlVariableParser(String variable) {
 		this.variable = variable;
 		Pattern p = Pattern
-				.compile("[\\$\\?]_([^_]+)_?([a-zA-Z0-9]+)?_?([a-zA-Z0-9]+)?.*$");
+				.compile("[\\$\\?]([_]{1,2})([^_]+)_?([a-zA-Z0-9]+)?_?([a-zA-Z0-9]+)?.*$");
 		Matcher m = p.matcher(this.variable);
 		if (m.matches()) {
 			this.isParameter = true;
-			this.name = m.group(1);
-			if (m.group(2) != null) {
-				if (m.group(2).toLowerCase().equals("iri")) {
+			this.isOptional = m.group(1).length() == 2;
+			this.name = m.group(2);
+			if (m.group(3) != null) {
+				if (m.group(3).toLowerCase().equals("iri")) {
 					this.isForcedIri = true;
-				} else if (m.group(2).toLowerCase().equals("literal")) {
+				} else if (m.group(3).toLowerCase().equals("literal")) {
 					this.isForcedPlainLiteral = true;
-				} else if (m.group(2).length() == 2 && m.group(3) == null) {
+				} else if (m.group(3).length() == 2 && m.group(3) == null) {
 					// specifies lang
 					this.isForcedLangedLiteral = true;
 					this.lang = m.group(2).toLowerCase();
-				} else if (m.group(3) != null) {
+				} else if (m.group(4) != null) {
 					this.datatypePrefix = m.group(2);
 					this.datatypeLocalName = m.group(3);
 					this.isForcedDatatype = true;
@@ -129,6 +131,14 @@ public class SparqlVariableParser {
 	public boolean isPlain() throws ParameterException {
 		if (isParameter()) {
 			return this.isPlain;
+		} else {
+			throw new ParameterException();
+		}
+	}
+
+	public boolean isOptional() throws ParameterException {
+		if (isParameter()) {
+			return this.isOptional;
 		} else {
 			throw new ParameterException();
 		}

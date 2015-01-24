@@ -1,12 +1,10 @@
 package uk.ac.open.kmi.stoner.sparql;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -21,9 +19,13 @@ public class SparqlVariableParserTest {
 	@Rule
 	public TestName method = new TestName();
 
+	@Before
+	public void before(){
+		log.info("{}", method.getMethodName());
+	}
+	
 	@Test
 	public void isApiParameter() {
-		log.info("Test {}", method.getMethodName());
 
 		// A parameter
 		Assert.assertTrue(new SparqlVariableParser("$_type").isParameter());
@@ -38,36 +40,32 @@ public class SparqlVariableParserTest {
 	}
 
 	@Test
-	public void getParameterNameOk() {
-		log.info("Test {}", method.getMethodName());
+	public void getParameterNameOk() throws ParameterException {
 
-		Map<String, String> positives = new HashMap<String, String>();
-		positives.put("$_name", "name");
-		positives.put("$_name_", "name");
-		positives.put("?_name_literal", "name");
-		positives.put("$_name_xsd_int", "name");
-		positives.put("?_name_ex_dtype", "name");
-		positives.put("$_name_en", "name");
-		positives.put("?_name_it", "name");
-		positives.put("$_name_gr", "name");
-		positives.put("?_type_iri", "type");
-		for (Entry<String, String> entry : positives.entrySet()) {
-			String expected = entry.getValue();
-			String actual = "";
-			try {
-				actual = new SparqlVariableParser(entry.getKey())
-						.getParameterName();
-			} catch (ParameterException e) {
-				Assert.assertTrue(false);
-				log.error("", e);
-			}
-			Assert.assertEquals(expected, actual);
-		}
+		Assert.assertEquals("name", new SparqlVariableParser("$_name")
+						.getParameterName());
+		Assert.assertEquals("name", new SparqlVariableParser("$_name_")
+		.getParameterName());
+		Assert.assertEquals("name", new SparqlVariableParser("?_name_literal")
+		.getParameterName());
+		Assert.assertEquals("name", new SparqlVariableParser("$_name_xsd_int")
+		.getParameterName());
+		Assert.assertEquals("name", new SparqlVariableParser("?_name_ex_dtype")
+		.getParameterName());
+		Assert.assertEquals("name", new SparqlVariableParser("$_name_en")
+		.getParameterName());
+		Assert.assertEquals("name", new SparqlVariableParser("?_name_it")
+		.getParameterName());
+		Assert.assertEquals("name", new SparqlVariableParser("$_name_gr")
+		.getParameterName());
+		Assert.assertEquals("type", new SparqlVariableParser("?_type_iri")
+		.getParameterName());
+		Assert.assertEquals("name", new SparqlVariableParser("?__name_it")
+		.getParameterName());
 	}
 
 	@Test
 	public void getParameterNameFailures() {
-		log.info("Test {}", method.getMethodName());
 
 		List<String> negatives = new ArrayList<String>();
 		negatives.add("$x");
@@ -90,31 +88,20 @@ public class SparqlVariableParserTest {
 	}
 
 	@Test
-	public void isForcedIri() {
-		log.info("Test {}", method.getMethodName());
-		Map<String, Boolean> tests = new HashMap<String, Boolean>();
-		tests.put("?_name_iri", true);
-		tests.put("?_name_iri_", true);
-		tests.put("?_name_iri______", true);
-		tests.put("?_name_literal", false);
-		tests.put("?_name", false);
-		tests.put("?_name_xsd_string", false);
-		for (Entry<String, Boolean> var : tests.entrySet()) {
-			boolean expected = var.getValue();
-			boolean actual;
-			try {
-				actual = new SparqlVariableParser(var.getKey()).isForcedIri();
-				Assert.assertEquals(expected, actual);
-			} catch (ParameterException e) {
-				Assert.assertTrue(false);
-				log.error("", e);
-			}
-		}
+	public void isForcedIri() throws ParameterException {
+		// True
+		Assert.assertTrue(new SparqlVariableParser( "?_name_iri"  ).isForcedIri());
+		Assert.assertTrue(new SparqlVariableParser( "?_name_iri_"  ).isForcedIri());
+		Assert.assertTrue(new SparqlVariableParser( "?_name_iri_____"  ).isForcedIri());
+		// False
+		Assert.assertFalse(new SparqlVariableParser( "?_name_literal"  ).isForcedIri());
+		Assert.assertFalse(new SparqlVariableParser( "?_name"  ).isForcedIri());
+		Assert.assertFalse(new SparqlVariableParser( "?_name_string"  ).isForcedIri());
+		Assert.assertFalse(new SparqlVariableParser( "?_name_xsd_iri"  ).isForcedIri());
 	}
 
 	@Test
 	public void isForcedLiteral() throws ParameterException {
-		log.info("Test {}", method.getMethodName());
 		Assert.assertTrue(new SparqlVariableParser("?_name_literal")
 				.isForcedPlainLiteral());
 		Assert.assertTrue(new SparqlVariableParser("$_type_literal")
@@ -130,7 +117,7 @@ public class SparqlVariableParserTest {
 
 	@Test
 	public void isForcedTypedLiteral() throws ParameterException {
-		log.info("Test {}", method.getMethodName());
+		
 		Assert.assertTrue(new SparqlVariableParser("?_name_rdf_HTML")
 				.isForcedTypedLiteral());
 		Assert.assertTrue(new SparqlVariableParser("$_type_ex_bob")
@@ -155,7 +142,7 @@ public class SparqlVariableParserTest {
 
 	@Test
 	public void isPlain() throws ParameterException {
-		log.info("Test {}", method.getMethodName());
+		
 		Assert.assertTrue(new SparqlVariableParser("?_name").isPlain());
 		Assert.assertTrue(new SparqlVariableParser("?_name______").isPlain());
 		Assert.assertTrue(new SparqlVariableParser("?_name_accipicchia___")
@@ -174,7 +161,7 @@ public class SparqlVariableParserTest {
 
 	@Test
 	public void isForcedLangedLiteral() throws ParameterException {
-		log.info("Test {}", method.getMethodName());
+		
 		// True:
 		Assert.assertTrue(new SparqlVariableParser("?_name_en")
 				.isForcedLangedLiteral());
@@ -204,8 +191,6 @@ public class SparqlVariableParserTest {
 	
 	@Test
 	public void getDatatypePrefix() throws ParameterException{
-		log.info("Test {}", method.getMethodName());
-		
 		Assert.assertTrue(new SparqlVariableParser("$_paramname_xsd_string").getDatatypePrefix().equals("xsd"));
 		Assert.assertTrue(new SparqlVariableParser("$_paramname_xsd_boolean").getDatatypePrefix().equals("xsd"));
 		Assert.assertTrue(new SparqlVariableParser("$_paramname_en_string").getDatatypePrefix().equals("en"));
