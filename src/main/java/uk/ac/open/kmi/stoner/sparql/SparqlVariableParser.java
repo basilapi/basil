@@ -35,16 +35,16 @@ public class SparqlVariableParser {
 					this.isForcedIri = true;
 				} else if (m.group(3).toLowerCase().equals("literal")) {
 					this.isForcedPlainLiteral = true;
-				} else if (m.group(3).length() == 2 && m.group(3) == null) {
+				} else if (m.group(3).length() == 2 && m.group(4) == null) {
 					// specifies lang
 					this.isForcedLangedLiteral = true;
-					this.lang = m.group(2).toLowerCase();
+					this.lang = m.group(3).toLowerCase();
 				} else if (m.group(4) != null) {
-					this.datatypePrefix = m.group(2);
-					this.datatypeLocalName = m.group(3);
+					this.datatypePrefix = m.group(3);
+					this.datatypeLocalName = m.group(4);
 					this.isForcedDatatype = true;
 				} else {
-					// Let's check if group(2) is a well known XSD Datatype
+					// Let's check if group(3) is a well known XSD Datatype
 					Set<String> xsdDatatypes = new HashSet<String>();
 					xsdDatatypes.add("string");
 					xsdDatatypes.add("int");
@@ -60,8 +60,8 @@ public class SparqlVariableParser {
 					// TODO add others
 					// ...
 					//
-					if (xsdDatatypes.contains(m.group(2))) {
-						this.datatypeLocalName = m.group(2);
+					if (xsdDatatypes.contains(m.group(3))) {
+						this.datatypeLocalName = m.group(3);
 						this.datatypePrefix = "xsd";
 						this.isForcedDatatype = true;
 					} else {
