@@ -11,10 +11,10 @@ import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SparqlVariableParserTest {
+public class VariableParserTest {
 
 	private static Logger log = LoggerFactory
-			.getLogger(SparqlVariableParserTest.class);
+			.getLogger(VariableParserTest.class);
 
 	@Rule
 	public TestName method = new TestName();

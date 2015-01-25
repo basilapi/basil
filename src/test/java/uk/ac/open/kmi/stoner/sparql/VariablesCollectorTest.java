@@ -18,10 +18,10 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.syntax.ElementWalker;
 
-public class SparqlVariablesCollectorTest {
+public class VariablesCollectorTest {
 
 	private static Logger log = LoggerFactory
-			.getLogger(SparqlVariablesCollectorTest.class);
+			.getLogger(VariablesCollectorTest.class);
 
 	private VariablesCollector collector = new VariablesCollector();
 	
