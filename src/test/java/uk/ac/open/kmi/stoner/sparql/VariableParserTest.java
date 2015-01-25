@@ -130,10 +130,6 @@ public class VariableParserTest {
 	@Test
 	public void isForcedTypedLiteral() throws ParameterException {
 
-		Assert.assertTrue(new VariableParser("?_name_rdf_HTML").getParameter()
-				.isForcedTypedLiteral());
-		Assert.assertTrue(new VariableParser("$_type_ex_bob").getParameter()
-				.isForcedTypedLiteral());
 		Assert.assertTrue(new VariableParser("?_literal_xsd_string")
 				.getParameter().isForcedTypedLiteral());
 
@@ -150,6 +146,11 @@ public class VariableParserTest {
 				.isForcedTypedLiteral());
 		Assert.assertFalse(new VariableParser("?_literal").getParameter()
 				.isForcedTypedLiteral());
+		
+		// Undefined prefixes
+		Assert.assertTrue(new VariableParser("?_name_rdf_HTML").isError());
+		Assert.assertTrue(new VariableParser("$_type_ex_bob").isError());
+		
 	}
 
 	@Test

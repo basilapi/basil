@@ -57,16 +57,15 @@ public class VariableParser {
 					p.setForcedPlainLiteral(true);
 				} else if (m.group(3).length() == 2 && m.group(4) == null) {
 					// specifies lang
-					p.setForcedLangedLiteral(true);
 					p.setLang(m.group(3).toLowerCase());
 				} else if (m.group(4) != null) {
 					String datatypePrefix = m.group(3);
 					String datatypeLocalName = m.group(4);
-					p.setForcedDatatype(true);
 					String namespace = prefixes.get(datatypePrefix);
 					if (namespace == null) {
-						throw new ParameterException("Unknown prefix: "
+						exception = new ParameterException("Unknown prefix: "
 								+ datatypePrefix);
+						isError = true;
 					} else {
 						p.setDatatype(namespace + datatypeLocalName);
 					}
@@ -90,11 +89,8 @@ public class VariableParser {
 					if (xsdDatatypes.contains(m.group(3))) {
 						String datatypeLocalName = m.group(3);
 						String datatype = XSD.getURI() + datatypeLocalName;
-						p.setForcedDatatype(true);
 						p.setDatatype(datatype);
 					} else {
-						// Let's guess what we can...
-						// XXX Maybe we should report why?
 						isError = true;
 						this.exception = new ParameterException(
 								"Cannot recognize parameter properties.");

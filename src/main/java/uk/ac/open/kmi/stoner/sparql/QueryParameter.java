@@ -1,8 +1,13 @@
 package uk.ac.open.kmi.stoner.sparql;
 
+import java.io.Serializable;
 
-public class QueryParameter {
+public class QueryParameter implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6725251315049248905L;
 	private String name;
 	private boolean isForcedIri = false;
 	private boolean isForcedPlainLiteral = false;
@@ -10,7 +15,6 @@ public class QueryParameter {
 	private boolean isForcedTypedLiteral = false;
 	private boolean isPlain = false;
 	private String lang = null;
-	private boolean isNeat = true;
 	private boolean isOptional;
 	private String datatype = null;
 
@@ -28,30 +32,24 @@ public class QueryParameter {
 
 	void setForcedIri(boolean isForcedIri) {
 		this.isForcedIri = isForcedIri;
+		//
+		this.datatype = null;
+		this.lang = null;
+		this.isForcedLangedLiteral = false;
+		this.isForcedPlainLiteral = false;
+		this.isForcedTypedLiteral = false;
 	}
 
 	public boolean isForcedPlainLiteral() {
 		return isForcedPlainLiteral;
 	}
 
-	void setForcedPlainLiteral(boolean isForcedPlainLiteral) {
-		this.isForcedPlainLiteral = isForcedPlainLiteral;
-	}
-
 	public boolean isForcedLangedLiteral() {
 		return isForcedLangedLiteral;
 	}
 
-	void setForcedLangedLiteral(boolean isForcedLangedLiteral) {
-		this.isForcedLangedLiteral = isForcedLangedLiteral;
-	}
-
 	public boolean isForcedTypedLiteral() {
 		return isForcedTypedLiteral;
-	}
-
-	void setForcedDatatype(boolean isForcedDatatype) {
-		this.isForcedTypedLiteral = isForcedDatatype;
 	}
 
 	public boolean isPlain() {
@@ -60,6 +58,13 @@ public class QueryParameter {
 
 	void setPlain(boolean isPlain) {
 		this.isPlain = isPlain;
+
+		this.datatype = null;
+		this.lang = null;
+		this.isForcedLangedLiteral = false;
+		this.isForcedIri = false;
+		this.isForcedTypedLiteral = false;
+		this.isForcedPlainLiteral = false;
 	}
 
 	public String getLang() {
@@ -68,14 +73,13 @@ public class QueryParameter {
 
 	void setLang(String lang) {
 		this.lang = lang;
-	}
+		this.isForcedLangedLiteral = true;
+		//
+		this.datatype = null;
+		this.isForcedIri = false;
+		this.isForcedPlainLiteral = false;
+		this.isForcedTypedLiteral = false;
 
-	public boolean isNeat() {
-		return isNeat;
-	}
-
-	void setNeat(boolean isNeat) {
-		this.isNeat = isNeat;
 	}
 
 	public boolean isOptional() {
@@ -92,6 +96,22 @@ public class QueryParameter {
 
 	void setDatatype(String datatype) {
 		this.datatype = datatype;
+		this.isForcedTypedLiteral = true;
+		//
+		this.isForcedLangedLiteral = false;
+		this.isForcedIri = false;
+		this.isForcedPlainLiteral = false;
+		this.lang = null;
+	}
+
+	public void setForcedPlainLiteral(boolean b) {
+		this.isForcedPlainLiteral = true;
+		//
+		this.isForcedLangedLiteral = false;
+		this.isForcedTypedLiteral = false;
+		this.isForcedIri = false;
+		this.datatype = null;
+		this.lang = null;
 	}
 
 }

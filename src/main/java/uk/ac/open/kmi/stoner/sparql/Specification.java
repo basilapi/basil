@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class Specification implements Serializable {
 	private static final long serialVersionUID = 9010724117224824994L;
-	
+
 	private String endpoint;
 	private String query;
 	private Set<QueryParameter> parameters;
@@ -16,7 +16,7 @@ public class Specification implements Serializable {
 		return endpoint;
 	}
 
-	public void setEndpoint(String endpoint) {
+	void setEndpoint(String endpoint) {
 		this.endpoint = endpoint;
 	}
 
@@ -24,7 +24,7 @@ public class Specification implements Serializable {
 		return query;
 	}
 
-	public void setQuery(String query) {
+	void setQuery(String query) {
 		this.query = query;
 	}
 
@@ -32,7 +32,7 @@ public class Specification implements Serializable {
 		return Collections.unmodifiableSet(parameters);
 	}
 
-	public void setParameters(Set<QueryParameter> parameters) {
+	void setParameters(Set<QueryParameter> parameters) {
 		this.parameters = new HashSet<QueryParameter>();
 		this.parameters.addAll(parameters);
 	}
