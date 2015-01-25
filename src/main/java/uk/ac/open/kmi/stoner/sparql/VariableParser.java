@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SparqlVariableParser {
+public class VariableParser implements QueryParameter {
 
 	private String variable;
 	private String name;
@@ -21,7 +21,7 @@ public class SparqlVariableParser {
 	private boolean isNeat = true;
 	private boolean isOptional;
 
-	public SparqlVariableParser(String variable) {
+	public VariableParser(String variable) {
 		this.variable = variable;
 		Pattern p = Pattern
 				.compile("[\\$\\?]([_]{1,2})([^_]+)_?([a-zA-Z0-9]+)?_?([a-zA-Z0-9]+)?.*$");
@@ -84,10 +84,16 @@ public class SparqlVariableParser {
 		return isParameter;
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isNeat()
+	 */
 	public boolean isNeat() {
 		return isNeat;
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#getParameterName()
+	 */
 	public String getParameterName() throws ParameterException {
 		if (isParameter()) {
 			return this.name;
@@ -96,6 +102,9 @@ public class SparqlVariableParser {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isForcedIri()
+	 */
 	public boolean isForcedIri() throws ParameterException {
 		if (isParameter()) {
 			return this.isForcedIri;
@@ -104,6 +113,9 @@ public class SparqlVariableParser {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isForcedTypedLiteral()
+	 */
 	public boolean isForcedTypedLiteral() throws ParameterException {
 		if (isParameter()) {
 			return this.isForcedDatatype;
@@ -112,6 +124,9 @@ public class SparqlVariableParser {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isForcedPlainLiteral()
+	 */
 	public boolean isForcedPlainLiteral() throws ParameterException {
 		if (isParameter()) {
 			return this.isForcedPlainLiteral;
@@ -120,6 +135,9 @@ public class SparqlVariableParser {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isForcedLangedLiteral()
+	 */
 	public boolean isForcedLangedLiteral() throws ParameterException {
 		if (isParameter()) {
 			return this.isForcedLangedLiteral;
@@ -128,6 +146,9 @@ public class SparqlVariableParser {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isPlain()
+	 */
 	public boolean isPlain() throws ParameterException {
 		if (isParameter()) {
 			return this.isPlain;
@@ -136,6 +157,9 @@ public class SparqlVariableParser {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isOptional()
+	 */
 	public boolean isOptional() throws ParameterException {
 		if (isParameter()) {
 			return this.isOptional;
@@ -162,6 +186,9 @@ public class SparqlVariableParser {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#getLang()
+	 */
 	public String getLang() throws ParameterException {
 		if (isParameter() && this.lang != null) {
 			return this.lang;

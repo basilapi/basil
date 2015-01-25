@@ -26,8 +26,8 @@ import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
 import com.hp.hpl.jena.sparql.syntax.ElementUnion;
 import com.hp.hpl.jena.sparql.syntax.ElementVisitor;
 
-public class SparqlVariablesCollector implements ElementVisitor {
-	//private static Logger log = LoggerFactory.getLogger(SparqlVariablesCollector.class);
+public class VariablesCollector implements ElementVisitor {
+
 	private Set<String> variables = new HashSet<String>();
 
 	public Set<String> getVariables() {

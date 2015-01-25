@@ -23,7 +23,7 @@ public class SparqlVariablesCollectorTest {
 	private static Logger log = LoggerFactory
 			.getLogger(SparqlVariablesCollectorTest.class);
 
-	private SparqlVariablesCollector collector = new SparqlVariablesCollector();
+	private VariablesCollector collector = new VariablesCollector();
 	
 	@Rule
 	public TestName testName = new TestName();
@@ -43,12 +43,12 @@ public class SparqlVariablesCollectorTest {
 	}
 	
 	private Set<String> extractVars(String query){
-		log.info(" {}", query);
+		log.debug(" {}", query);
 		Query q = QueryFactory.create(query);
 		Element element = q.getQueryPattern();		
 		ElementWalker.walk(element, collector);
 		Set<String> vars = collector.getVariables();
-		log.info(" > {}", vars);
+		log.debug(" > {}", vars);
         return vars;
 	} 
 
@@ -76,6 +76,15 @@ public class SparqlVariablesCollectorTest {
         Assert.assertTrue(vars.contains("?title"));
         Assert.assertTrue(vars.contains("?url"));
         Assert.assertTrue(vars.contains("?apply"));
+        Assert.assertTrue(vars.contains("?numCredits"));
         Assert.assertTrue(vars.contains("?description"));
+	}
+	
+
+	@Test
+	public void select_4() throws IOException {
+		Set<String> vars = extractVars(loadQuery(testName.getMethodName()));
+		Assert.assertTrue(vars.contains("?x"));
+        Assert.assertTrue(vars.contains("?y"));
 	}
 }
