@@ -1,7 +1,9 @@
 package uk.ac.open.kmi.stoner.sparql;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,6 +12,9 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 public class VariableParserTest {
 
@@ -20,10 +25,10 @@ public class VariableParserTest {
 	public TestName method = new TestName();
 
 	@Before
-	public void before(){
+	public void before() {
 		log.info("{}", method.getMethodName());
 	}
-	
+
 	@Test
 	public void isApiParameter() {
 
@@ -42,26 +47,26 @@ public class VariableParserTest {
 	@Test
 	public void getParameterNameOk() throws ParameterException {
 
-		Assert.assertEquals("name", new VariableParser("$_name")
-						.getParameterName());
+		Assert.assertEquals("name", new VariableParser("$_name").getParameter()
+				.getName());
 		Assert.assertEquals("name", new VariableParser("$_name_")
-		.getParameterName());
+				.getParameter().getName());
 		Assert.assertEquals("name", new VariableParser("?_name_literal")
-		.getParameterName());
+				.getParameter().getName());
 		Assert.assertEquals("name", new VariableParser("$_name_xsd_int")
-		.getParameterName());
+				.getParameter().getName());
 		Assert.assertEquals("name", new VariableParser("?_name_ex_dtype")
-		.getParameterName());
+				.getParameter().getName());
 		Assert.assertEquals("name", new VariableParser("$_name_en")
-		.getParameterName());
+				.getParameter().getName());
 		Assert.assertEquals("name", new VariableParser("?_name_it")
-		.getParameterName());
+				.getParameter().getName());
 		Assert.assertEquals("name", new VariableParser("$_name_gr")
-		.getParameterName());
+				.getParameter().getName());
 		Assert.assertEquals("type", new VariableParser("?_type_iri")
-		.getParameterName());
+				.getParameter().getName());
 		Assert.assertEquals("name", new VariableParser("?__name_it")
-		.getParameterName());
+				.getParameter().getName());
 	}
 
 	@Test
@@ -78,8 +83,8 @@ public class VariableParserTest {
 		negatives.add("?type_iri");
 		for (String var : negatives) {
 			try {
-				new VariableParser(var).getParameterName();
-			} catch (ParameterException e) {
+				new VariableParser(var).getParameter().getName();
+			} catch (NullPointerException e) {
 				continue;
 			}
 			log.error("NotAParameterException was expected: {}", var);
@@ -90,110 +95,127 @@ public class VariableParserTest {
 	@Test
 	public void isForcedIri() throws ParameterException {
 		// True
-		Assert.assertTrue(new VariableParser( "?_name_iri"  ).isForcedIri());
-		Assert.assertTrue(new VariableParser( "?_name_iri_"  ).isForcedIri());
-		Assert.assertTrue(new VariableParser( "?_name_iri_____"  ).isForcedIri());
+		Assert.assertTrue(new VariableParser("?_name_iri").getParameter()
+				.isForcedIri());
+		Assert.assertTrue(new VariableParser("?_name_iri_").getParameter()
+				.isForcedIri());
+		Assert.assertTrue(new VariableParser("?_name_iri_____").getParameter()
+				.isForcedIri());
 		// False
-		Assert.assertFalse(new VariableParser( "?_name_literal"  ).isForcedIri());
-		Assert.assertFalse(new VariableParser( "?_name"  ).isForcedIri());
-		Assert.assertFalse(new VariableParser( "?_name_string"  ).isForcedIri());
-		Assert.assertFalse(new VariableParser( "?_name_xsd_iri"  ).isForcedIri());
+		Assert.assertFalse(new VariableParser("?_name_literal").getParameter()
+				.isForcedIri());
+		Assert.assertFalse(new VariableParser("?_name").getParameter()
+				.isForcedIri());
+		Assert.assertFalse(new VariableParser("?_name_string").getParameter()
+				.isForcedIri());
+		Assert.assertFalse(new VariableParser("?_name_xsd_iri").getParameter()
+				.isForcedIri());
 	}
 
 	@Test
 	public void isForcedLiteral() throws ParameterException {
-		Assert.assertTrue(new VariableParser("?_name_literal")
+		Assert.assertTrue(new VariableParser("?_name_literal").getParameter()
 				.isForcedPlainLiteral());
-		Assert.assertTrue(new VariableParser("$_type_literal")
+		Assert.assertTrue(new VariableParser("$_type_literal").getParameter()
 				.isForcedPlainLiteral());
 		Assert.assertTrue(new VariableParser("?_literal_literal")
-				.isForcedPlainLiteral());
+				.getParameter().isForcedPlainLiteral());
 
-		Assert.assertFalse(new VariableParser("$_literal_iri")
+		Assert.assertFalse(new VariableParser("$_literal_iri").getParameter()
 				.isForcedPlainLiteral());
-		Assert.assertFalse(new VariableParser("?_literal")
+		Assert.assertFalse(new VariableParser("?_literal").getParameter()
 				.isForcedPlainLiteral());
 	}
 
 	@Test
 	public void isForcedTypedLiteral() throws ParameterException {
-		
-		Assert.assertTrue(new VariableParser("?_name_rdf_HTML")
+
+		Assert.assertTrue(new VariableParser("?_name_rdf_HTML").getParameter()
 				.isForcedTypedLiteral());
-		Assert.assertTrue(new VariableParser("$_type_ex_bob")
+		Assert.assertTrue(new VariableParser("$_type_ex_bob").getParameter()
 				.isForcedTypedLiteral());
 		Assert.assertTrue(new VariableParser("?_literal_xsd_string")
+				.getParameter().isForcedTypedLiteral());
+
+		Assert.assertTrue(new VariableParser("?_param_string").getParameter()
+				.isForcedTypedLiteral());
+		Assert.assertTrue(new VariableParser("?_param_boolean").getParameter()
+				.isForcedTypedLiteral());
+		Assert.assertTrue(new VariableParser("?_param_int").getParameter()
+				.isForcedTypedLiteral());
+		Assert.assertTrue(new VariableParser("?_param_integer").getParameter()
 				.isForcedTypedLiteral());
 
-		Assert.assertTrue(new VariableParser("?_param_string")
+		Assert.assertFalse(new VariableParser("$_literal_xsd").getParameter()
 				.isForcedTypedLiteral());
-		Assert.assertTrue(new VariableParser("?_param_boolean")
-				.isForcedTypedLiteral());
-		Assert.assertTrue(new VariableParser("?_param_int")
-				.isForcedTypedLiteral());
-		Assert.assertTrue(new VariableParser("?_param_integer")
-				.isForcedTypedLiteral());
-
-		Assert.assertFalse(new VariableParser("$_literal_xsd")
-				.isForcedTypedLiteral());
-		Assert.assertFalse(new VariableParser("?_literal")
+		Assert.assertFalse(new VariableParser("?_literal").getParameter()
 				.isForcedTypedLiteral());
 	}
 
 	@Test
 	public void isPlain() throws ParameterException {
-		
-		Assert.assertTrue(new VariableParser("?_name").isPlain());
-		Assert.assertTrue(new VariableParser("?_name______").isPlain());
-		Assert.assertTrue(new VariableParser("?_name_accipicchia___")
+
+		Assert.assertTrue(new VariableParser("?_name").getParameter().isPlain());
+		Assert.assertTrue(new VariableParser("?_name______").getParameter()
 				.isPlain());
+		Assert.assertTrue(new VariableParser("?_name_accipicchia___")
+				.getParameter().isPlain());
 
 		Assert.assertFalse(new VariableParser("?_literal_xsd_string")
-				.isPlain());
+				.getParameter().isPlain());
 		Assert.assertFalse(new VariableParser("$_literal_xsd_string")
+				.getParameter().isPlain());
+		Assert.assertFalse(new VariableParser("$_iri_iri").getParameter()
 				.isPlain());
-		Assert.assertFalse(new VariableParser("$_iri_iri").isPlain());
-		Assert.assertFalse(new VariableParser("?_literal_iri").isPlain());
-		Assert.assertFalse(new VariableParser("?_rdf_html_html")
-				.isPlain()); // this is var named 'rdf' with datatype html:html
-								// ...
+		Assert.assertFalse(new VariableParser("?_literal_iri").getParameter()
+				.isPlain());
+		Assert.assertFalse(new VariableParser("?_rdf_html_html").getParameter()
+				.isPlain());
 	}
 
 	@Test
 	public void isForcedLangedLiteral() throws ParameterException {
-		
+
 		// True:
-		Assert.assertTrue(new VariableParser("?_name_en")
+		Assert.assertTrue(new VariableParser("?_name_en").getParameter()
 				.isForcedLangedLiteral());
-		Assert.assertTrue(new VariableParser("?_name_it")
+		Assert.assertTrue(new VariableParser("?_name_it").getParameter()
 				.isForcedLangedLiteral());
-		Assert.assertTrue(new VariableParser("?_name_es")
+		Assert.assertTrue(new VariableParser("?_name_es").getParameter()
 				.isForcedLangedLiteral());
-		Assert.assertTrue(new VariableParser("?_name_ab")
+		Assert.assertTrue(new VariableParser("?_name_ab").getParameter()
 				.isForcedLangedLiteral());
 		// False:
-		Assert.assertFalse(new VariableParser("?_name_abc")
+		Assert.assertFalse(new VariableParser("?_name_abc").getParameter()
 				.isForcedLangedLiteral());
-		Assert.assertFalse(new VariableParser("?_name_a")
+		Assert.assertFalse(new VariableParser("?_name_a").getParameter()
 				.isForcedLangedLiteral());
-		Assert.assertFalse(new VariableParser("?_name_literal")
+		Assert.assertFalse(new VariableParser("?_name_literal").getParameter()
 				.isForcedLangedLiteral());
-		Assert.assertFalse(new VariableParser("$_type_literal")
+		Assert.assertFalse(new VariableParser("$_type_literal").getParameter()
 				.isForcedLangedLiteral());
 		Assert.assertFalse(new VariableParser("?_literal_literal")
-				.isForcedLangedLiteral());
+				.getParameter().isForcedLangedLiteral());
 
-		Assert.assertFalse(new VariableParser("$_literal_iri")
+		Assert.assertFalse(new VariableParser("$_literal_iri").getParameter()
 				.isForcedPlainLiteral());
-		Assert.assertFalse(new VariableParser("?_literal")
+		Assert.assertFalse(new VariableParser("?_literal").getParameter()
 				.isForcedPlainLiteral());
 	}
-	
+
 	@Test
-	public void getDatatypePrefix() throws ParameterException{
-		Assert.assertTrue(new VariableParser("$_paramname_xsd_string").getDatatypePrefix().equals("xsd"));
-		Assert.assertTrue(new VariableParser("$_paramname_xsd_boolean").getDatatypePrefix().equals("xsd"));
-		Assert.assertTrue(new VariableParser("$_paramname_en_string").getDatatypePrefix().equals("en"));
-		Assert.assertTrue(new VariableParser("$_paramname_xsd_string").getDatatypePrefix().equals("xsd"));
+	public void getDatatype() throws ParameterException {
+		Assert.assertTrue(new VariableParser("$_paramname_xsd_string")
+				.getParameter().getDatatype()
+				.equals(XSDDatatype.XSDstring.getURI()));
+		Assert.assertTrue(new VariableParser("$_paramname_xsd_boolean")
+				.getParameter().getDatatype()
+				.equals(XSDDatatype.XSDboolean.getURI()));
+
+		Map<String, String> prefixes = new HashMap<String, String>();
+		prefixes.put("en", XSD.getURI());
+		Assert.assertTrue(new VariableParser("$_paramname_en_string", prefixes)
+				.getParameter().getDatatype()
+				.equals(XSDDatatype.XSDstring.getURI()));
 	}
 }

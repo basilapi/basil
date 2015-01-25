@@ -1,23 +1,97 @@
 package uk.ac.open.kmi.stoner.sparql;
 
-public interface QueryParameter {
 
-	public abstract boolean isNeat();
+public class QueryParameter {
 
-	public abstract String getParameterName() throws ParameterException;
+	private String name;
+	private boolean isForcedIri = false;
+	private boolean isForcedPlainLiteral = false;
+	private boolean isForcedLangedLiteral = false;
+	private boolean isForcedTypedLiteral = false;
+	private boolean isPlain = false;
+	private String lang = null;
+	private boolean isNeat = true;
+	private boolean isOptional;
+	private String datatype = null;
 
-	public abstract boolean isForcedIri() throws ParameterException;
+	public String getName() {
+		return name;
+	}
 
-	public abstract boolean isForcedTypedLiteral() throws ParameterException;
+	void setName(String name) {
+		this.name = name;
+	}
 
-	public abstract boolean isForcedPlainLiteral() throws ParameterException;
+	public boolean isForcedIri() {
+		return isForcedIri;
+	}
 
-	public abstract boolean isForcedLangedLiteral() throws ParameterException;
+	void setForcedIri(boolean isForcedIri) {
+		this.isForcedIri = isForcedIri;
+	}
 
-	public abstract boolean isPlain() throws ParameterException;
+	public boolean isForcedPlainLiteral() {
+		return isForcedPlainLiteral;
+	}
 
-	public abstract boolean isOptional() throws ParameterException;
+	void setForcedPlainLiteral(boolean isForcedPlainLiteral) {
+		this.isForcedPlainLiteral = isForcedPlainLiteral;
+	}
 
-	public abstract String getLang() throws ParameterException;
+	public boolean isForcedLangedLiteral() {
+		return isForcedLangedLiteral;
+	}
+
+	void setForcedLangedLiteral(boolean isForcedLangedLiteral) {
+		this.isForcedLangedLiteral = isForcedLangedLiteral;
+	}
+
+	public boolean isForcedTypedLiteral() {
+		return isForcedTypedLiteral;
+	}
+
+	void setForcedDatatype(boolean isForcedDatatype) {
+		this.isForcedTypedLiteral = isForcedDatatype;
+	}
+
+	public boolean isPlain() {
+		return isPlain;
+	}
+
+	void setPlain(boolean isPlain) {
+		this.isPlain = isPlain;
+	}
+
+	public String getLang() {
+		return lang;
+	}
+
+	void setLang(String lang) {
+		this.lang = lang;
+	}
+
+	public boolean isNeat() {
+		return isNeat;
+	}
+
+	void setNeat(boolean isNeat) {
+		this.isNeat = isNeat;
+	}
+
+	public boolean isOptional() {
+		return isOptional;
+	}
+
+	void setOptional(boolean isOptional) {
+		this.isOptional = isOptional;
+	}
+
+	public String getDatatype() {
+		return datatype;
+	}
+
+	void setDatatype(String datatype) {
+		this.datatype = datatype;
+	}
 
 }

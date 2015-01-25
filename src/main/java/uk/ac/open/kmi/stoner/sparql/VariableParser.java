@@ -1,48 +1,75 @@
 package uk.ac.open.kmi.stoner.sparql;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class VariableParser implements QueryParameter {
+import com.hp.hpl.jena.vocabulary.XSD;
 
+public class VariableParser {
 	private String variable;
-	private String name;
 	private boolean isParameter = false;
-	private boolean isForcedIri = false;
-	private boolean isForcedPlainLiteral = false;
-	private boolean isForcedLangedLiteral = false;
-	private boolean isForcedDatatype = false;
-	private boolean isPlain = false;
-	private String datatypePrefix = null;
-	private String lang = null;
-	private String datatypeLocalName = null;
-	private boolean isNeat = true;
-	private boolean isOptional;
+	private Map<String, String> prefixes;
+	private boolean isError = false;
+	private Exception exception = null;
+	private QueryParameter p = null;
 
 	public VariableParser(String variable) {
 		this.variable = variable;
-		Pattern p = Pattern
+		this.prefixes = new HashMap<String, String>();
+		this.prefixes.put("xsd", XSD.getURI());
+		try {
+			parse();
+		} catch (ParameterException e) {
+			this.exception = e;
+			this.isError = true;
+		}
+	}
+
+	public VariableParser(String variable, Map<String, String> prefixes) {
+		this.variable = variable;
+		this.prefixes = prefixes;
+		try {
+			parse();
+		} catch (ParameterException e) {
+			this.exception = e;
+			this.isError = true;
+		}
+	}
+
+	private void parse() throws ParameterException {
+		Pattern pt = Pattern
 				.compile("[\\$\\?]([_]{1,2})([^_]+)_?([a-zA-Z0-9]+)?_?([a-zA-Z0-9]+)?.*$");
-		Matcher m = p.matcher(this.variable);
+		Matcher m = pt.matcher(this.variable);
 		if (m.matches()) {
 			this.isParameter = true;
-			this.isOptional = m.group(1).length() == 2;
-			this.name = m.group(2);
+
+			this.p = new QueryParameter();
+			p.setOptional(m.group(1).length() == 2);
+			p.setName(m.group(2));
 			if (m.group(3) != null) {
 				if (m.group(3).toLowerCase().equals("iri")) {
-					this.isForcedIri = true;
+					p.setForcedIri(true);
 				} else if (m.group(3).toLowerCase().equals("literal")) {
-					this.isForcedPlainLiteral = true;
+					p.setForcedPlainLiteral(true);
 				} else if (m.group(3).length() == 2 && m.group(4) == null) {
 					// specifies lang
-					this.isForcedLangedLiteral = true;
-					this.lang = m.group(3).toLowerCase();
+					p.setForcedLangedLiteral(true);
+					p.setLang(m.group(3).toLowerCase());
 				} else if (m.group(4) != null) {
-					this.datatypePrefix = m.group(3);
-					this.datatypeLocalName = m.group(4);
-					this.isForcedDatatype = true;
+					String datatypePrefix = m.group(3);
+					String datatypeLocalName = m.group(4);
+					p.setForcedDatatype(true);
+					String namespace = prefixes.get(datatypePrefix);
+					if (namespace == null) {
+						throw new ParameterException("Unknown prefix: "
+								+ datatypePrefix);
+					} else {
+						p.setDatatype(namespace + datatypeLocalName);
+					}
 				} else {
 					// Let's check if group(3) is a well known XSD Datatype
 					Set<String> xsdDatatypes = new HashSet<String>();
@@ -61,18 +88,21 @@ public class VariableParser implements QueryParameter {
 					// ...
 					//
 					if (xsdDatatypes.contains(m.group(3))) {
-						this.datatypeLocalName = m.group(3);
-						this.datatypePrefix = "xsd";
-						this.isForcedDatatype = true;
+						String datatypeLocalName = m.group(3);
+						String datatype = XSD.getURI() + datatypeLocalName;
+						p.setForcedDatatype(true);
+						p.setDatatype(datatype);
 					} else {
 						// Let's guess what we can...
 						// XXX Maybe we should report why?
-						this.isNeat = false;
-						this.isPlain = true;
+						isError = true;
+						this.exception = new ParameterException(
+								"Cannot recognize parameter properties.");
+						p.setPlain(true);
 					}
 				}
 			} else {
-				this.isPlain = true;
+				p.setPlain(true);
 			}
 
 		} else {
@@ -84,118 +114,15 @@ public class VariableParser implements QueryParameter {
 		return isParameter;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isNeat()
-	 */
-	public boolean isNeat() {
-		return isNeat;
+	public QueryParameter getParameter() {
+		return p;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#getParameterName()
-	 */
-	public String getParameterName() throws ParameterException {
-		if (isParameter()) {
-			return this.name;
-		} else {
-			throw new ParameterException();
-		}
+	public boolean isError() {
+		return this.isError;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isForcedIri()
-	 */
-	public boolean isForcedIri() throws ParameterException {
-		if (isParameter()) {
-			return this.isForcedIri;
-		} else {
-			throw new ParameterException();
-		}
+	public Exception getException() {
+		return this.exception;
 	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isForcedTypedLiteral()
-	 */
-	public boolean isForcedTypedLiteral() throws ParameterException {
-		if (isParameter()) {
-			return this.isForcedDatatype;
-		} else {
-			throw new ParameterException();
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isForcedPlainLiteral()
-	 */
-	public boolean isForcedPlainLiteral() throws ParameterException {
-		if (isParameter()) {
-			return this.isForcedPlainLiteral;
-		} else {
-			throw new ParameterException();
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isForcedLangedLiteral()
-	 */
-	public boolean isForcedLangedLiteral() throws ParameterException {
-		if (isParameter()) {
-			return this.isForcedLangedLiteral;
-		} else {
-			throw new ParameterException();
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isPlain()
-	 */
-	public boolean isPlain() throws ParameterException {
-		if (isParameter()) {
-			return this.isPlain;
-		} else {
-			throw new ParameterException();
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#isOptional()
-	 */
-	public boolean isOptional() throws ParameterException {
-		if (isParameter()) {
-			return this.isOptional;
-		} else {
-			throw new ParameterException();
-		}
-	}
-
-	public String getDatatypePrefix() throws ParameterException {
-		if (isParameter() && this.datatypePrefix != null) {
-			return this.datatypePrefix;
-		} else {
-			throw new ParameterException(
-					"Not that kind of parameter: datatype prefix is missing.");
-		}
-	}
-
-	public String getDatatypeLocalName() throws ParameterException {
-		if (isParameter() && this.datatypeLocalName != null) {
-			return this.datatypeLocalName;
-		} else {
-			throw new ParameterException(
-					"Not that kind of parameter: datatype local name is missing.");
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.open.kmi.stoner.sparql.QueryParameter#getLang()
-	 */
-	public String getLang() throws ParameterException {
-		if (isParameter() && this.lang != null) {
-			return this.lang;
-		} else {
-			throw new ParameterException(
-					"Not that kind of parameter: lang is missing.");
-		}
-	}
-
 }
