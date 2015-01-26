@@ -52,9 +52,9 @@ public class VariableParser {
 			p.setName(m.group(2));
 			if (m.group(3) != null) {
 				if (m.group(3).toLowerCase().equals("iri")) {
-					p.setForcedIri();
+					p.setIri();
 				} else if (m.group(3).toLowerCase().equals("literal")) {
-					p.setForcedPlainLiteral();
+					p.setPlainLiteral();
 				} else if (m.group(3).length() == 2 && m.group(4) == null) {
 					// specifies lang
 					p.setLang(m.group(3).toLowerCase());

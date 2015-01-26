@@ -96,56 +96,56 @@ public class VariableParserTest {
 	public void isForcedIri() throws ParameterException {
 		// True
 		Assert.assertTrue(new VariableParser("?_name_iri").getParameter()
-				.isForcedIri());
+				.isIri());
 		Assert.assertTrue(new VariableParser("?_name_iri_").getParameter()
-				.isForcedIri());
+				.isIri());
 		Assert.assertTrue(new VariableParser("?_name_iri_____").getParameter()
-				.isForcedIri());
+				.isIri());
 		// False
 		Assert.assertFalse(new VariableParser("?_name_literal").getParameter()
-				.isForcedIri());
+				.isIri());
 		Assert.assertFalse(new VariableParser("?_name").getParameter()
-				.isForcedIri());
+				.isIri());
 		Assert.assertFalse(new VariableParser("?_name_string").getParameter()
-				.isForcedIri());
+				.isIri());
 		Assert.assertFalse(new VariableParser("?_name_xsd_iri").getParameter()
-				.isForcedIri());
+				.isIri());
 	}
 
 	@Test
 	public void isForcedLiteral() throws ParameterException {
 		Assert.assertTrue(new VariableParser("?_name_literal").getParameter()
-				.isForcedPlainLiteral());
+				.isPlainLiteral());
 		Assert.assertTrue(new VariableParser("$_type_literal").getParameter()
-				.isForcedPlainLiteral());
+				.isPlainLiteral());
 		Assert.assertTrue(new VariableParser("?_literal_literal")
-				.getParameter().isForcedPlainLiteral());
+				.getParameter().isPlainLiteral());
 
 		Assert.assertFalse(new VariableParser("$_literal_iri").getParameter()
-				.isForcedPlainLiteral());
+				.isPlainLiteral());
 		Assert.assertFalse(new VariableParser("?_literal").getParameter()
-				.isForcedPlainLiteral());
+				.isPlainLiteral());
 	}
 
 	@Test
 	public void isForcedTypedLiteral() throws ParameterException {
 
 		Assert.assertTrue(new VariableParser("?_literal_xsd_string")
-				.getParameter().isForcedTypedLiteral());
+				.getParameter().isTypedLiteral());
 
 		Assert.assertTrue(new VariableParser("?_param_string").getParameter()
-				.isForcedTypedLiteral());
+				.isTypedLiteral());
 		Assert.assertTrue(new VariableParser("?_param_boolean").getParameter()
-				.isForcedTypedLiteral());
+				.isTypedLiteral());
 		Assert.assertTrue(new VariableParser("?_param_int").getParameter()
-				.isForcedTypedLiteral());
+				.isTypedLiteral());
 		Assert.assertTrue(new VariableParser("?_param_integer").getParameter()
-				.isForcedTypedLiteral());
+				.isTypedLiteral());
 
 		Assert.assertFalse(new VariableParser("$_literal_xsd").getParameter()
-				.isForcedTypedLiteral());
+				.isTypedLiteral());
 		Assert.assertFalse(new VariableParser("?_literal").getParameter()
-				.isForcedTypedLiteral());
+				.isTypedLiteral());
 		
 		// Undefined prefixes
 		Assert.assertTrue(new VariableParser("?_name_rdf_HTML").isError());
@@ -179,29 +179,29 @@ public class VariableParserTest {
 
 		// True:
 		Assert.assertTrue(new VariableParser("?_name_en").getParameter()
-				.isForcedLangedLiteral());
+				.isLangedLiteral());
 		Assert.assertTrue(new VariableParser("?_name_it").getParameter()
-				.isForcedLangedLiteral());
+				.isLangedLiteral());
 		Assert.assertTrue(new VariableParser("?_name_es").getParameter()
-				.isForcedLangedLiteral());
+				.isLangedLiteral());
 		Assert.assertTrue(new VariableParser("?_name_ab").getParameter()
-				.isForcedLangedLiteral());
+				.isLangedLiteral());
 		// False:
 		Assert.assertFalse(new VariableParser("?_name_abc").getParameter()
-				.isForcedLangedLiteral());
+				.isLangedLiteral());
 		Assert.assertFalse(new VariableParser("?_name_a").getParameter()
-				.isForcedLangedLiteral());
+				.isLangedLiteral());
 		Assert.assertFalse(new VariableParser("?_name_literal").getParameter()
-				.isForcedLangedLiteral());
+				.isLangedLiteral());
 		Assert.assertFalse(new VariableParser("$_type_literal").getParameter()
-				.isForcedLangedLiteral());
+				.isLangedLiteral());
 		Assert.assertFalse(new VariableParser("?_literal_literal")
-				.getParameter().isForcedLangedLiteral());
+				.getParameter().isLangedLiteral());
 
 		Assert.assertFalse(new VariableParser("$_literal_iri").getParameter()
-				.isForcedPlainLiteral());
+				.isPlainLiteral());
 		Assert.assertFalse(new VariableParser("?_literal").getParameter()
-				.isForcedPlainLiteral());
+				.isPlainLiteral());
 	}
 
 	@Test

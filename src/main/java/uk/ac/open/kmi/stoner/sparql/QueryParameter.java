@@ -8,9 +8,6 @@ public class QueryParameter implements Serializable {
 		IRI, TypedLiteral, LangedLiteral, PlainLiteral, Mixed
 	}
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6725251315049248905L;
 	private String name;
 	private String lang = null;
@@ -26,26 +23,25 @@ public class QueryParameter implements Serializable {
 		this.name = name;
 	}
 
-	public boolean isForcedIri() {
+	public boolean isIri() {
 		return type == Type.IRI;
 	}
 
-	void setForcedIri() {
+	void setIri() {
 		this.type = Type.IRI;
-		//
 		this.datatype = null;
 		this.lang = null;
 	}
 
-	public boolean isForcedPlainLiteral() {
+	public boolean isPlainLiteral() {
 		return type == Type.PlainLiteral;
 	}
 
-	public boolean isForcedLangedLiteral() {
+	public boolean isLangedLiteral() {
 		return type == Type.LangedLiteral;
 	}
 
-	public boolean isForcedTypedLiteral() {
+	public boolean isTypedLiteral() {
 		return type == Type.TypedLiteral;
 	}
 
@@ -55,7 +51,6 @@ public class QueryParameter implements Serializable {
 
 	void setMixed() {
 		this.type = Type.Mixed;
-
 		this.datatype = null;
 		this.lang = null;
 	}
@@ -67,7 +62,6 @@ public class QueryParameter implements Serializable {
 	void setLang(String lang) {
 		this.lang = lang;
 		this.type = Type.LangedLiteral;
-		//
 		this.datatype = null;
 	}
 
@@ -86,13 +80,11 @@ public class QueryParameter implements Serializable {
 	void setDatatype(String datatype) {
 		this.datatype = datatype;
 		this.type = Type.TypedLiteral;
-		//
 		this.lang = null;
 	}
 
-	public void setForcedPlainLiteral() {
+	public void setPlainLiteral() {
 		this.type = Type.PlainLiteral;
-		//
 		this.datatype = null;
 		this.lang = null;
 	}
