@@ -11,9 +11,14 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileStoreTest {
 
+	private static Logger log = LoggerFactory
+			.getLogger(FileStoreTest.class);
+	
 	private FileStore store;
 	private static File home;
 
@@ -28,6 +33,7 @@ public class FileStoreTest {
 
 	@Before
 	public void before() {
+		log.info("{}", testName.getMethodName());
 		store = new FileStore(home);
 	}
 
@@ -60,8 +66,6 @@ public class FileStoreTest {
 
 		Assert.assertTrue(spec.getEndpoint().equals(spec2.getEndpoint()));
 		Assert.assertTrue(spec.getQuery().equals(spec2.getQuery()));
-		
-		// FIXME Check the query parameters
-		//Assert.assertTrue(spec.getParameters().iterator().next().equals(spec2.getParameters().iterator().next()));
+		Assert.assertTrue(spec.getParameters().iterator().next().equals(spec2.getParameters().iterator().next()));
 	}
 }

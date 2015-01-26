@@ -4,20 +4,20 @@ import java.io.Serializable;
 
 public class QueryParameter implements Serializable {
 
+	public enum Type{
+		IRI, TypedLiteral, LangedLiteral, PlainLiteral, Mixed
+	}
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6725251315049248905L;
 	private String name;
-	private boolean isForcedIri = false;
-	private boolean isForcedPlainLiteral = false;
-	private boolean isForcedLangedLiteral = false;
-	private boolean isForcedTypedLiteral = false;
-	private boolean isPlain = false;
 	private String lang = null;
 	private boolean isOptional;
 	private String datatype = null;
-
+	private Type type = null;
+	
 	public String getName() {
 		return name;
 	}
@@ -27,44 +27,37 @@ public class QueryParameter implements Serializable {
 	}
 
 	public boolean isForcedIri() {
-		return isForcedIri;
+		return type == Type.IRI;
 	}
 
-	void setForcedIri(boolean isForcedIri) {
-		this.isForcedIri = isForcedIri;
+	void setForcedIri() {
+		this.type = Type.IRI;
 		//
 		this.datatype = null;
 		this.lang = null;
-		this.isForcedLangedLiteral = false;
-		this.isForcedPlainLiteral = false;
-		this.isForcedTypedLiteral = false;
 	}
 
 	public boolean isForcedPlainLiteral() {
-		return isForcedPlainLiteral;
+		return type == Type.PlainLiteral;
 	}
 
 	public boolean isForcedLangedLiteral() {
-		return isForcedLangedLiteral;
+		return type == Type.LangedLiteral;
 	}
 
 	public boolean isForcedTypedLiteral() {
-		return isForcedTypedLiteral;
+		return type == Type.TypedLiteral;
 	}
 
-	public boolean isPlain() {
-		return isPlain;
+	public boolean isMixed() {
+		return type == Type.Mixed;
 	}
 
-	void setPlain(boolean isPlain) {
-		this.isPlain = isPlain;
+	void setMixed() {
+		this.type = Type.Mixed;
 
 		this.datatype = null;
 		this.lang = null;
-		this.isForcedLangedLiteral = false;
-		this.isForcedIri = false;
-		this.isForcedTypedLiteral = false;
-		this.isForcedPlainLiteral = false;
 	}
 
 	public String getLang() {
@@ -73,13 +66,9 @@ public class QueryParameter implements Serializable {
 
 	void setLang(String lang) {
 		this.lang = lang;
-		this.isForcedLangedLiteral = true;
+		this.type = Type.LangedLiteral;
 		//
 		this.datatype = null;
-		this.isForcedIri = false;
-		this.isForcedPlainLiteral = false;
-		this.isForcedTypedLiteral = false;
-
 	}
 
 	public boolean isOptional() {
@@ -96,22 +85,22 @@ public class QueryParameter implements Serializable {
 
 	void setDatatype(String datatype) {
 		this.datatype = datatype;
-		this.isForcedTypedLiteral = true;
+		this.type = Type.TypedLiteral;
 		//
-		this.isForcedLangedLiteral = false;
-		this.isForcedIri = false;
-		this.isForcedPlainLiteral = false;
 		this.lang = null;
 	}
 
-	public void setForcedPlainLiteral(boolean b) {
-		this.isForcedPlainLiteral = true;
+	public void setForcedPlainLiteral() {
+		this.type = Type.PlainLiteral;
 		//
-		this.isForcedLangedLiteral = false;
-		this.isForcedTypedLiteral = false;
-		this.isForcedIri = false;
 		this.datatype = null;
 		this.lang = null;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof QueryParameter) &&
+				(((QueryParameter)obj).type.equals(this.type)) &&
+				(((QueryParameter)obj).getName().equals(this.getName()));
+	}
 }

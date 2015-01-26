@@ -156,22 +156,22 @@ public class VariableParserTest {
 	@Test
 	public void isPlain() throws ParameterException {
 
-		Assert.assertTrue(new VariableParser("?_name").getParameter().isPlain());
+		Assert.assertTrue(new VariableParser("?_name").getParameter().isMixed());
 		Assert.assertTrue(new VariableParser("?_name______").getParameter()
-				.isPlain());
+				.isMixed());
 		Assert.assertTrue(new VariableParser("?_name_accipicchia___")
-				.getParameter().isPlain());
+				.getParameter().isMixed());
 
 		Assert.assertFalse(new VariableParser("?_literal_xsd_string")
-				.getParameter().isPlain());
+				.getParameter().isMixed());
 		Assert.assertFalse(new VariableParser("$_literal_xsd_string")
-				.getParameter().isPlain());
+				.getParameter().isMixed());
 		Assert.assertFalse(new VariableParser("$_iri_iri").getParameter()
-				.isPlain());
+				.isMixed());
 		Assert.assertFalse(new VariableParser("?_literal_iri").getParameter()
-				.isPlain());
+				.isMixed());
 		Assert.assertFalse(new VariableParser("?_rdf_html_html").getParameter()
-				.isPlain());
+				.isMixed());
 	}
 
 	@Test
