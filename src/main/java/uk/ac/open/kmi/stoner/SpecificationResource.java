@@ -1,5 +1,8 @@
 package uk.ac.open.kmi.stoner;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
@@ -10,25 +13,24 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.open.kmi.stoner.sparql.Specification;
+import uk.ac.open.kmi.stoner.sparql.SpecificationFactory;
+import uk.ac.open.kmi.stoner.store.Store;
+
 @Path("/")
-public class SpecificationResource {
+public class SpecificationResource extends AbstractResource {
 
 	private static Logger log = LoggerFactory
 			.getLogger(SpecificationResource.class);
-
-	@Context
-	HttpHeaders requestHeaders;
-
-	@Context
-	UriInfo requestUri;
 
 	/**
 	 * Creates a new API
@@ -38,20 +40,50 @@ public class SpecificationResource {
 	 */
 	@PUT
 	@Produces("text/plain")
-	public Response put(String body) {
+	public Response put(@QueryParam("endpoint") String endpoint, String body) {
 		log.trace("Called PUT");
+		String id = shortUUID();
+		return doPUT(id, body);
+	}
 
-		// If body is empty
+	private Response doPUT(String id, String body) {
+
 		if (body.equals("")) {
-			return Response.serverError()
+			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 					.header(Headers.Error, "Body cannot be empty").build();
 		}
-		
-		// XXX Not Implemented
-		return Response.status(501).entity("Not implemented yet\n").build();
-		
-//		return Response.created(
-//				URI.create(requestUri.getBaseUri() + shortUUID())).build();
+
+		String endpoint = getStonerParameter(
+				Headers.asParameter(Headers.Endpoint), true);
+
+		Specification specification = SpecificationFactory.create(endpoint,
+				body);
+		Store data = getDataStore();
+		boolean created = true;
+		if (data.existsSpec(id)) {
+			created = false;
+		}
+		try {
+			data.saveSpec(id, specification);
+		} catch (IOException e) {
+			throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+		}
+
+		URI api = requestUri.getBaseUriBuilder().path(id).build();
+		URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
+		log.info((created ? "Created" : "Replaced") + " spec at: {}", spec);
+		ResponseBuilder response;
+		if (created) {
+			response = Response.created(api).entity(
+					"Created: " + api.toString() + "\n");
+		} else {
+			response = Response.ok(spec).entity(
+					"Replaced: " + spec.toString() + "/spec\n");
+		}
+
+		addHeaders(response, id);
+
+		return response.build();
 	}
 
 	/**
@@ -62,16 +94,13 @@ public class SpecificationResource {
 	 * @return
 	 */
 	@PUT
-	@Path("{id:(.+)}/spec")
+	@Path("{id:([^/]+)}/spec")
 	@Produces("text/plain")
 	public Response replaceSpec(@PathParam(value = "id") String id, String body) {
 		log.trace("Called PUT with id: {}", id);
-
-		// XXX Not Implemented
-		return Response.status(501).entity("Not implemented yet\n").build();
-		
+		return doPUT(id, body);
 	}
-	
+
 	/**
 	 * Gets the spec of an API.
 	 * 
@@ -79,32 +108,66 @@ public class SpecificationResource {
 	 * @return
 	 */
 	@GET
-	@Path("{id:(.+)}/spec")
+	@Path("{id:([^/]+)}/spec")
 	@Produces("text/plain")
 	public Response getSpec(@PathParam(value = "id") String id) {
 		log.trace("Called GET spec with id: {}", id);
+		try {
 
-		// XXX Not Implemented
-		return Response.status(501).entity("Not implemented yet\n").build();
-		
+			Store store = getDataStore();
+			if (!store.existsSpec(id)) {
+				return Response.status(Status.NOT_FOUND).build();
+			}
+
+			Specification spec = store.loadSpec(id);
+			ResponseBuilder response = Response.ok();
+			response.header(Headers.Endpoint, spec.getEndpoint());
+			addHeaders(response, id);
+			response.entity(spec.getQuery());
+
+			return response.build();
+		} catch (Exception e) {
+			log.error("An error occurred", e);
+			throw new WebApplicationException(Response
+					.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					.entity(e.getMessage()).build());
+		}
 	}
-	
+
+	/**
+	 * Gets the stone (redirects to api).
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Path("{id:([^/]+)}")
+	@Produces("text/plain")
+	public Response getId(@PathParam(value = "id") String id) {
+		log.trace("Called GET with id: {}", id);
+		ResponseBuilder r = Response.seeOther(requestUri.getBaseUriBuilder()
+				.path(id).path("api").build());
+		addHeaders(r, id);
+		return r.build();
+	}
+
 	/**
 	 * Updates the spec of an API
+	 * 
 	 * @param id
 	 * @return
 	 */
 	@POST
-	@Path("{id:(.+)}/spec")
+	@Path("{id:([^/]+)}/spec")
 	@Produces("text/plain")
 	public Response updateSpec(@PathParam(value = "id") String id) {
 		log.trace("Called POST spec with id: {}", id);
 
 		// XXX Not Implemented
 		return Response.status(501).entity("Not implemented yet\n").build();
-		
+
 	}
-	
+
 	/**
 	 * Delete an API
 	 * 
@@ -112,28 +175,32 @@ public class SpecificationResource {
 	 * @return
 	 */
 	@DELETE
-	@Path("{id:(.+)}/spec")
+	@Path("{id:([^/]+)}/spec")
 	@Produces("text/plain")
 	public Response deleteSpec(@PathParam(value = "id") String id) {
 		log.trace("Called DELETE spec with id: {}", id);
 
 		// XXX Not Implemented
 		return Response.status(501).entity("Not implemented yet\n").build();
-		
+
 	}
 
 	/**
-	 * List APIs
+	 * List stones
 	 * 
 	 * @return
 	 */
 	@GET
 	@Produces("text/plain")
-	public Response list() {
+	public String list() {
 		log.trace("Called GET");
-		
-		// XXX Not Implemented
-		return Response.status(501).entity("Not implemented yet\n").build();
+		Store data = getDataStore();
+		StringBuilder sb = new StringBuilder();
+		for (String stone : data.listSpecs()) {
+			sb.append(requestUri.getBaseUriBuilder().path(stone));
+			sb.append("\n");
+		}
+		return sb.toString();
 	}
 
 	/**

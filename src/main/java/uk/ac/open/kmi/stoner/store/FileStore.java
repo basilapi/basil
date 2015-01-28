@@ -7,11 +7,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.stoner.sparql.Specification;
 
 public class FileStore implements Store {
-
+	private Logger log = LoggerFactory.getLogger(FileStore.class);
 	private File home;
 
 	public FileStore(File home) {
@@ -27,6 +32,7 @@ public class FileStore implements Store {
 	}
 
 	void write(String id, Serializable o, String ext) throws IOException {
+		log.trace("writing {}", id);
 		try {
 			File file = getFile(id, ext);
 			FileOutputStream fileOut = new FileOutputStream(file);
@@ -41,6 +47,7 @@ public class FileStore implements Store {
 
 	Object read(String id, String ext) throws IOException,
 			ClassNotFoundException {
+		log.trace("reading {}", id);
 		try {
 			Object o;
 			File file = getFile(id, ext);
@@ -69,5 +76,24 @@ public class FileStore implements Store {
 
 	public void saveSpec(String id, Specification spec) throws IOException {
 		write(id, spec, "spec");
+	}
+
+	public boolean existsSpec(String id) {
+		try {
+			return getFile(id, "spec").exists();
+		} catch (IOException e) {
+			log.error("cannot test file: {}", id);
+			return false;
+		}
+	}
+
+	public List<String> listSpecs() {
+		List<String> specs = new ArrayList<String>();
+		for (File f : org.apache.commons.io.FileUtils.listFiles(home,
+				new String[] { "spec" }, false)) {
+			specs.add(f.getName()
+					.substring(0, f.getName().lastIndexOf('.')));
+		}
+		return specs;
 	}
 }

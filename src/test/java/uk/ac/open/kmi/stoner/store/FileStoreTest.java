@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -37,9 +39,12 @@ public class FileStoreTest {
 	}
 
 	@Before
-	public void before() {
+	public void before() throws IOException {
 		log.info("{}", testName.getMethodName());
+		FileUtils.deleteDirectory(home);
+		home.mkdirs();
 		store = new FileStore(home);
+		
 	}
 
 	@Rule
@@ -82,6 +87,26 @@ public class FileStoreTest {
 		Assert.assertTrue(spec.getQuery().equals(spec2.getQuery()));
 		Assert.assertTrue(spec.getParameters().iterator().next()
 				.equals(spec2.getParameters().iterator().next()));
+	}
+
+	@Test
+	public void saveAndListSpec() throws IOException {
+		Specification spec = SpecificationFactory.create(
+				"http://data.open.ac.uk/sparql",
+				"SELECT * WHERE {?X a ?_type_iri}");
+		store.saveSpec("myspecid", spec);
+		store.saveSpec("myspecid2", spec);
+		store.saveSpec("myspecid3", spec);
+		store.saveSpec("myspecid4", spec);
+		List<String> stones = store.listSpecs();
+		for (String id : stones) {
+			log.debug(" - {}", id);
+		}
+		Assert.assertTrue(stones.size() == 4);
+		stones.contains("myspecid");
+		stones.contains("myspecid2");
+		stones.contains("myspecid3");
+		stones.contains("myspecid4");
 	}
 
 }
