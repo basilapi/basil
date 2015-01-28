@@ -16,13 +16,13 @@ import uk.ac.open.kmi.stoner.store.Store;
 public class AbstractResource {
 
 	@Context
-	HttpHeaders requestHeaders;
+	protected HttpHeaders requestHeaders;
 
 	@Context
-	UriInfo requestUri;
+	protected UriInfo requestUri;
 
 	@Context
-	ServletContext context;
+	protected ServletContext context;
 
 	protected final ResponseBuilder addHeaders(ResponseBuilder builder,
 			String id) {
