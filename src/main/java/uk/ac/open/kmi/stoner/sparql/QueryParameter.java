@@ -4,17 +4,17 @@ import java.io.Serializable;
 
 public class QueryParameter implements Serializable {
 
-	public enum Type{
+	public enum Type {
 		IRI, TypedLiteral, LangedLiteral, PlainLiteral
 	}
-	
+
 	private static final long serialVersionUID = 6725251315049248905L;
 	private String name;
 	private String lang = null;
 	private boolean isOptional;
 	private String datatype = null;
-	private Type type = null;
-	
+	private Type type = Type.PlainLiteral; // defaults to plain literal
+
 	public String getName() {
 		return name;
 	}
@@ -81,8 +81,15 @@ public class QueryParameter implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		return (obj instanceof QueryParameter) &&
-				(((QueryParameter)obj).type.equals(this.type)) &&
-				(((QueryParameter)obj).getName().equals(this.getName()));
+		boolean eq = (obj instanceof QueryParameter)
+				&& (((QueryParameter) obj).type.equals(this.type))
+				&& (((QueryParameter) obj).getName().equals(this.getName()));
+		if (this.isLangedLiteral()) {
+			return this.getLang().equals((((QueryParameter) obj).getLang()));
+		} else if (this.isTypedLiteral()) {
+			return this.getDatatype().equals(
+					((QueryParameter) obj).getDatatype());
+		}
+		return eq;
 	}
 }
