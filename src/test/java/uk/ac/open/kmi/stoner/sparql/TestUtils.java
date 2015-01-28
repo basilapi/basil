@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 
+import uk.ac.open.kmi.stoner.sparql.QueryParameter.Type;
+
 public class TestUtils {
 
 	private static String loadQueryString(String qname) throws IOException {
@@ -21,5 +23,21 @@ public class TestUtils {
 		String sparql = loadQueryString(fileName);
 		String endpoint = endpoint(sparql);
 		return SpecificationFactory.create(endpoint, sparql);
+	}
+
+	public static QueryParameter buildQueryParameter(String name, Type type,
+			String lang, String datatype) {
+		QueryParameter qp = new QueryParameter();
+		qp.setName(name);
+		if (type == Type.IRI) {
+			qp.setIri();
+		} else if (type == Type.TypedLiteral) {
+			qp.setDatatype(datatype);
+		} else if (type == Type.LangedLiteral) {
+			qp.setLang(lang);
+		} else if (type == Type.PlainLiteral) {
+			qp.setPlainLiteral();
+		}
+		return qp;
 	}
 }

@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.stoner.sparql;
+package uk.ac.open.kmi.stoner.store;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,7 +8,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public class FileStore {
+import uk.ac.open.kmi.stoner.sparql.Specification;
+
+public class FileStore implements Store {
 
 	private File home;
 
@@ -16,17 +18,17 @@ public class FileStore {
 		this.home = home;
 	}
 
-	private File getFile(String id) throws IOException {
+	protected File getFile(String id, String ext) throws IOException {
 		if (!home.isDirectory()) {
 			throw new IOException("Not a directory: " + home);
 		}
-		File newFile = new File(home, id + ".ser");
+		File newFile = new File(home, id + "." + ext);
 		return newFile;
 	}
 
-	public void write(String id, Serializable o) throws IOException {
+	void write(String id, Serializable o, String ext) throws IOException {
 		try {
-			File file = getFile(id);
+			File file = getFile(id, ext);
 			FileOutputStream fileOut = new FileOutputStream(file);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(o);
@@ -37,10 +39,11 @@ public class FileStore {
 		}
 	}
 
-	public Object read(String id) throws IOException, ClassNotFoundException {
+	Object read(String id, String ext) throws IOException,
+			ClassNotFoundException {
 		try {
 			Object o;
-			File file = getFile(id);
+			File file = getFile(id, ext);
 			FileInputStream fileIn = new FileInputStream(file);
 			ObjectInputStream in = new ObjectInputStream(fileIn);
 			o = in.readObject();
@@ -52,5 +55,19 @@ public class FileStore {
 		} catch (ClassNotFoundException c) {
 			throw c;
 		}
+	}
+
+	public Specification loadSpec(String id) throws IOException {
+		try {
+			return (Specification) read(id, "spec");
+		} catch (ClassNotFoundException e) {
+			throw new IOException(e);
+		} catch (IOException e) {
+			throw e;
+		}
+	}
+
+	public void saveSpec(String id, Specification spec) throws IOException {
+		write(id, spec, "spec");
 	}
 }
