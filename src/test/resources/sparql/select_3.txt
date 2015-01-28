@@ -1,3 +1,4 @@
+# X-Stoner-Endpoint: http://data.open.ac.uk/sparql
 PREFIX dc: <http://purl.org/dc/terms/>
 PREFIX dc11: <http://purl.org/dc/elements/1.1/>
 PREFIX oucourse: <http://data.open.ac.uk/courses/ontology/>
@@ -24,7 +25,7 @@ FROM <http://data.open.ac.uk/context/xcri>
 WHERE
 {
 ?x a xcri:course .
-?x xcri:internalID ?code .
+?x xcri:internalID ?_code_literal .
 ?x dc11:title ?title .
 ?x mlo:url ?url .
 ?x mlo:specifies/xcri:applyUntil ?apply .

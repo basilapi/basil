@@ -11,7 +11,8 @@ public class Specification implements Serializable {
 
 	private String endpoint;
 	private String query;
-	private Map<String, QueryParameter> mappings = new HashMap<String, QueryParameter>();
+	private Map<String, QueryParameter> variablesParameters = new HashMap<String, QueryParameter>();
+	private Map<String, String> parametersVariables = new HashMap<String, String>();
 
 	public String getEndpoint() {
 		return endpoint;
@@ -30,18 +31,30 @@ public class Specification implements Serializable {
 	}
 
 	public Collection<QueryParameter> getParameters() {
-		return Collections.unmodifiableCollection(mappings.values());
+		return Collections.unmodifiableCollection(variablesParameters.values());
 	}
 
 	void map(String variable, QueryParameter parameter) {
-		this.mappings.put(variable, parameter);
+		this.variablesParameters.put(variable, parameter);
+		this.parametersVariables.put(parameter.getName(), variable);
 	}
-	
-	public QueryParameter getParameter(String name){
-		return mappings.get(name);
+
+	public QueryParameter getParameter(String name) {
+		return variablesParameters.get(parametersVariables.get(name));
 	}
-	
-	public boolean hasParameter(String name){
-		return mappings.containsKey(name);
+
+	public QueryParameter getParameterOfVariable(String variable) {
+		return variablesParameters.get(variable);
+	}
+	public String getVariableOfParameter(String param) {
+		return parametersVariables.get(param);
+	}
+
+	public boolean hasParameter(String name) {
+		return parametersVariables.containsKey(name);
+	}
+
+	public boolean hasVariable(String name) {
+		return variablesParameters.containsKey(name);
 	}
 }

@@ -72,7 +72,7 @@ public class VariablesCollectorTest {
 	public void select_3() throws IOException {
 		Set<String> vars = extractVars(loadQuery(testName.getMethodName()));
 		Assert.assertTrue(vars.contains("?x"));
-        Assert.assertTrue(vars.contains("?code"));
+        Assert.assertTrue(vars.contains("?_code_literal"));
         Assert.assertTrue(vars.contains("?title"));
         Assert.assertTrue(vars.contains("?url"));
         Assert.assertTrue(vars.contains("?apply"));
@@ -84,7 +84,6 @@ public class VariablesCollectorTest {
 	@Test
 	public void select_4() throws IOException {
 		Set<String> vars = extractVars(loadQuery(testName.getMethodName()));
-		Assert.assertTrue(vars.contains("?x"));
-        Assert.assertTrue(vars.contains("?y"));
+		Assert.assertTrue(vars.contains("?_x_iri"));
 	}
 }

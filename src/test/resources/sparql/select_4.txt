@@ -1,3 +1,4 @@
+# X-Stoner-Endpoint: http://data.open.ac.uk/sparql
 PREFIX dc: <http://purl.org/dc/terms/>
 PREFIX dc11: <http://purl.org/dc/elements/1.1/>
 PREFIX oucourse: <http://data.open.ac.uk/courses/ontology/>
@@ -11,14 +12,13 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX cm: <http://purl.org/net/cm/>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
-SELECT *
+SELECT DISTINCT ?type
 WHERE {
- FILTER (?x = ?y) .
  SERVICE <http://dbpedia.org/sparql> {
-    ?x a owl:Class
+    ?_x_iri a ?type
  } . 
  SERVICE <http://data.open.ac.uk/sparql>{
-    ?y a owl:Class
+    ?_x_iri a ?type
  } . 
  
 }

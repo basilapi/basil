@@ -1,4 +1,4 @@
-#
+# X-Stoner-Endpoint: http://data.open.ac.uk/sparql
 #
 # "earthquake"
 
