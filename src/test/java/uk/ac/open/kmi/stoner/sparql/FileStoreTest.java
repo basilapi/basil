@@ -47,10 +47,8 @@ public class FileStoreTest {
 		param.setName("param1");
 		param.setLang("en");
 		store.write(testName.getMethodName(), param);
-
 		QueryParameter param2 = (QueryParameter) store.read(testName
 				.getMethodName());
-		//
 		Assert.assertTrue(param2.getName().equals(param.getName()));
 	}
 
@@ -61,9 +59,7 @@ public class FileStoreTest {
 				"SELECT * WHERE {?X a ?_type_iri}");
 		
 		store.write(testName.getMethodName(), spec);
-		//
 		Specification spec2 = (Specification) store.read(testName.getMethodName());
-
 		Assert.assertTrue(spec.getEndpoint().equals(spec2.getEndpoint()));
 		Assert.assertTrue(spec.getQuery().equals(spec2.getQuery()));
 		Assert.assertTrue(spec.getParameters().iterator().next().equals(spec2.getParameters().iterator().next()));

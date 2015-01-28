@@ -93,7 +93,7 @@ public class VariableParserTest {
 	}
 
 	@Test
-	public void isForcedIri() throws ParameterException {
+	public void isIri() throws ParameterException {
 		// True
 		Assert.assertTrue(new VariableParser("?_name_iri").getParameter()
 				.isIri());
@@ -104,8 +104,7 @@ public class VariableParserTest {
 		// False
 		Assert.assertFalse(new VariableParser("?_name_literal").getParameter()
 				.isIri());
-		Assert.assertFalse(new VariableParser("?_name").getParameter()
-				.isIri());
+		Assert.assertFalse(new VariableParser("?_name").getParameter().isIri());
 		Assert.assertFalse(new VariableParser("?_name_string").getParameter()
 				.isIri());
 		Assert.assertFalse(new VariableParser("?_name_xsd_iri").getParameter()
@@ -113,22 +112,23 @@ public class VariableParserTest {
 	}
 
 	@Test
-	public void isForcedLiteral() throws ParameterException {
+	public void isLiteral() throws ParameterException {
 		Assert.assertTrue(new VariableParser("?_name_literal").getParameter()
 				.isPlainLiteral());
 		Assert.assertTrue(new VariableParser("$_type_literal").getParameter()
 				.isPlainLiteral());
 		Assert.assertTrue(new VariableParser("?_literal_literal")
 				.getParameter().isPlainLiteral());
-
+		Assert.assertTrue(new VariableParser("?_literal").getParameter()
+				.isPlainLiteral());
+		// False
 		Assert.assertFalse(new VariableParser("$_literal_iri").getParameter()
 				.isPlainLiteral());
-		Assert.assertFalse(new VariableParser("?_literal").getParameter()
-				.isPlainLiteral());
+
 	}
 
 	@Test
-	public void isForcedTypedLiteral() throws ParameterException {
+	public void isTypedLiteral() throws ParameterException {
 
 		Assert.assertTrue(new VariableParser("?_literal_xsd_string")
 				.getParameter().isTypedLiteral());
@@ -146,36 +146,15 @@ public class VariableParserTest {
 				.isTypedLiteral());
 		Assert.assertFalse(new VariableParser("?_literal").getParameter()
 				.isTypedLiteral());
-		
+
 		// Undefined prefixes
 		Assert.assertTrue(new VariableParser("?_name_rdf_HTML").isError());
 		Assert.assertTrue(new VariableParser("$_type_ex_bob").isError());
-		
+
 	}
 
 	@Test
-	public void isPlain() throws ParameterException {
-
-		Assert.assertTrue(new VariableParser("?_name").getParameter().isMixed());
-		Assert.assertTrue(new VariableParser("?_name______").getParameter()
-				.isMixed());
-		Assert.assertTrue(new VariableParser("?_name_accipicchia___")
-				.getParameter().isMixed());
-
-		Assert.assertFalse(new VariableParser("?_literal_xsd_string")
-				.getParameter().isMixed());
-		Assert.assertFalse(new VariableParser("$_literal_xsd_string")
-				.getParameter().isMixed());
-		Assert.assertFalse(new VariableParser("$_iri_iri").getParameter()
-				.isMixed());
-		Assert.assertFalse(new VariableParser("?_literal_iri").getParameter()
-				.isMixed());
-		Assert.assertFalse(new VariableParser("?_rdf_html_html").getParameter()
-				.isMixed());
-	}
-
-	@Test
-	public void isForcedLangedLiteral() throws ParameterException {
+	public void isLangedLiteral() throws ParameterException {
 
 		// True:
 		Assert.assertTrue(new VariableParser("?_name_en").getParameter()
@@ -199,9 +178,9 @@ public class VariableParserTest {
 				.getParameter().isLangedLiteral());
 
 		Assert.assertFalse(new VariableParser("$_literal_iri").getParameter()
-				.isPlainLiteral());
+				.isLangedLiteral());
 		Assert.assertFalse(new VariableParser("?_literal").getParameter()
-				.isPlainLiteral());
+				.isLangedLiteral());
 	}
 
 	@Test

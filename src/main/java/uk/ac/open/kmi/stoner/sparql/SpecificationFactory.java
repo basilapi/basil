@@ -1,6 +1,5 @@
 package uk.ac.open.kmi.stoner.sparql;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import com.hp.hpl.jena.query.Query;
@@ -17,17 +16,16 @@ public class SpecificationFactory {
 		ElementWalker.walk(element, collector);
 		Set<String> vars = collector.getVariables();
 		VariableParser parser;
-		Set<QueryParameter> parameters = new HashSet<QueryParameter>();
-		for (String var : vars) {
-			parser = new VariableParser(var);
-			if (parser.isParameter()) {
-				parameters.add(parser.getParameter());
-			}
-		}
 		Specification spec = new Specification();
 		spec.setEndpoint(endpoint);
 		spec.setQuery(sparql);
-		spec.setParameters(parameters);
+		
+		for (String var : vars) {
+			parser = new VariableParser(var);
+			if (parser.isParameter()) {
+				spec.map(var, parser.getParameter());
+			}
+		}
 		return spec;
 	}
 }

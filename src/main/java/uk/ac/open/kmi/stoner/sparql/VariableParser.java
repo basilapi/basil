@@ -94,11 +94,11 @@ public class VariableParser {
 						isError = true;
 						this.exception = new ParameterException(
 								"Cannot recognize parameter properties.");
-						p.setMixed();
+						p.setPlainLiteral();
 					}
 				}
 			} else {
-				p.setMixed();
+				p.setPlainLiteral();
 			}
 
 		} else {
@@ -112,6 +112,10 @@ public class VariableParser {
 
 	public QueryParameter getParameter() {
 		return p;
+	}
+
+	public String getVariable() {
+		return variable;
 	}
 
 	public boolean isError() {

@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class QueryParameter implements Serializable {
 
 	public enum Type{
-		IRI, TypedLiteral, LangedLiteral, PlainLiteral, Mixed
+		IRI, TypedLiteral, LangedLiteral, PlainLiteral
 	}
 	
 	private static final long serialVersionUID = 6725251315049248905L;
@@ -43,16 +43,6 @@ public class QueryParameter implements Serializable {
 
 	public boolean isTypedLiteral() {
 		return type == Type.TypedLiteral;
-	}
-
-	public boolean isMixed() {
-		return type == Type.Mixed;
-	}
-
-	void setMixed() {
-		this.type = Type.Mixed;
-		this.datatype = null;
-		this.lang = null;
 	}
 
 	public String getLang() {

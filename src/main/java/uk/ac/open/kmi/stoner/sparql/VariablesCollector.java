@@ -5,9 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.sparql.core.TriplePath;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.Expr;
+import com.hp.hpl.jena.sparql.syntax.Element;
 import com.hp.hpl.jena.sparql.syntax.ElementAssign;
 import com.hp.hpl.jena.sparql.syntax.ElementBind;
 import com.hp.hpl.jena.sparql.syntax.ElementData;
@@ -25,6 +28,7 @@ import com.hp.hpl.jena.sparql.syntax.ElementSubQuery;
 import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
 import com.hp.hpl.jena.sparql.syntax.ElementUnion;
 import com.hp.hpl.jena.sparql.syntax.ElementVisitor;
+import com.hp.hpl.jena.sparql.syntax.ElementWalker;
 
 public class VariablesCollector implements ElementVisitor {
 
@@ -34,6 +38,13 @@ public class VariablesCollector implements ElementVisitor {
 		return Collections.unmodifiableSet(variables);
 	}
 
+	public void collect(String query){
+		reset();
+		Query q = QueryFactory.create(query);
+		Element element = q.getQueryPattern();		
+		ElementWalker.walk(element, this);
+	}
+	
 	public void reset() {
 		variables = new HashSet<String>();
 	}
