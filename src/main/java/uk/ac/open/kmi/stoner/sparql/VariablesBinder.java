@@ -45,6 +45,7 @@ public class VariablesBinder {
 	 * @see #bindIri(String, String)
 	 * @see #bindLangedLiteral(String, String, String)
 	 * @see #bindPlainLiteral(String, String)
+	 * @see #bindNumber(String, String)
 	 * @see #bindTypedLiteral(String, String, String)
 	 */
 	public VariablesBinder bind(String name, String value) {
@@ -56,6 +57,8 @@ public class VariablesBinder {
 				bindLangedLiteral(name, value, p.getLang());
 			} else if (p.isTypedLiteral()) {
 				bindTypedLiteral(name, value, p.getDatatype());
+			} else if (p.isNumber()) {
+				bindNumber(name, value);
 			} else {
 				// Default is PlainLiteral
 				bindPlainLiteral(name, value);
@@ -76,6 +79,23 @@ public class VariablesBinder {
 			String datatype) {
 		pss.setLiteral(spec.getVariableOfParameter(name), value,
 				new BaseDatatype(datatype));
+		return this;
+	}
+
+	/**
+	 * Binds a value as typed literal.
+	 * 
+	 * @param name
+	 * @param value
+	 * @param datatype
+	 * @return a reference to this object.
+	 */
+	public VariablesBinder bindNumber(String name, String value) {
+		if (value.contains(".")) {
+			pss.setLiteral(spec.getVariableOfParameter(name), Double.valueOf(value));	
+		}else{
+			pss.setLiteral(spec.getVariableOfParameter(name), Integer.valueOf(value));
+		}
 		return this;
 	}
 

@@ -55,6 +55,8 @@ public class VariableParser {
 					p.setIri();
 				} else if (m.group(3).toLowerCase().equals("literal")) {
 					p.setPlainLiteral();
+				} else if (m.group(3).toLowerCase().equals("number")) {
+					p.setNumber();
 				} else if (m.group(3).length() == 2 && m.group(4) == null) {
 					// specifies lang
 					p.setLang(m.group(3).toLowerCase());

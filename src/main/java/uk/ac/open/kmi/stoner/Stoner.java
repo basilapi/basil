@@ -26,6 +26,7 @@ public class Stoner extends Application implements ServletContextListener {
 		s.add(HelloWorldResource.class);
 		s.add(SpecificationResource.class);
 		s.add(ApiResource.class);
+		s.add(ExplainResource.class);
 		return s;
 	}
 

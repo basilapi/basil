@@ -47,43 +47,51 @@ public class SpecificationResource extends AbstractResource {
 	}
 
 	private Response doPUT(String id, String body) {
-
-		if (body.equals("")) {
-			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-					.header(Headers.Error, "Body cannot be empty").build();
-		}
-
-		String endpoint = getStonerParameter(
-				Headers.asParameter(Headers.Endpoint), true);
-
-		Specification specification = SpecificationFactory.create(endpoint,
-				body);
-		Store data = getDataStore();
-		boolean created = true;
-		if (data.existsSpec(id)) {
-			created = false;
-		}
 		try {
-			data.saveSpec(id, specification);
-		} catch (IOException e) {
-			throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+			if (body.equals("")) {
+				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+						.header(Headers.Error, "Body cannot be empty").build();
+			}
+
+			String endpoint = getStonerParameter(
+					Headers.asParameter(Headers.Endpoint), true);
+
+			Specification specification = SpecificationFactory.create(endpoint,
+					body);
+			Store data = getDataStore();
+			boolean created = true;
+			if (data.existsSpec(id)) {
+				created = false;
+			}
+			try {
+				data.saveSpec(id, specification);
+			} catch (IOException e) {
+				throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+			}
+
+			URI api = requestUri.getBaseUriBuilder().path(id).build();
+
+			ResponseBuilder response;
+			if (created) {
+				URI spec = requestUri.getBaseUriBuilder().path(id).path("spec")
+						.build();
+				log.info("Created  spec at: {}", spec);
+				response = Response.created(api).entity(
+						"Created: " + api.toString());
+			} else {
+				URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
+				log.info("Replaced spec at: {}", spec);
+				response = Response.ok(spec).entity(
+						"Replaced: " + spec.toString() + "\n");
+			}
+
+			addHeaders(response, id);
+
+			return response.build();
+		} catch (Exception e) {
+			log.error("", e);
+			return Response.serverError().entity(e.getMessage()).build();
 		}
-
-		URI api = requestUri.getBaseUriBuilder().path(id).build();
-		URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
-		log.info((created ? "Created" : "Replaced") + " spec at: {}", spec);
-		ResponseBuilder response;
-		if (created) {
-			response = Response.created(api).entity(
-					"Created: " + api.toString() + "\n");
-		} else {
-			response = Response.ok(spec).entity(
-					"Replaced: " + spec.toString() + "/spec\n");
-		}
-
-		addHeaders(response, id);
-
-		return response.build();
 	}
 
 	/**

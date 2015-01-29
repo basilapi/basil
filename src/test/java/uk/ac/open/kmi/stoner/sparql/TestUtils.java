@@ -15,8 +15,9 @@ public class TestUtils {
 
 	private static String endpoint(String qname) {
 		int pos = qname.indexOf("X-Stoner-Endpoint:");
+		int len = "X-Stoner-Endpoint:".length();
 		int eol = qname.indexOf('\n', pos);
-		return qname.substring(pos, eol).trim();
+		return qname.substring(pos + len, eol).trim();
 	}
 
 	public static Specification loadQuery(String fileName) throws IOException {
@@ -39,5 +40,10 @@ public class TestUtils {
 			qp.setPlainLiteral();
 		}
 		return qp;
+	}
+
+	public static String loadTemplate(String qname) throws IOException {
+		return IOUtils.toString(TestUtils.class.getClassLoader()
+				.getResourceAsStream("./format/" + qname + ".tmpl"), "UTF-8");
 	}
 }

@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class QueryParameter implements Serializable {
 
 	public enum Type {
-		IRI, TypedLiteral, LangedLiteral, PlainLiteral
+		IRI, TypedLiteral, LangedLiteral, PlainLiteral, Number
 	}
 
 	private static final long serialVersionUID = 6725251315049248905L;
@@ -47,6 +47,15 @@ public class QueryParameter implements Serializable {
 	 */
 	public boolean isIri() {
 		return type == Type.IRI;
+	}
+	
+	/**
+	 * If the value has to be treated a number in the SPARQL query.
+	 * 
+	 * @return boolean true or false
+	 */
+	public boolean isNumber() {
+		return type == Type.Number;
 	}
 
 	/**
@@ -170,5 +179,11 @@ public class QueryParameter implements Serializable {
 					((QueryParameter) obj).getDatatype());
 		}
 		return eq;
+	}
+
+	public void setNumber() {
+		this.type = Type.Number;
+		this.datatype = null;
+		this.lang = null;
 	}
 }
