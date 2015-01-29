@@ -11,12 +11,14 @@ public final class Headers {
 	public static final String Spec = PREFIX + "Spec";
 	public static final String Format = PREFIX + "Format";
 	public static final String Store = PREFIX + "Store";
-	
+	public static final String Type = PREFIX + "Type";
+
 	public static String getHeader(String parameter) {
-		return PREFIX + parameter;
+		return PREFIX + parameter.substring(0, 1).toUpperCase()
+				+ parameter.substring(1).toLowerCase();
 	}
-	
-	public static String asParameter(String Header){
+
+	public static String asParameter(String Header) {
 		return Header.substring(PREFIX.length()).toLowerCase();
 	}
 }

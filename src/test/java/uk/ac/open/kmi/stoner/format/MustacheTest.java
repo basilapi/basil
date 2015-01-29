@@ -1,9 +1,6 @@
 package uk.ac.open.kmi.stoner.format;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URISyntaxException;
@@ -23,9 +20,6 @@ import uk.ac.open.kmi.stoner.sparql.Specification;
 import uk.ac.open.kmi.stoner.sparql.TestUtils;
 import uk.ac.open.kmi.stoner.sparql.VariablesBinder;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -45,8 +39,7 @@ public class MustacheTest {
 
 	@Test
 	public void test() throws URISyntaxException, IOException {
-		File tmpl = new File(getClass().getClassLoader()
-				.getResource("./format/mustache1.tmpl").toURI());
+		String tmpl = TestUtils.loadTemplate("mustache1");
 		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
 		Map<String, Object> row = new HashMap<String, Object>();
 		row.put("name", "Enrico");
@@ -55,9 +48,7 @@ public class MustacheTest {
 		row.put("name", "Luca");
 		items.add(row);
 		Writer writer = new StringWriter();
-		MustacheFactory mf = new DefaultMustacheFactory();
-		Mustache mustache = mf.compile(new FileReader(tmpl), "mustache1");
-		mustache.execute(writer, Items.create(items));
+		Engine.MUSTACHE.exec(writer, tmpl, Items.create(items));
 		writer.flush();
 		log.debug("\n{}", writer);
 	}
@@ -74,11 +65,7 @@ public class MustacheTest {
 				spec.getEndpoint(), q);
 		final ResultSet rs = qe.execSelect();
 		Writer writer = new StringWriter();
-		MustacheFactory mf = new DefaultMustacheFactory();
-		Mustache mustache = mf.compile(new StringReader(template),
-				method.getMethodName());
-
-		mustache.execute(writer, Items.create(rs));
+		Engine.MUSTACHE.exec(writer, template, Items.create(rs));
 		writer.flush();
 		log.debug("\n{}", writer);
 	}

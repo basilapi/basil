@@ -2,6 +2,7 @@ package uk.ac.open.kmi.stoner.store;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,6 +14,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.open.kmi.stoner.format.Formats;
 import uk.ac.open.kmi.stoner.sparql.Specification;
 
 public class FileStore implements Store {
@@ -91,9 +93,24 @@ public class FileStore implements Store {
 		List<String> specs = new ArrayList<String>();
 		for (File f : org.apache.commons.io.FileUtils.listFiles(home,
 				new String[] { "spec" }, false)) {
-			specs.add(f.getName()
-					.substring(0, f.getName().lastIndexOf('.')));
+			specs.add(f.getName().substring(0, f.getName().lastIndexOf('.')));
 		}
 		return specs;
+	}
+
+	public Formats loadFormats(String id) throws IOException {
+		try {
+			try {
+				return (Formats) read(id, "formats");
+			} catch (FileNotFoundException e) {
+				return new Formats();
+			}
+		} catch (ClassNotFoundException e) {
+			throw new IOException(e);
+		}
+	}
+
+	public void saveFormats(String id, Formats formats) throws IOException {
+		write(id, formats, "formats");
 	}
 }

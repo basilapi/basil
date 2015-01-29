@@ -33,7 +33,7 @@ public class SpecificationResource extends AbstractResource {
 			.getLogger(SpecificationResource.class);
 
 	/**
-	 * Creates a new API
+	 * Creates a new Stone
 	 * 
 	 * @param body
 	 * @return
