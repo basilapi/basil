@@ -39,6 +39,10 @@ public class Items implements Callable<Iterator<Map<String, Object>>> {
 				}
 				return item;
 			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
 		};
 		return o;
 	}
@@ -60,6 +64,10 @@ public class Items implements Callable<Iterator<Map<String, Object>>> {
 				item.put("predicate", qs.getPredicate());
 				item.put("object", qs.getObject());
 				return item;
+			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
 			}
 		};
 		return o;
