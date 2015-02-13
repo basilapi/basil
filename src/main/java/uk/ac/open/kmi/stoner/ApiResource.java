@@ -109,7 +109,6 @@ public class ApiResource extends AbstractResource {
 				// No extension, check if the extension is the name of a view
 				if (type == null) {
 					Views views = store.loadViews(id);
-					System.out.println(extension + " -- " + views.getNames());
 					if (views.exists(extension)) {
 						View view = views.byName(extension);
 						StringWriter writer = new StringWriter();
