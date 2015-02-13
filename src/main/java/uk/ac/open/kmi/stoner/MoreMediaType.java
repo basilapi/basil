@@ -20,6 +20,10 @@ public class MoreMediaType {
 			"n-triples");
 	public static final MediaType TEXT_X_NQUADS_TYPE = new MediaType("text",
 			"x-nquads");
+	public static final MediaType TEXT_TSV_TYPE = new MediaType("text",
+			"tsv");
+	public static final MediaType TEXT_CSV_TYPE = new MediaType("text",
+			"csv");
 	public static final MediaType SPARQL_RESULTS_XML_TYPE = new MediaType(
 			"application", "sparql-results+xml");
 	public static final MediaType SPARQL_RESULTS_JSON_TYPE = new MediaType(
@@ -41,6 +45,8 @@ public class MoreMediaType {
 		extensions.put("nt", MoreMediaType.NTRIPLES_TYPE);
 		extensions.put("nq", MoreMediaType.TEXT_X_NQUADS_TYPE);
 		extensions.put("jsonld", MoreMediaType.JSONLD_TYPE);
+		extensions.put("tsv", MoreMediaType.TEXT_TSV_TYPE);
+		extensions.put("csv", MoreMediaType.TEXT_CSV_TYPE);
 	}
 
 }

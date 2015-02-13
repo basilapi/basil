@@ -57,6 +57,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.hp.hpl.jena.sparql.core.DatasetGraphFactory;
 import com.hp.hpl.jena.sparql.core.DatasetGraphOne;
+import com.hp.hpl.jena.sparql.resultset.CSVOutput;
 import com.hp.hpl.jena.sparql.resultset.JSONOutput;
 import com.hp.hpl.jena.sparql.resultset.XMLOutput;
 import com.hp.hpl.jena.sparql.util.Context;
@@ -104,6 +105,8 @@ public class ApiResource extends AbstractResource {
 			MediaType type = null;
 			// If we have an extension
 			if (!extension.equals("")) {
+				// remove dot
+				extension = extension.substring(1);
 				type = getFromExtension(extension);
 
 				// No extension, check if the extension is the name of a view
@@ -174,7 +177,7 @@ public class ApiResource extends AbstractResource {
 			ResponseBuilder rb;
 			rb = Response.ok().entity(entity);
 			addHeaders(rb, id);
-
+			rb.header("Content-Type", type.withCharset("UTF-8").toString());
 			return rb.build();
 		} catch (IOException e) {
 			throw new WebApplicationException(e);
@@ -585,6 +588,22 @@ public class ApiResource extends AbstractResource {
 			return new String(baos.toByteArray());
 		}
 
+		// text/csv
+		if (MoreMediaType.TEXT_CSV_TYPE.equals(type)) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			CSVOutput xOut = new CSVOutput();
+			xOut.format(baos, rs);
+			return new String(baos.toByteArray());
+		}
+
+		// text/tsv
+		if (MoreMediaType.TEXT_TSV_TYPE.equals(type)) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			CSVOutput xOut = new CSVOutput();
+			xOut.format(baos, rs);
+			return new String(baos.toByteArray());
+		}
+
 		return null;
 	}
 
@@ -598,7 +617,9 @@ public class ApiResource extends AbstractResource {
 				MoreMediaType.TEXT_TURTLE_TYPE,
 				MoreMediaType.TEXT_X_NQUADS_TYPE,
 				MoreMediaType.SPARQL_RESULTS_JSON_TYPE,
-				MoreMediaType.SPARQL_RESULTS_XML_TYPE });
+				MoreMediaType.SPARQL_RESULTS_XML_TYPE,
+				MoreMediaType.TEXT_CSV_TYPE,
+				MoreMediaType.TEXT_TSV_TYPE});
 	}
 
 	public MediaType getFromExtension(String ext) {
@@ -643,13 +664,12 @@ public class ApiResource extends AbstractResource {
 	public Response post(@PathParam("id") String id,
 			@PathParam("ext") String extension,
 			MultivaluedMap<String, String> form) {
-		return performQuery(id, form, extension.substring(1));
+		return performQuery(id, form, extension);
 	}
 
 	@GET
 	public Response get(@PathParam("id") String id,
 			@PathParam("ext") String extension) {
-		return performQuery(id, requestUri.getQueryParameters(),
-				extension.substring(1));
+		return performQuery(id, requestUri.getQueryParameters(), extension);
 	}
 }
