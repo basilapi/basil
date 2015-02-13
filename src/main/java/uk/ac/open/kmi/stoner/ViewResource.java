@@ -1,5 +1,8 @@
 package uk.ac.open.kmi.stoner;
 
+import java.io.IOException;
+
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -10,6 +13,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.ac.open.kmi.stoner.store.Store;
 import uk.ac.open.kmi.stoner.view.Engine;
 import uk.ac.open.kmi.stoner.view.View;
@@ -17,6 +23,7 @@ import uk.ac.open.kmi.stoner.view.Views;
 
 @Path("{id:([^/]+)}/view")
 public class ViewResource extends ApiResource {
+	private Logger log = LoggerFactory.getLogger(ViewResource.class);
 
 	@PUT
 	@Path("{name:([^/]+)}")
@@ -94,6 +101,23 @@ public class ViewResource extends ApiResource {
 			return builder.build();
 		} catch (Exception e) {
 			return Response.serverError().entity(e).build();
+		}
+	}
+
+	@DELETE
+	@Path("{name:([^/]+)}")
+	public Response delete(@PathParam("id") String id,
+			@PathParam("name") String name) {
+		Views views;
+		try {
+			views = getDataStore().loadViews(id);
+			views.remove(name);
+			getDataStore().saveViews(id, views);
+			log.debug("View deleted: {}:{} ", id, name);
+			return Response.noContent().build();
+		} catch (IOException e) {
+			log.error("", e);
+			return Response.serverError().build();
 		}
 	}
 }

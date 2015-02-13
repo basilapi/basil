@@ -102,39 +102,46 @@ public class ApiResource extends AbstractResource {
 			Object entity = null;
 
 			MediaType type = null;
+			// If we have an extension
 			if (!extension.equals("")) {
 				type = getFromExtension(extension);
-				if (type == null) {
-					// NOT FOUND HERE
-					return Response.status(404).entity("Not found").build();
-				}
-			}
-			
-			// No extension, check if the extension is the name of a view ...
-			if (type == null) {
-				Views views = store.loadViews(id);
-				if (views.exists(extension)) {
-					View view = views.byName(extension);
-					StringWriter writer = new StringWriter();
-					Items data = null;
-					if (q.isSelectType()) {
-						data = Items.create(qe.execSelect());
-					} else if (q.isConstructType()) {
-						data = Items.create(qe.execConstructTriples());
-					} else if (q.isAskType()) {
-						data = Items.create(qe.execAsk());
-					} else if (q.isDescribeType()) {
-						data = Items.create(qe.execDescribeTriples());
-					} else {
-						return Response
-								.serverError()
-								.entity("Unsupported query type: "
-										+ q.getQueryType()).build();
-					}
-					view.getEngine().exec(writer, view.getTemplate(), data);
-				}
-			}
 
+				// No extension, check if the extension is the name of a view
+				if (type == null) {
+					Views views = store.loadViews(id);
+					System.out.println(extension + " -- " + views.getNames());
+					if (views.exists(extension)) {
+						View view = views.byName(extension);
+						StringWriter writer = new StringWriter();
+						Items data = null;
+						if (q.isSelectType()) {
+							data = Items.create(qe.execSelect());
+						} else if (q.isConstructType()) {
+							data = Items.create(qe.execConstructTriples());
+						} else if (q.isAskType()) {
+							data = Items.create(qe.execAsk());
+						} else if (q.isDescribeType()) {
+							data = Items.create(qe.execDescribeTriples());
+						} else {
+							return Response
+									.serverError()
+									.entity("Unsupported query type: "
+											+ q.getQueryType()).build();
+						}
+						view.getEngine().exec(writer, view.getTemplate(), data);
+						// Yeah!
+						ResponseBuilder rb = Response.ok(writer.toString());
+						addHeaders(rb, id);
+						rb.header("Content-Type", view.getMimeType()
+								+ "; charset=utf-8");
+						return rb.build();
+					}
+				}
+				// Still found nothing?
+				if (type == null) {
+					return Response.status(404).entity("Not found\n").build();
+				}
+			}
 			// No extension, look for best acceptable
 			if (type == null) {
 				type = getBestAcceptable();

@@ -30,7 +30,7 @@ public class AbstractResource {
 		URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
 		URI store = requestUri.getBaseUriBuilder().path(id).path("store")
 				.build();
-		URI views = requestUri.getBaseUriBuilder().path(id).path("views")
+		URI views = requestUri.getBaseUriBuilder().path(id).path("view")
 				.build();
 		builder.header(Headers.Api, api);
 		builder.header(Headers.Spec, spec);
