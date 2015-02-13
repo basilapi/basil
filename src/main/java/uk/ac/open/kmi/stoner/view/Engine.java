@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.stoner.format;
+package uk.ac.open.kmi.stoner.view;
 
 import java.io.StringReader;
 import java.io.Writer;

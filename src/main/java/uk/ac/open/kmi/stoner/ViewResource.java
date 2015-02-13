@@ -9,13 +9,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
-import uk.ac.open.kmi.stoner.format.Engine;
-import uk.ac.open.kmi.stoner.format.Format;
-import uk.ac.open.kmi.stoner.format.Formats;
 import uk.ac.open.kmi.stoner.store.Store;
+import uk.ac.open.kmi.stoner.view.Engine;
+import uk.ac.open.kmi.stoner.view.Format;
+import uk.ac.open.kmi.stoner.view.Formats;
 
-@Path("{id:([^/]+)}/format")
-public class FormatResource extends AbstractResource {
+@Path("{id:([^/]+)}/view")
+public class ViewResource extends AbstractResource {
 
 	@PUT
 	@Path("{extension:([^/]+)}")

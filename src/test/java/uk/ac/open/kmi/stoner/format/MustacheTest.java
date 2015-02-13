@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.stoner.sparql.Specification;
 import uk.ac.open.kmi.stoner.sparql.TestUtils;
 import uk.ac.open.kmi.stoner.sparql.VariablesBinder;
+import uk.ac.open.kmi.stoner.view.Engine;
+import uk.ac.open.kmi.stoner.view.Items;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;

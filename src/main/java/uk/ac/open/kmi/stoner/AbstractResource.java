@@ -35,7 +35,7 @@ public class AbstractResource {
 		builder.header(Headers.Api, api);
 		builder.header(Headers.Spec, spec);
 		builder.header(Headers.Store, store);
-		builder.header(Headers.Format, format);
+		builder.header(Headers.View, format);
 		return builder;
 	}
 

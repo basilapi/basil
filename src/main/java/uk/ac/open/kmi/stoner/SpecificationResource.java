@@ -88,9 +88,9 @@ public class SpecificationResource extends AbstractResource {
 			addHeaders(response, id);
 
 			return response.build();
-		} catch (Exception e) {
+		} catch (WebApplicationException e) {
 			log.error("", e);
-			return Response.serverError().entity(e.getMessage()).build();
+			throw e;
 		}
 	}
 

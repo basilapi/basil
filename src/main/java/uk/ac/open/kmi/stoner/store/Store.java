@@ -3,8 +3,8 @@ package uk.ac.open.kmi.stoner.store;
 import java.io.IOException;
 import java.util.List;
 
-import uk.ac.open.kmi.stoner.format.Formats;
 import uk.ac.open.kmi.stoner.sparql.Specification;
+import uk.ac.open.kmi.stoner.view.Formats;
 
 public interface Store {
 

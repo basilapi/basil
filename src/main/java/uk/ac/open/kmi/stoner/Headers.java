@@ -9,7 +9,7 @@ public final class Headers {
 	public static final String Endpoint = PREFIX + "Endpoint";
 	public static final String Api = PREFIX + "Api";
 	public static final String Spec = PREFIX + "Spec";
-	public static final String Format = PREFIX + "Format";
+	public static final String View = PREFIX + "View";
 	public static final String Store = PREFIX + "Store";
 	public static final String Type = PREFIX + "Type";
 
