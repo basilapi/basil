@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.stoner.sparql.Specification;
-import uk.ac.open.kmi.stoner.view.Formats;
+import uk.ac.open.kmi.stoner.view.Views;
 
 public class FileStore implements Store {
 	private Logger log = LoggerFactory.getLogger(FileStore.class);
@@ -98,19 +98,19 @@ public class FileStore implements Store {
 		return specs;
 	}
 
-	public Formats loadFormats(String id) throws IOException {
+	public Views loadViews(String id) throws IOException {
 		try {
 			try {
-				return (Formats) read(id, "formats");
+				return (Views) read(id, "formats");
 			} catch (FileNotFoundException e) {
-				return new Formats();
+				return new Views();
 			}
 		} catch (ClassNotFoundException e) {
 			throw new IOException(e);
 		}
 	}
 
-	public void saveFormats(String id, Formats formats) throws IOException {
+	public void saveFormats(String id, Views formats) throws IOException {
 		write(id, formats, "formats");
 	}
 }

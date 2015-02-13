@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Format implements Serializable {
+public class View implements Serializable {
 
 	/**
 	 * 
@@ -12,7 +12,7 @@ public class Format implements Serializable {
 	private static final long serialVersionUID = -5880624222164431668L;
 
 	private String mimeType;
-	private String extension;
+	private String name;
 	private String template;
 	private Engine engine;
 
@@ -24,12 +24,12 @@ public class Format implements Serializable {
 		this.mimeType = mimeType;
 	}
 
-	public String getExtension() {
-		return extension;
+	public String getName() {
+		return name;
 	}
 
 	void setExtension(String extension) {
-		this.extension = extension;
+		this.name = extension;
 	}
 
 	public String getTemplate() {
@@ -46,10 +46,10 @@ public class Format implements Serializable {
 	}
 
 	public boolean equals(Object o) {
-		if (o instanceof Format) {
-			Format f = (Format) o;
+		if (o instanceof View) {
+			View f = (View) o;
 			return f.engine.equals(this.engine)
-					&& f.extension.equals(this.extension)
+					&& f.name.equals(this.name)
 					&& f.mimeType.equals(this.mimeType)
 					&& f.template.equals(this.template);
 		}
@@ -59,6 +59,6 @@ public class Format implements Serializable {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(engine).append(mimeType)
-				.append(extension).append(template).build();
+				.append(name).append(template).build();
 	}
 }

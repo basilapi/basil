@@ -11,18 +11,18 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import uk.ac.open.kmi.stoner.store.Store;
 import uk.ac.open.kmi.stoner.view.Engine;
-import uk.ac.open.kmi.stoner.view.Format;
-import uk.ac.open.kmi.stoner.view.Formats;
+import uk.ac.open.kmi.stoner.view.View;
+import uk.ac.open.kmi.stoner.view.Views;
 
 @Path("{id:([^/]+)}/view")
 public class ViewResource extends AbstractResource {
 
 	@PUT
-	@Path("{extension:([^/]+)}")
+	@Path("{name:([^/]+)}")
 	@Produces("text/plain")
 	public Response put(@PathParam("id") String id,
 			@QueryParam("type") String type,
-			@PathParam("extension") String extension, String body) {
+			@PathParam("name") String name, String body) {
 		try {
 			Engine engine;
 			// Content-type
@@ -39,16 +39,16 @@ public class ViewResource extends AbstractResource {
 			}
 
 			Store data = getDataStore();
-			Formats formats = data.loadFormats(id);
+			Views views = data.loadViews(id);
 			boolean created = true;
-			if (formats.supportsExtension(extension)) {
+			if (views.exists(name)) {
 				created = false;
 			}
-			formats.put(type, extension, body, engine);
-			data.saveFormats(id, formats);
+			views.put(type, name, body, engine);
+			data.saveFormats(id, views);
 			if (created) {
 				return Response.created(
-						requestUri.getBaseUriBuilder().path(extension).build())
+						requestUri.getBaseUriBuilder().path(name).build())
 						.build();
 			} else {
 				return Response.ok().build();
@@ -60,14 +60,14 @@ public class ViewResource extends AbstractResource {
 
 	@GET
 	@Produces("text/plain")
-	public Response listFormats(@PathParam("id") String id) {
+	public Response listViews(@PathParam("id") String id) {
 		try {
-			Formats formats = getDataStore().loadFormats(id);
+			Views formats = getDataStore().loadViews(id);
 			if(formats.numberOf() == 0){
 				return Response.noContent().build();
 			}
 			StringBuilder sb = new StringBuilder();
-			for (String ext : formats.getExtensions()) {
+			for (String ext : formats.getNames()) {
 				sb.append(ext).append("\n");
 			}
 			return Response.ok(sb.toString()).build();
@@ -77,19 +77,19 @@ public class ViewResource extends AbstractResource {
 	}
 
 	@GET
-	@Path("{extension:([^/]+)}")
+	@Path("{name:([^/]+)}")
 	public Response get(@PathParam("id") String id,
-			@PathParam("extension") String extension) {
+			@PathParam("name") String name) {
 		try {
-			Formats formats = getDataStore().loadFormats(id);
-			Format format = formats.byExtension(extension);
-			if (format == null) {
+			Views views = getDataStore().loadViews(id);
+			View view = views.byName(name);
+			if (view == null) {
 				return Response.status(404).entity("Not found").build();
 			}
-			ResponseBuilder builder = Response.ok(format.getTemplate());
+			ResponseBuilder builder = Response.ok(view.getTemplate());
 			addHeaders(builder, id);
-			builder.header("Content-type", format.getEngine().getContentType());
-			builder.header(Headers.Type, format.getMimeType());
+			builder.header("Content-type", view.getEngine().getContentType());
+			builder.header(Headers.Type, view.getMimeType());
 			return builder.build();
 		} catch (Exception e) {
 			return Response.serverError().entity(e).build();

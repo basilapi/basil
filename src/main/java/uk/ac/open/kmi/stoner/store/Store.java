@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import uk.ac.open.kmi.stoner.sparql.Specification;
-import uk.ac.open.kmi.stoner.view.Formats;
+import uk.ac.open.kmi.stoner.view.Views;
 
 public interface Store {
 
@@ -16,7 +16,7 @@ public interface Store {
 
 	public List<String> listSpecs();
 
-	public Formats loadFormats(String id) throws IOException;
+	public Views loadViews(String id) throws IOException;
 
-	public void saveFormats(String id, Formats formats) throws IOException;
+	public void saveFormats(String id, Views formats) throws IOException;
 }
