@@ -82,6 +82,11 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.jena</groupId>
 			<artifactId>jena-core</artifactId>
 			<version>2.12.1</version>
@@ -137,7 +142,7 @@
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>9.3.0.M1</version>
 				<configuration>
-					<scanIntervalSeconds>2</scanIntervalSeconds>
+					<scanIntervalSeconds>5</scanIntervalSeconds>
 					<systemProperties>
 						<systemProperty>
 							<name>log4j.configurationFile</name>
