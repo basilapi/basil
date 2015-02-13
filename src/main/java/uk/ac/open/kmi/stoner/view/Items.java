@@ -47,6 +47,30 @@ public class Items implements Callable<Iterator<Map<String, Object>>> {
 		return o;
 	}
 
+	public static Items create(final Boolean rs) {
+		Items o = new Items();
+
+		o.items = new Iterator<Map<String, Object>>() {
+			boolean hasNext = true;
+
+			public boolean hasNext() {
+				return hasNext;
+			}
+
+			public Map<String, Object> next() {
+				hasNext = false;
+				Map<String, Object> item = new HashMap<String, Object>();
+				item.put("boolean", rs);
+				return item;
+			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+		return o;
+	}
+
 	public static Items create(final Iterator<Triple> triples) {
 		Items o = new Items();
 		o.items = new Iterator<Map<String, Object>>() {

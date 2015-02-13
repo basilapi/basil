@@ -1,5 +1,6 @@
 package uk.ac.open.kmi.stoner;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -15,13 +16,13 @@ import uk.ac.open.kmi.stoner.view.View;
 import uk.ac.open.kmi.stoner.view.Views;
 
 @Path("{id:([^/]+)}/view")
-public class ViewResource extends AbstractResource {
+public class ViewResource extends ApiResource {
 
 	@PUT
 	@Path("{name:([^/]+)}")
 	@Produces("text/plain")
 	public Response put(@PathParam("id") String id,
-			@QueryParam("type") String type,
+			@QueryParam("type") @DefaultValue("text/html") String type,
 			@PathParam("name") String name, String body) {
 		try {
 			Engine engine;
@@ -63,7 +64,7 @@ public class ViewResource extends AbstractResource {
 	public Response listViews(@PathParam("id") String id) {
 		try {
 			Views formats = getDataStore().loadViews(id);
-			if(formats.numberOf() == 0){
+			if (formats.numberOf() == 0) {
 				return Response.noContent().build();
 			}
 			StringBuilder sb = new StringBuilder();
@@ -78,7 +79,7 @@ public class ViewResource extends AbstractResource {
 
 	@GET
 	@Path("{name:([^/]+)}")
-	public Response get(@PathParam("id") String id,
+	public Response spec(@PathParam("id") String id,
 			@PathParam("name") String name) {
 		try {
 			Views views = getDataStore().loadViews(id);

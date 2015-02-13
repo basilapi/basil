@@ -39,6 +39,9 @@ import uk.ac.open.kmi.stoner.sparql.QueryParameter;
 import uk.ac.open.kmi.stoner.sparql.Specification;
 import uk.ac.open.kmi.stoner.sparql.VariablesBinder;
 import uk.ac.open.kmi.stoner.store.Store;
+import uk.ac.open.kmi.stoner.view.Items;
+import uk.ac.open.kmi.stoner.view.View;
+import uk.ac.open.kmi.stoner.view.Views;
 
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
@@ -106,7 +109,33 @@ public class ApiResource extends AbstractResource {
 					return Response.status(404).entity("Not found").build();
 				}
 			}
-			// No extension
+			
+			// No extension, check if the extension is the name of a view ...
+			if (type == null) {
+				Views views = store.loadViews(id);
+				if (views.exists(extension)) {
+					View view = views.byName(extension);
+					StringWriter writer = new StringWriter();
+					Items data = null;
+					if (q.isSelectType()) {
+						data = Items.create(qe.execSelect());
+					} else if (q.isConstructType()) {
+						data = Items.create(qe.execConstructTriples());
+					} else if (q.isAskType()) {
+						data = Items.create(qe.execAsk());
+					} else if (q.isDescribeType()) {
+						data = Items.create(qe.execDescribeTriples());
+					} else {
+						return Response
+								.serverError()
+								.entity("Unsupported query type: "
+										+ q.getQueryType()).build();
+					}
+					view.getEngine().exec(writer, view.getTemplate(), data);
+				}
+			}
+
+			// No extension, look for best acceptable
 			if (type == null) {
 				type = getBestAcceptable();
 			}
@@ -614,6 +643,7 @@ public class ApiResource extends AbstractResource {
 	@GET
 	public Response get(@PathParam("id") String id,
 			@PathParam("ext") String extension) {
-		return performQuery(id, requestUri.getQueryParameters(), extension.substring(1));
+		return performQuery(id, requestUri.getQueryParameters(),
+				extension.substring(1));
 	}
 }
