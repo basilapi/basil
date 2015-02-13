@@ -30,12 +30,12 @@ public class AbstractResource {
 		URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
 		URI store = requestUri.getBaseUriBuilder().path(id).path("store")
 				.build();
-		URI format = requestUri.getBaseUriBuilder().path(id).path("format")
+		URI views = requestUri.getBaseUriBuilder().path(id).path("views")
 				.build();
 		builder.header(Headers.Api, api);
 		builder.header(Headers.Spec, spec);
 		builder.header(Headers.Store, store);
-		builder.header(Headers.View, format);
+		builder.header(Headers.View, views);
 		return builder;
 	}
 

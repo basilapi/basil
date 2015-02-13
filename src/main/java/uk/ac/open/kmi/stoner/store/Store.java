@@ -18,5 +18,5 @@ public interface Store {
 
 	public Views loadViews(String id) throws IOException;
 
-	public void saveFormats(String id, Views formats) throws IOException;
+	public void saveViews(String id, Views views) throws IOException;
 }

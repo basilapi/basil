@@ -46,7 +46,7 @@ public class ViewResource extends ApiResource {
 				created = false;
 			}
 			views.put(type, name, body, engine);
-			data.saveFormats(id, views);
+			data.saveViews(id, views);
 			if (created) {
 				return Response.created(
 						requestUri.getBaseUriBuilder().path(name).build())
@@ -63,12 +63,12 @@ public class ViewResource extends ApiResource {
 	@Produces("text/plain")
 	public Response listViews(@PathParam("id") String id) {
 		try {
-			Views formats = getDataStore().loadViews(id);
-			if (formats.numberOf() == 0) {
+			Views views = getDataStore().loadViews(id);
+			if (views.numberOf() == 0) {
 				return Response.noContent().build();
 			}
 			StringBuilder sb = new StringBuilder();
-			for (String ext : formats.getNames()) {
+			for (String ext : views.getNames()) {
 				sb.append(ext).append("\n");
 			}
 			return Response.ok(sb.toString()).build();

@@ -101,7 +101,7 @@ public class FileStore implements Store {
 	public Views loadViews(String id) throws IOException {
 		try {
 			try {
-				return (Views) read(id, "formats");
+				return (Views) read(id, "views");
 			} catch (FileNotFoundException e) {
 				return new Views();
 			}
@@ -110,7 +110,7 @@ public class FileStore implements Store {
 		}
 	}
 
-	public void saveFormats(String id, Views formats) throws IOException {
-		write(id, formats, "formats");
+	public void saveViews(String id, Views views) throws IOException {
+		write(id, views, "views");
 	}
 }
