@@ -14,11 +14,11 @@
 
 
 	<servlet>
-		<servlet-name>StoneR Endpoint</servlet-name>
+		<servlet-name>BASIL</servlet-name>
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>javax.ws.rs.Application</param-name>
-			<param-value>uk.ac.open.kmi.stoner.Stoner</param-value>
+			<param-value>uk.ac.open.kmi.basil.BasilApplication</param-value>
 		</init-param>
 	</servlet>
 
@@ -28,11 +28,11 @@
     </context-param>
     
 	<servlet-mapping>
-		<servlet-name>StoneR Endpoint</servlet-name>
-		<url-pattern>/stone/*</url-pattern>
+		<servlet-name>BASIL</servlet-name>
+		<url-pattern>/basil/*</url-pattern>
 	</servlet-mapping>
 
 	<listener>
-		<listener-class>uk.ac.open.kmi.stoner.Stoner</listener-class>
+		<listener-class>uk.ac.open.kmi.basil.BasilApplication</listener-class>
 	</listener>
 </web-app>
