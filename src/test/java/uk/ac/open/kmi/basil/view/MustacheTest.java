@@ -38,13 +38,14 @@ public class MustacheTest {
 	}
 
 	@Test
-	public void test() throws URISyntaxException, IOException {
-		String tmpl = TestUtils.loadTemplate("mustache1");
-		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-		Map<String, Object> row = new HashMap<String, Object>();
+	public void test() throws URISyntaxException, IOException,
+			EngineExecutionException {
+		String tmpl = TestUtils.loadTemplate("mustache", "mustache1");
+		List<Map<String, String>> items = new ArrayList<Map<String, String>>();
+		Map<String, String> row = new HashMap<String, String>();
 		row.put("name", "Enrico");
 		items.add(row);
-		row = new HashMap<String, Object>();
+		row = new HashMap<String, String>();
 		row.put("name", "Luca");
 		items.add(row);
 		Writer writer = new StringWriter();
@@ -54,9 +55,10 @@ public class MustacheTest {
 	}
 
 	@Test
-	public void select_1() throws IOException {
+	public void select_1() throws IOException, EngineExecutionException {
 		Specification spec = TestUtils.loadQuery(method.getMethodName());
-		String template = TestUtils.loadTemplate(method.getMethodName());
+		String template = TestUtils.loadTemplate("mustache",
+				method.getMethodName());
 		VariablesBinder binder = new VariablesBinder(spec);
 		binder.bind("geoid", "2328926");
 

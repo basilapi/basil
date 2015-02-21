@@ -1,6 +1,5 @@
 package uk.ac.open.kmi.basil;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -179,7 +178,7 @@ public class ApiResource extends AbstractResource {
 			addHeaders(rb, id);
 			rb.header("Content-Type", type.withCharset("UTF-8").toString());
 			return rb.build();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new WebApplicationException(e);
 		}
 	}
@@ -618,8 +617,7 @@ public class ApiResource extends AbstractResource {
 				MoreMediaType.TEXT_X_NQUADS_TYPE,
 				MoreMediaType.SPARQL_RESULTS_JSON_TYPE,
 				MoreMediaType.SPARQL_RESULTS_XML_TYPE,
-				MoreMediaType.TEXT_CSV_TYPE,
-				MoreMediaType.TEXT_TSV_TYPE});
+				MoreMediaType.TEXT_CSV_TYPE, MoreMediaType.TEXT_TSV_TYPE });
 	}
 
 	public MediaType getFromExtension(String ext) {

@@ -10,10 +10,10 @@ import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 
-public class Items implements Callable<Iterator<Map<String, Object>>> {
-	private Iterator<Map<String, Object>> items;
+public class Items implements Callable<Iterator<Map<String, String>>> {
+	private Iterator<Map<String, String>> items;
 
-	public static Items create(List<Map<String, Object>> items) {
+	public static Items create(List<Map<String, String>> items) {
 		Items o = new Items();
 		o.items = items.iterator();
 		return o;
@@ -24,18 +24,18 @@ public class Items implements Callable<Iterator<Map<String, Object>>> {
 
 	public static Items create(final ResultSet rs) {
 		Items o = new Items();
-		o.items = new Iterator<Map<String, Object>>() {
+		o.items = new Iterator<Map<String, String>>() {
 			public boolean hasNext() {
 				return rs.hasNext();
 			}
 
-			public Map<String, Object> next() {
+			public Map<String, String> next() {
 				QuerySolution qs = rs.next();
 				Iterator<String> vars = qs.varNames();
-				Map<String, Object> item = new HashMap<String, Object>();
+				Map<String, String> item = new HashMap<String, String>();
 				while (vars.hasNext()) {
 					String var = vars.next();
-					item.put(var, qs.get(var));
+					item.put(var, qs.get(var).toString());
 				}
 				return item;
 			}
@@ -50,17 +50,17 @@ public class Items implements Callable<Iterator<Map<String, Object>>> {
 	public static Items create(final Boolean rs) {
 		Items o = new Items();
 
-		o.items = new Iterator<Map<String, Object>>() {
+		o.items = new Iterator<Map<String, String>>() {
 			boolean hasNext = true;
 
 			public boolean hasNext() {
 				return hasNext;
 			}
 
-			public Map<String, Object> next() {
+			public Map<String, String> next() {
 				hasNext = false;
-				Map<String, Object> item = new HashMap<String, Object>();
-				item.put("boolean", rs);
+				Map<String, String> item = new HashMap<String, String>();
+				item.put("boolean", Boolean.toString(rs));
 				return item;
 			}
 
@@ -73,20 +73,20 @@ public class Items implements Callable<Iterator<Map<String, Object>>> {
 
 	public static Items create(final Iterator<Triple> triples) {
 		Items o = new Items();
-		o.items = new Iterator<Map<String, Object>>() {
+		o.items = new Iterator<Map<String, String>>() {
 			public boolean hasNext() {
 				return triples.hasNext();
 			}
 
-			public Map<String, Object> next() {
+			public Map<String, String> next() {
 				Triple qs = triples.next();
-				Map<String, Object> item = new HashMap<String, Object>();
-				item.put("s", qs.getSubject());
-				item.put("p", qs.getPredicate());
-				item.put("o", qs.getObject());
-				item.put("subject", qs.getSubject());
-				item.put("predicate", qs.getPredicate());
-				item.put("object", qs.getObject());
+				Map<String, String> item = new HashMap<String, String>();
+				item.put("s", qs.getSubject().toString());
+				item.put("p", qs.getPredicate().toString());
+				item.put("o", qs.getObject().toString());
+				item.put("subject", qs.getSubject().toString());
+				item.put("predicate", qs.getPredicate().toString());
+				item.put("object", qs.getObject().toString());
 				return item;
 			}
 
@@ -97,7 +97,7 @@ public class Items implements Callable<Iterator<Map<String, Object>>> {
 		return o;
 	}
 
-	public Iterator<Map<String, Object>> call() throws Exception {
+	public Iterator<Map<String, String>> call() throws Exception {
 		return items;
 	}
 

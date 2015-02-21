@@ -47,8 +47,8 @@ public class TestUtils {
 		return qp;
 	}
 
-	public static String loadTemplate(String qname) throws IOException {
+	public static String loadTemplate(String type, String qname) throws IOException {
 		return IOUtils.toString(TestUtils.class.getClassLoader()
-				.getResourceAsStream("./view/" + qname + ".tmpl"), "UTF-8");
+				.getResourceAsStream("./" + type + "/" + qname + ".tmpl"), "UTF-8");
 	}
 }
