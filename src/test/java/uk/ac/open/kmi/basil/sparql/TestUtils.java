@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 
+import uk.ac.open.kmi.basil.Headers;
 import uk.ac.open.kmi.basil.sparql.QueryParameter;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
@@ -17,8 +18,8 @@ public class TestUtils {
 	}
 
 	private static String endpoint(String qname) {
-		int pos = qname.indexOf("X-Stoner-Endpoint:");
-		int len = "X-Stoner-Endpoint:".length();
+		int pos = qname.indexOf(Headers.Endpoint + ":");
+		int len = (Headers.Endpoint + ":").length();
 		int eol = qname.indexOf('\n', pos);
 		return qname.substring(pos + len, eol).trim();
 	}

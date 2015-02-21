@@ -39,7 +39,7 @@ public class AbstractResource {
 		return builder;
 	}
 
-	protected final String getStonerParameter(String parameter,
+	protected final String getParameterOrHeader(String parameter,
 			boolean mandatory) {
 		String value = requestUri.getQueryParameters().getFirst(parameter);
 		if (value == null) {

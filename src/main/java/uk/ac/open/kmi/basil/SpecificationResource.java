@@ -53,7 +53,7 @@ public class SpecificationResource extends AbstractResource {
 						.header(Headers.Error, "Body cannot be empty").build();
 			}
 
-			String endpoint = getStonerParameter(
+			String endpoint = getParameterOrHeader(
 					Headers.asParameter(Headers.Endpoint), true);
 
 			Specification specification = SpecificationFactory.create(endpoint,

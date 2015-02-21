@@ -24,7 +24,7 @@
 
 	<context-param>
         <param-name>file-store-home</param-name>
-        <param-value>./stoner-store</param-value>
+        <param-value>./basil-store</param-value>
     </context-param>
     
 	<servlet-mapping>

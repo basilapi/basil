@@ -4,7 +4,7 @@ public final class Headers {
 	private Headers() {
 	}
 
-	public static final String PREFIX = "X-Stoner-";
+	public static final String PREFIX = "X-Basil-";
 	public static final String Error = PREFIX + "Error";
 	public static final String Endpoint = PREFIX + "Endpoint";
 	public static final String Api = PREFIX + "Api";
