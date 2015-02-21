@@ -27,6 +27,7 @@ public class TestUtils {
 	public static Specification loadQuery(String fileName) throws IOException {
 		String sparql = loadQueryString(fileName);
 		String endpoint = endpoint(sparql);
+		System.out.println(endpoint);
 		return SpecificationFactory.create(endpoint, sparql);
 	}
 

@@ -1,4 +1,4 @@
-# X-Stoner-Endpoint: http://data.open.ac.uk/sparql
+# X-Basil-Endpoint: http://data.open.ac.uk/sparql
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX mlo: <http://purl.org/net/mlo/> 
 PREFIX aiiso: <http://purl.org/vocab/aiiso/schema#> 

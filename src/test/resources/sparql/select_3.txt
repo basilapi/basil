@@ -1,4 +1,4 @@
-# X-Stoner-Endpoint: http://data.open.ac.uk/sparql
+# X-Basil-Endpoint: http://data.open.ac.uk/sparql
 PREFIX dc: <http://purl.org/dc/terms/>
 PREFIX dc11: <http://purl.org/dc/elements/1.1/>
 PREFIX oucourse: <http://data.open.ac.uk/courses/ontology/>

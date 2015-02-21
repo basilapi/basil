@@ -1,4 +1,4 @@
-# X-Stoner-Endpoint: http://dbpedia.org/sparql
+# X-Basil-Endpoint: http://dbpedia.org/sparql
 select ?subject ?label ?nationality where {
   ?subject a <http://dbpedia.org/ontology/Person> ;
     <http://www.w3.org/2000/01/rdf-schema#label> ?label ;
