@@ -1,18 +1,16 @@
 package uk.ac.open.kmi.basil;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.ac.open.kmi.basil.store.FileStore;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.ws.rs.core.Application;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import uk.ac.open.kmi.basil.store.FileStore;
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Luca Panziera on 09/01/15.
@@ -23,7 +21,6 @@ public class BasilApplication extends Application implements ServletContextListe
 	@Override
 	public Set<Class<?>> getClasses() {
 		Set<Class<?>> s = new HashSet<Class<?>>();
-		s.add(HelloWorldResource.class);
 		s.add(SpecificationResource.class);
 		s.add(ApiResource.class);
 		s.add(ExplainResource.class);
