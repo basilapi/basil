@@ -1,32 +1,24 @@
 package uk.ac.open.kmi.basil;
 
+import com.wordnik.swagger.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.ac.open.kmi.basil.sparql.Specification;
+import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
+import uk.ac.open.kmi.basil.store.Store;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
-import uk.ac.open.kmi.basil.store.Store;
-
 @Path("/")
+@Api(value = "/basil", description = "BASIL operations")
 public class SpecificationResource extends AbstractResource {
 
 	private static Logger log = LoggerFactory
@@ -40,7 +32,16 @@ public class SpecificationResource extends AbstractResource {
 	 */
 	@PUT
 	@Produces("text/plain")
-	public Response put(@QueryParam("endpoint") String endpoint, String body) {
+    @ApiOperation(value = "Create a new API specification",
+            notes = "The operation returns the resource URI of the API specification",
+            response = URI.class)
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
+            @ApiResponse(code = 201, message = "Specification created"),
+            @ApiResponse(code = 500, message = "Internal error") })
+	public Response put(@ApiParam(value = "SPARQL endpoint of the data source")
+                            @QueryParam("endpoint") String endpoint,
+                        @ApiParam(value = "SPARQL query that defines the API specification", required = true)
+                        String body) {
 		log.trace("Called PUT");
 		String id = shortUUID();
 		return doPUT(id, body);
@@ -104,7 +105,16 @@ public class SpecificationResource extends AbstractResource {
 	@PUT
 	@Path("{id:([^/]+)}/spec")
 	@Produces("text/plain")
-	public Response replaceSpec(@PathParam(value = "id") String id, String body) {
+    @ApiOperation(value = "Update existing API specification",
+            response = URI.class)
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
+            @ApiResponse(code = 200, message = "Specification updated"),
+            @ApiResponse(code = 500, message = "Internal error") })
+	public Response replaceSpec(
+            @ApiParam(value = "ID of the API specification", required = true)
+            @PathParam(value = "id") String id,
+            @ApiParam(value = "SPARQL query that substitutes the API specification", required = true)
+            String body) {
 		log.trace("Called PUT with id: {}", id);
 		return doPUT(id, body);
 	}
@@ -118,7 +128,14 @@ public class SpecificationResource extends AbstractResource {
 	@GET
 	@Path("{id:([^/]+)}/spec")
 	@Produces("text/plain")
-	public Response getSpec(@PathParam(value = "id") String id) {
+    @ApiOperation(value = "Get the API specification",
+            response = URI.class)
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "Specification not found"),
+            @ApiResponse(code = 200, message = "Specification found"),
+            @ApiResponse(code = 500, message = "Internal error") })
+	public Response getSpec(
+            @ApiParam(value = "ID of the API specification", required = true)
+            @PathParam(value = "id") String id) {
 		log.trace("Called GET spec with id: {}", id);
 		try {
 
@@ -143,7 +160,7 @@ public class SpecificationResource extends AbstractResource {
 	}
 
 	/**
-	 * Gets the stone (redirects to api).
+	 * Gets the specification (redirects to api).
 	 * 
 	 * @param id
 	 * @return

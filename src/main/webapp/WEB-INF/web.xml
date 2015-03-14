@@ -8,10 +8,9 @@
 	OR CONDITIONS OF ANY KIND, either express or implied. ~ See the License for 
 	the specific language governing permissions and ~ limitations under the License. -->
 
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
 	<servlet>
 		<servlet-name>BASIL</servlet-name>
@@ -20,6 +19,11 @@
 			<param-name>javax.ws.rs.Application</param-name>
 			<param-value>uk.ac.open.kmi.basil.BasilApplication</param-value>
 		</init-param>
+        <init-param>
+            <param-name>jersey.config.server.wadl.disableWadl</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<context-param>
@@ -32,7 +36,42 @@
 		<url-pattern>/basil/*</url-pattern>
 	</servlet-mapping>
 
+    <servlet>
+        <servlet-name>Jersey2Config</servlet-name>
+        <servlet-class>com.wordnik.swagger.jersey.config.JerseyJaxrsConfig</servlet-class>
+        <init-param>
+            <param-name>api.version</param-name>
+            <param-value>1.0.0</param-value>
+        </init-param>
+        <init-param>
+            <param-name>swagger.api.basepath</param-name>
+            <param-value>http://localhost:8080/basil</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
 	<listener>
 		<listener-class>uk.ac.open.kmi.basil.BasilApplication</listener-class>
 	</listener>
+
+    <servlet>
+        <servlet-name>Jersey2Config</servlet-name>
+        <servlet-class>com.wordnik.swagger.jersey.config.JerseyJaxrsConfig</servlet-class>
+        <init-param>
+            <param-name>api.version</param-name>
+            <param-value>1.0.0</param-value>
+        </init-param>
+        <init-param>
+            <param-name>swagger.api.basepath</param-name>
+            <param-value>http://localhost:8002/api</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>Bootstrap</servlet-name>
+        <servlet-class>uk.ac.open.kmi.basil.swagger.Bootstrap</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
 </web-app>
