@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.UUID;
 
 @Path("/")
@@ -103,7 +104,7 @@ public class SpecificationResource extends AbstractResource {
 	 * @return
 	 */
 	@PUT
-	@Path("{id:([^/]+)}/spec")
+	@Path("{id:([^/]+)}")
 	@Produces("text/plain")
     @ApiOperation(value = "Update existing API specification",
             response = URI.class)
@@ -126,10 +127,9 @@ public class SpecificationResource extends AbstractResource {
 	 * @return
 	 */
 	@GET
-	@Path("{id:([^/]+)}/spec")
+	@Path("{id:([^/]+)} ")
 	@Produces("text/plain")
-    @ApiOperation(value = "Get the API specification",
-            response = URI.class)
+    @ApiOperation(value = "Get the API specification")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "Specification not found"),
             @ApiResponse(code = 200, message = "Specification found"),
             @ApiResponse(code = 500, message = "Internal error") })
@@ -160,49 +160,21 @@ public class SpecificationResource extends AbstractResource {
 	}
 
 	/**
-	 * Gets the specification (redirects to api).
-	 * 
-	 * @param id
-	 * @return
-	 */
-	@GET
-	@Path("{id:([^/]+)}")
-	@Produces("text/plain")
-	public Response getId(@PathParam(value = "id") String id) {
-		log.trace("Called GET with id: {}", id);
-		ResponseBuilder r = Response.seeOther(requestUri.getBaseUriBuilder()
-				.path(id).path("api").build());
-		addHeaders(r, id);
-		return r.build();
-	}
-
-	/**
-	 * Updates the spec of an API
-	 * 
-	 * @param id
-	 * @return
-	 */
-	@POST
-	@Path("{id:([^/]+)}/spec")
-	@Produces("text/plain")
-	public Response updateSpec(@PathParam(value = "id") String id) {
-		log.trace("Called POST spec with id: {}", id);
-
-		// XXX Not Implemented
-		return Response.status(501).entity("Not implemented yet\n").build();
-
-	}
-
-	/**
 	 * Delete an API
 	 * 
 	 * @param id
 	 * @return
 	 */
 	@DELETE
-	@Path("{id:([^/]+)}/spec")
+	@Path("{id:([^/]+)}")
 	@Produces("text/plain")
-	public Response deleteSpec(@PathParam(value = "id") String id) {
+    @ApiOperation(value = "Delete API specification")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "Specification not found"),
+            @ApiResponse(code = 200, message = "Specification deleted"),
+            @ApiResponse(code = 500, message = "Internal error") })
+	public Response deleteSpec(
+            @ApiParam(value = "ID of the API specification", required = true)
+            @PathParam(value = "id") String id) {
 		log.trace("Called DELETE spec with id: {}", id);
 
 		// XXX Not Implemented
@@ -217,7 +189,12 @@ public class SpecificationResource extends AbstractResource {
 	 */
 	@GET
 	@Produces("text/plain")
-	public String list() {
+    @ApiOperation(value = "Get the list of available API specification",response = List.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "Internal error") }
+            )
+    public String list() {
 		log.trace("Called GET");
 		Store data = getDataStore();
 		StringBuilder sb = new StringBuilder();

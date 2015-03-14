@@ -1,36 +1,43 @@
 package uk.ac.open.kmi.basil;
 
-import java.io.IOException;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-
+import com.wordnik.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.ac.open.kmi.basil.store.Store;
 import uk.ac.open.kmi.basil.view.Engine;
 import uk.ac.open.kmi.basil.view.View;
 import uk.ac.open.kmi.basil.view.Views;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import java.io.IOException;
+import java.util.List;
+
 @Path("{id:([^/]+)}/view")
-public class ViewResource extends ApiResource {
+@Api(value = "/basil", description = "BASIL operations")
+public class ViewResource extends AbstractResource {
 	private Logger log = LoggerFactory.getLogger(ViewResource.class);
 
 	@PUT
 	@Path("{name:([^/]+)}")
 	@Produces("text/plain")
-	public Response put(@PathParam("id") String id,
+    @ApiOperation(value = "Create a new API view",
+            notes = "The operation returns the resource URI of the API view")
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
+            @ApiResponse(code = 201, message = "View created"),
+            @ApiResponse(code = 500, message = "Internal error") })
+	public Response put(
+            @ApiParam(value = "ID of the API specification", required = true)
+            @PathParam("id") String id,
+            @ApiParam(value = "Media type of the view output (e.g., text/html)", required = true)
 			@QueryParam("type") @DefaultValue("text/html") String type,
-			@PathParam("name") String name, String body) {
+            @ApiParam(value = "Name of the view", required = true)
+            @PathParam("name") String name,
+            @ApiParam(value = "Media type of the view", required = true)
+            @HeaderParam("Content-Type") String contentType,
+            @ApiParam(value = "Template of the view", required = true)
+            String body) {
 		try {
 			Engine engine;
 			// Content-type
@@ -68,7 +75,14 @@ public class ViewResource extends ApiResource {
 
 	@GET
 	@Produces("text/plain")
-	public Response listViews(@PathParam("id") String id) {
+    @ApiOperation(value = "Get the list of available views of an API",response = List.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "Internal error") }
+    )
+    public Response listViews(
+            @ApiParam(value = "ID of the API specification", required = true)
+            @PathParam("id") String id) {
 		try {
 			Views views = getDataStore().loadViews(id);
 			if (views.numberOf() == 0) {
@@ -86,7 +100,14 @@ public class ViewResource extends ApiResource {
 
 	@GET
 	@Path("{name:([^/]+)}")
-	public Response spec(@PathParam("id") String id,
+    @ApiOperation(value = "Consume an API view")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "API view not found"),
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "Internal error") })
+    public Response spec(
+            @ApiParam(value = "ID of the API specification", required = true)
+            @PathParam("id") String id,
+            @ApiParam(value = "Name of the view", required = true)
 			@PathParam("name") String name) {
 		try {
 			Views views = getDataStore().loadViews(id);
@@ -106,7 +127,14 @@ public class ViewResource extends ApiResource {
 
 	@DELETE
 	@Path("{name:([^/]+)}")
-	public Response delete(@PathParam("id") String id,
+    @ApiOperation(value = "Delete API view")
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "API view not found"),
+            @ApiResponse(code = 200, message = "API view deleted"),
+            @ApiResponse(code = 500, message = "Internal error") })
+	public Response delete(
+            @ApiParam(value = "ID of the API specification", required = true)
+            @PathParam("id") String id,
+            @ApiParam(value = "Name of the view", required = true)
 			@PathParam("name") String name) {
 		Views views;
 		try {

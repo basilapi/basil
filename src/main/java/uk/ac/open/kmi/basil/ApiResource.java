@@ -1,56 +1,9 @@
 package uk.ac.open.kmi.basil;
 
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Variant;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.riot.out.JsonLDWriter;
-import org.apache.jena.riot.system.PrefixMap;
-import org.apache.jena.riot.system.PrefixMapNull;
-import org.apache.jena.riot.system.PrefixMapStd;
-import org.apache.jena.riot.writer.NQuadsWriter;
-import org.apache.jena.riot.writer.NTriplesWriter;
-import org.apache.jena.riot.writer.RDFJSONWriter;
-import org.apache.jena.riot.writer.RDFXMLPlainWriter;
-import org.apache.jena.riot.writer.TurtleWriter;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import uk.ac.open.kmi.basil.sparql.QueryParameter;
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.sparql.VariablesBinder;
-import uk.ac.open.kmi.basil.store.Store;
-import uk.ac.open.kmi.basil.view.Items;
-import uk.ac.open.kmi.basil.view.View;
-import uk.ac.open.kmi.basil.view.Views;
-
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFormatter;
+import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
@@ -60,8 +13,36 @@ import com.hp.hpl.jena.sparql.resultset.CSVOutput;
 import com.hp.hpl.jena.sparql.resultset.JSONOutput;
 import com.hp.hpl.jena.sparql.resultset.XMLOutput;
 import com.hp.hpl.jena.sparql.util.Context;
+import com.wordnik.swagger.annotations.*;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.out.JsonLDWriter;
+import org.apache.jena.riot.system.PrefixMap;
+import org.apache.jena.riot.system.PrefixMapNull;
+import org.apache.jena.riot.system.PrefixMapStd;
+import org.apache.jena.riot.writer.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import uk.ac.open.kmi.basil.sparql.QueryParameter;
+import uk.ac.open.kmi.basil.sparql.Specification;
+import uk.ac.open.kmi.basil.sparql.VariablesBinder;
+import uk.ac.open.kmi.basil.store.Store;
+import uk.ac.open.kmi.basil.view.Items;
+import uk.ac.open.kmi.basil.view.View;
+import uk.ac.open.kmi.basil.view.Views;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Variant;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 
 @Path("{id:([^/]+)}/api{ext:(\\.[a-zA-Z0-9]+)?}")
+@Api(value = "/basil", description = "BASIL operations")
 public class ApiResource extends AbstractResource {
 
 	private Response performQuery(String id,
@@ -659,14 +640,31 @@ public class ApiResource extends AbstractResource {
 
 	@POST
 	@Consumes("application/x-www-form-urlencoded")
-	public Response post(@PathParam("id") String id,
-			@PathParam("ext") String extension,
-			MultivaluedMap<String, String> form) {
+    @ApiOperation(value = "Invoke API")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "Internal error") }
+    )
+	public Response post(
+            @ApiParam(value = "ID of the API specification", required = true)
+            @PathParam("id") String id,
+            @ApiParam(value = "Extension of the output data format (e.g., .json, .xml)")
+            @PathParam("ext") String extension,
+            @ApiParam(value = "Input parameters")
+            MultivaluedMap<String, String> form) {
 		return performQuery(id, form, extension);
 	}
 
 	@GET
-	public Response get(@PathParam("id") String id,
+    @ApiOperation(value = "Invoke API")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "Internal error") }
+    )
+	public Response get(
+            @ApiParam(value = "ID of the API specification", required = true)
+            @PathParam("id") String id,
+            @ApiParam(value = "Extension of the output data format (e.g., .json, .xml)")
 			@PathParam("ext") String extension) {
 		return performQuery(id, requestUri.getQueryParameters(), extension);
 	}
