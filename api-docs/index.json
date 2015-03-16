@@ -1,0 +1,2 @@
+
+{"apiVersion":"1.0.0","swaggerVersion":"1.2","apis":[{"path":"/basil","description":"BASIL operations"}],"info":{"title":"BASIL API","description":"Tool for building Web APIs on top of SPARQL endpoints.","termsOfServiceUrl":"","contact":"","license":"Apache 2.0","licenseUrl":"http://www.apache.org/licenses/LICENSE-2.0.html"}}
