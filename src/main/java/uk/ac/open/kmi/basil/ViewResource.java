@@ -16,8 +16,8 @@ import java.util.List;
 
 @Path("{id:([^/]+)}/view")
 @Api(value = "/basil", description = "BASIL operations")
-public class ViewResource extends AbstractResource {
-	private Logger log = LoggerFactory.getLogger(ViewResource.class);
+public class ViewResource extends ApiResource {
+    private Logger log = LoggerFactory.getLogger(ViewResource.class);
 
 	@PUT
 	@Path("{name:([^/]+)}")
