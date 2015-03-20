@@ -63,7 +63,7 @@ public class ViewResource extends ApiResource {
 			data.saveViews(id, views);
 			if (created) {
 				return Response.created(
-						requestUri.getBaseUriBuilder().path(name).build())
+						requestUri.getBaseUriBuilder().path(id).path(name).build())
 						.build();
 			} else {
 				return Response.ok().build();
