@@ -121,13 +121,24 @@ public class SpecificationResource extends AbstractResource {
 	}
 
 	/**
+	 * Redirect to /spec
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Path("{id:([^/]+)}")
+	public Response redirectToSpec(
+            @PathParam(value = "id") String id) {
+		return Response.status(303).location(requestUri.getBaseUriBuilder().path(id).path("spec").build()).build();
+	}
+	/**
 	 * Gets the spec of an API.
 	 * 
 	 * @param id
 	 * @return
 	 */
 	@GET
-	@Path("{id:([^/]+)} ")
+	@Path("{id:([^/]+)}/spec")
 	@Produces("text/plain")
     @ApiOperation(value = "Get the API specification")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "Specification not found"),
