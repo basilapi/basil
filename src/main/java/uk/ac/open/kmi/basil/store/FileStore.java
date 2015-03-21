@@ -14,6 +14,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.view.Views;
 
@@ -112,5 +113,10 @@ public class FileStore implements Store {
 
 	public void saveViews(String id, Views views) throws IOException {
 		write(id, views, "views");
+	}
+
+	@Override
+	public void saveDoc(String id, Doc doc) throws IOException {
+		write(id, doc, "doc");
 	}
 }
