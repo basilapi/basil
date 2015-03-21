@@ -4,6 +4,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 
+ * @author enridaga
+ *
+ */
 public class Doc implements Serializable {
 	/**
 	 * 
@@ -18,5 +23,13 @@ public class Doc implements Serializable {
 
 	public void set(Field field, String value) {
 		doc.put(field, value);
+	}
+
+	public String get(Field name) {
+		return doc.get(Field.NAME);
+	}
+	
+	public boolean isEmpty(){
+		return get(Field.NAME) == null && get(Field.DESCRIPTION) == null;
 	}
 }

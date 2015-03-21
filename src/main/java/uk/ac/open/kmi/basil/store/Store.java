@@ -19,7 +19,11 @@ public interface Store {
 
 	public Views loadViews(String id) throws IOException;
 
+	public Doc loadDoc(String id) throws IOException;
+
 	public void saveViews(String id, Views views) throws IOException;
 	
 	public void saveDoc(String id, Doc doc) throws IOException;
+
+	public boolean deleteDoc(String id) throws IOException;
 }

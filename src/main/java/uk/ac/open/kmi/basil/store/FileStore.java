@@ -35,7 +35,7 @@ public class FileStore implements Store {
 	}
 
 	void write(String id, Serializable o, String ext) throws IOException {
-		log.trace("writing {}", id);
+		log.trace("writing {}.{}", id, ext);
 		try {
 			File file = getFile(id, ext);
 			FileOutputStream fileOut = new FileOutputStream(file);
@@ -48,9 +48,20 @@ public class FileStore implements Store {
 		}
 	}
 
+	boolean delete(String id, String ext) throws IOException {
+		log.trace("deleting {}.{}", id, ext);
+		try {
+			File file = getFile(id, ext);
+			return file.delete();
+		} catch (IOException i) {
+			throw i;
+		}
+	}
+	
+
 	Object read(String id, String ext) throws IOException,
 			ClassNotFoundException {
-		log.trace("reading {}", id);
+		log.trace("reading {}.{}", id, ext);
 		try {
 			Object o;
 			File file = getFile(id, ext);
@@ -109,6 +120,22 @@ public class FileStore implements Store {
 		} catch (ClassNotFoundException e) {
 			throw new IOException(e);
 		}
+	}
+
+	public Doc loadDoc(String id) throws IOException {
+		try {
+			try {
+				return (Doc) read(id, "doc");
+			} catch (FileNotFoundException e) {
+				return new Doc();
+			}
+		} catch (ClassNotFoundException e) {
+			throw new IOException(e);
+		}
+	}
+
+	public boolean deleteDoc(String id) throws IOException {
+		return delete(id, "doc");
 	}
 
 	public void saveViews(String id, Views views) throws IOException {
