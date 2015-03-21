@@ -28,15 +28,15 @@ public class AbstractResource {
 			String id) {
 		URI api = requestUri.getBaseUriBuilder().path(id).path("api").build();
 		URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
-		URI store = requestUri.getBaseUriBuilder().path(id).path("store")
-				.build();
+//		URI store = requestUri.getBaseUriBuilder().path(id).path("store")
+//				.build();
 		URI views = requestUri.getBaseUriBuilder().path(id).path("view")
 				.build();
 		URI docs = requestUri.getBaseUriBuilder().path(id).path("docs")
 				.build();
 		builder.header(Headers.Api, api);
 		builder.header(Headers.Spec, spec);
-		builder.header(Headers.Store, store);
+		// builder.header(Headers.Store, store); XXX Not implemented Yet
 		builder.header(Headers.View, views);
 		builder.header(Headers.Docs, docs);
 		return builder;

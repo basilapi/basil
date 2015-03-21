@@ -25,8 +25,8 @@ public class Doc implements Serializable {
 		doc.put(field, value);
 	}
 
-	public String get(Field name) {
-		return doc.get(Field.NAME);
+	public String get(Field f) {
+		return doc.get(f);
 	}
 	
 	public boolean isEmpty(){

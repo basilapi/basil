@@ -8,9 +8,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.doc.Doc.Field;
@@ -30,6 +34,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 @Path("{id:([^/]+)}/docs")
 @Api(value = "/basil", description = "BASIL operations")
 public class DocsResource extends AbstractResource {
+    private Logger log = LoggerFactory.getLogger(DocsResource.class);
 
 	@GET
 	@Produces("text/plain")
@@ -40,6 +45,7 @@ public class DocsResource extends AbstractResource {
     		@ApiResponse(code = 204, message = "No content")
     })
 	public Response get(@PathParam("id") String id) {
+		log.trace("Calling GET. id={}",id);
 		try {
 			Store store = getDataStore();
 			if (!store.existsSpec(id)) {
@@ -67,6 +73,7 @@ public class DocsResource extends AbstractResource {
     		@ApiResponse(code = 204, message = "Deleted. No content")
     })
 	public Response delete(@PathParam("id") String id) {
+		log.trace("Calling DELETE. id={}",id);
 		try {
 			Store store = getDataStore();
 			if (!store.existsSpec(id)) {
@@ -87,7 +94,6 @@ public class DocsResource extends AbstractResource {
 	}
 	
 	@PUT
-	@Path("{name:([^/]+)}")
 	@Produces("text/plain")
     @ApiOperation(value = "To create a new doc file (plain text) and/or set a name for the API",
             notes = "The operation returns the resource URI of the doc file")
@@ -99,10 +105,12 @@ public class DocsResource extends AbstractResource {
             @ApiParam(value = "ID of the API specification", required = true)
             @PathParam("id") String id,
             @ApiParam(value = "Name of the API", required = false)
-            @PathParam("name") String name,
+            @QueryParam("name") String name,
             @ApiParam(value = "Description of the API", required = false)
             String body) {
+		log.trace("Calling PUT. id={} name={}",id, name);
 		try {
+			log.trace("Body is: {}",body);
 			Store data = getDataStore();
 			if(!data.existsSpec(id)){
 				return Response.status(409).entity("API does not exists (create the API first).").build();

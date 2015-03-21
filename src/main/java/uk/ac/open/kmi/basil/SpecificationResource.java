@@ -129,7 +129,9 @@ public class SpecificationResource extends AbstractResource {
 	@Path("{id:([^/]+)}")
 	public Response redirectToSpec(
             @PathParam(value = "id") String id) {
-		return Response.status(303).location(requestUri.getBaseUriBuilder().path(id).path("spec").build()).build();
+		ResponseBuilder builder = Response.status(303);
+		addHeaders(builder, id);
+		return builder.location(requestUri.getBaseUriBuilder().path(id).path("spec").build()).build();
 	}
 	/**
 	 * Gets the spec of an API.
