@@ -100,7 +100,7 @@ public class ViewResource extends ApiResource {
 
 	@GET
 	@Path("{name:([^/]+)}")
-    @ApiOperation(value = "Consume an API view")
+    @ApiOperation(value = "See an API view")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "API view not found"),
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Internal error") })

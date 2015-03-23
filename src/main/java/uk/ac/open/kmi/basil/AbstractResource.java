@@ -32,6 +32,8 @@ public class AbstractResource {
 //				.build();
 		URI views = requestUri.getBaseUriBuilder().path(id).path("view")
 				.build();
+		URI swagger = requestUri.getBaseUriBuilder().path(id).path("api-docs")
+				.build();
 		URI docs = requestUri.getBaseUriBuilder().path(id).path("docs")
 				.build();
 		builder.header(Headers.Api, api);
@@ -39,6 +41,7 @@ public class AbstractResource {
 		// builder.header(Headers.Store, store); XXX Not implemented Yet
 		builder.header(Headers.View, views);
 		builder.header(Headers.Docs, docs);
+		builder.header(Headers.Swagger, swagger);
 		return builder;
 	}
 
