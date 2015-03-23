@@ -41,7 +41,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-@Path("{id:([^/]+)}/api{ext:(\\.[a-zA-Z0-9]+)?}")
+@Path("{id:([^/]+)}/api{ext:(\\.[\\-a-zA-Z0-9]+)?}")
 @Api(value = "/basil", description = "BASIL operations")
 public class ApiResource extends AbstractResource {
 
@@ -305,16 +305,16 @@ public class ApiResource extends AbstractResource {
 				Node n = t.getSubject();
 				p.append("<");
 				p.append(v);
-				p.append(" ");
-				p.append("type=\"");
-				if (n.isBlank()) {
-					p.append("anon");
-				} else if (n.isLiteral()) {
-					p.append("literal");
-				} else if (n.isURI()) {
-					p.append("uri");
-				}
-				p.append("\"");
+//				p.append(" ");
+//				p.append("type=\"");
+//				if (n.isBlank()) {
+//					p.append("anon");
+//				} else if (n.isLiteral()) {
+//					p.append("literal");
+//				} else if (n.isURI()) {
+//					p.append("uri");
+//				}
+//				p.append("\"");
 				p.append(">");
 				p.append(n.toString());
 				p.append("</");
@@ -349,16 +349,16 @@ public class ApiResource extends AbstractResource {
 				n = t.getSubject();
 				p.append("<");
 				p.append(v);
-				p.append(" ");
-				p.append("type=\"");
-				if (n.isBlank()) {
-					p.append("anon");
-				} else if (n.isLiteral()) {
-					p.append("literal");
-				} else if (n.isURI()) {
-					p.append("uri");
-				}
-				p.append("\"");
+//				p.append(" ");
+//				p.append("type=\"");
+//				if (n.isBlank()) {
+//					p.append("anon");
+//				} else if (n.isLiteral()) {
+//					p.append("literal");
+//				} else if (n.isURI()) {
+//					p.append("uri");
+//				}
+//				p.append("\"");
 				p.append(">");
 				p.append(n.toString());
 				p.append("</");
@@ -492,18 +492,18 @@ public class ApiResource extends AbstractResource {
 					RDFNode n = r.get(v);
 					p.append("<");
 					p.append(v);
-					p.append(" ");
-					p.append("type=\"");
-					if (n.isAnon()) {
-						p.append("anon");
-					} else if (n.isLiteral()) {
-						p.append("literal");
-					} else if (n.isURIResource()) {
-						p.append("uri");
-					} else if (n.isResource()) {
-						p.append("resource");
-					}
-					p.append("\"");
+//					p.append(" ");
+//					p.append("type=\"");
+//					if (n.isAnon()) {
+//						p.append("anon");
+//					} else if (n.isLiteral()) {
+//						p.append("literal");
+//					} else if (n.isURIResource()) {
+//						p.append("uri");
+//					} else if (n.isResource()) {
+//						p.append("resource");
+//					}
+//					p.append("\"");
 					p.append(">");
 					p.append(n.toString());
 					p.append("</");
@@ -533,18 +533,19 @@ public class ApiResource extends AbstractResource {
 				JSONObject item = new JSONObject();
 				Iterator<String> vi = t.varNames();
 				while (vi.hasNext()) {
-					JSONObject cell = new JSONObject();
+//					JSONObject cell = new JSONObject();
 					String vn = vi.next();
 					RDFNode n = t.get(vn);
-					if (n.isAnon()) {
-						cell.put("type", "anon");
-					} else if (n.isLiteral()) {
-						cell.put("type", "literal");
-					} else if (n.isURIResource()) {
-						cell.put("type", "uri");
-					}
-					cell.put("value", n.toString());
-					item.put(vn, cell);
+//					if (n.isAnon()) {
+//						cell.put("type", "anon");
+//					} else if (n.isLiteral()) {
+//						cell.put("type", "literal");
+//					} else if (n.isURIResource()) {
+//						cell.put("type", "uri");
+//					}
+//					cell.put("value", n.toString());
+//					item.put(vn, cell);
+					item.put(vn, n.toString());
 				}
 				items.add(item);
 			}
