@@ -86,7 +86,9 @@ public class Standalone {
 		String webxmlLocation = Standalone.class
 				.getResource("/WEB-INF/web.xml").toString();
 		root.setDescriptor(webxmlLocation);
-		String resLocation = new File(".").getAbsolutePath();
+		
+		String resLocation = Standalone.class
+				.getResource("/static").toString();
 		root.setResourceBase(resLocation);
 		root.setParentLoaderPriority(true);
 		server.setHandler(root);
