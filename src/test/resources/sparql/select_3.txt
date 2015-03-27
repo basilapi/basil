@@ -10,6 +10,8 @@ PREFIX gr: <http://purl.org/goodrelations/v1#>
 PREFIX xcri: <http://xcri.org/profiles/catalog/1.2/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX cm: <http://purl.org/net/cm/>
+
+# code might be DU311 ED841 E111 A219 L195 L161 L150 K101 ...
  
 SELECT DISTINCT
 ?x
