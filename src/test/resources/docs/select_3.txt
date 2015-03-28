@@ -1,0 +1,5 @@
+Information about a course under presentation.
+Data comes from the XCRI feed.
+
+Try: DU311 ED841 E111 A219 L195 L161 L150 K101
+
