@@ -74,7 +74,7 @@ public class ViewResource extends ApiResource {
 	}
 
 	@GET
-	@Produces("text/plain")
+	@Produces({"text/plain", "text/html"})
     @ApiOperation(value = "Get the list of available views of an API",response = List.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
