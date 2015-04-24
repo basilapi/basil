@@ -13,6 +13,6 @@ $ mvn install
 
 ```
 #!shell
-
+$ cd basil
 $ mvn jetty:run
 ```
