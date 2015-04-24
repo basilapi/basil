@@ -1,0 +1,15 @@
+# X-Basil-Endpoint: http://data.open.ac.uk/sparql
+#
+# "earthquake"
+
+PREFIX mlo: <http://purl.org/net/mlo/> 
+
+SELECT ?thing ?description 
+
+FROM <http://data.open.ac.uk/context/openlearn> 
+FROM <http://data.open.ac.uk/context/podcast> 
+where { 
+?thing <http://purl.org/dc/terms/description> ?description . 
+FILTER EXISTS { { ?thing a <http://data.open.ac.uk/openlearn/ontology/OpenLearnUnit> 
+} UNION { ?thing a <http://data.open.ac.uk/podcast/ontology/VideoPodcast> } } 
+. FILTER regex(str(?description), ?_term, "i" ) }

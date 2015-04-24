@@ -13,6 +13,7 @@
 	<description>Tool for Building web Apis SImpLy on top of sparql endpoints</description>
 
 	<modules>
+		<module>parent</module>
 		<module>basil</module>
 	</modules>
 </project>

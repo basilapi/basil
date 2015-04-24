@@ -1,0 +1,70 @@
+  prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  prefix podcast: <http://data.open.ac.uk/podcast/ontology/>
+  prefix audioboo: <http://data.open.ac.uk/audioboo/ontology/>
+  prefix yt: <http://data.open.ac.uk/youtube/ontology/>
+  prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  prefix rkb: <http://courseware.rkbexplorer.com/ontologies/courseware#>
+  prefix saou: <http://data.open.ac.uk/saou/ontology#>
+  prefix dbp: <http://dbpedia.org/property/>
+  prefix media: <http://purl.org/media#>
+  prefix olearn: <http://data.open.ac.uk/openlearn/ontology/>
+  prefix mlo: <http://purl.org/net/mlo/>
+  prefix bazaar: <http://digitalbazaar.com/media/>
+  prefix schema: <http://schema.org/>
+
+ SELECT 
+  distinct
+  (?related as ?identifier)
+  ?type
+  (str(?label) as ?title)
+  (str(?location) as ?link)
+
+  FROM <http://data.open.ac.uk/context/youtube>
+  FROM <http://data.open.ac.uk/context/audioboo>
+  FROM <http://data.open.ac.uk/context/podcast>
+  FROM <http://data.open.ac.uk/context/openlearn>
+  FROM <http://data.open.ac.uk/context/course>
+  FROM <http://data.open.ac.uk/context/qualification>
+  FROM <http://data.open.ac.uk/context/xcri>
+  WHERE
+  { 
+  # TRY: q18, q51, q70, qd, q36, x86, w39, q61, q64
+  BIND(iri(concat("http://data.open.ac.uk/qualification/",?_qid)) AS ?qualification) .
+  {
+       # related video podcasts
+       ?related podcast:relatesToQualification ?qualification .
+       ?related a podcast:VideoPodcast .
+       ?related rdfs:label ?label .
+       optional { ?related bazaar:download ?location }
+       BIND( "VideoPodcast" as ?type ) .
+     } union {
+       # related audio podcasts
+       ?related podcast:relatesToQualification ?qualification . 
+       ?related a podcast:AudioPodcast .
+       ?related rdfs:label ?label .
+       optional { ?related bazaar:download ?location }
+       BIND( "AudioPodcast" as ?type ) .
+     } union {
+       # related audioboo posts
+       ?related audioboo:relatesToQualification ?qualification . 
+       ?related a audioboo:AudioBooPost .
+       ?related rdfs:label ?label .
+       optional { ?related rdfs:seeAlso ?location }
+       BIND( "AudiobooPost" as ?type ) .
+     } union {
+       # related openlearn units
+       ?related a olearn:OpenLearnUnit .
+       ?related olearn:relatesToQualification ?qualification  .
+       BIND( "OpenLearnUnit" as ?type ) .
+       ?related <http://dbpedia.org/property/url> ?location .
+       ?related rdfs:label ?label .
+     }  union {
+       # related youtube videos
+       ?related a schema:VideoObject .
+       ?related yt:relatesToQualification ?qualification  .
+       BIND( "YoutubeVideo" as ?type ) .
+       ?related media:download ?location .
+       ?related rdfs:label ?label .
+     } 
+ }
+
