@@ -1,0 +1,36 @@
+# X-Basil-Endpoint: http://data.open.ac.uk/sparql
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX dc11: <http://purl.org/dc/elements/1.1/>
+PREFIX oucourse: <http://data.open.ac.uk/courses/ontology/>
+PREFIX oco: <http://data.open.ac.uk/saou/ontology#>
+PREFIX courseware: <http://courseware.rkbexplorer.com/ontologies/courseware#>
+PREFIX aiiso: <http://purl.org/vocab/aiiso/schema#>
+PREFIX mlo: <http://purl.org/net/mlo/>
+PREFIX gr: <http://purl.org/goodrelations/v1#>
+PREFIX xcri: <http://xcri.org/profiles/catalog/1.2/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX cm: <http://purl.org/net/cm/>
+
+# code might be DU311 ED841 E111 A219 L195 L161 L150 K101 ...
+ 
+SELECT DISTINCT
+?x
+?code
+?title
+?url
+?OUCourseLevel
+?numCredits
+?description
+?apply
+?globalRedirect
+FROM <http://data.open.ac.uk/context/xcri>
+WHERE
+{
+?x a xcri:course .
+?x xcri:internalID ?_code_literal .
+?x dc11:title ?title .
+?x mlo:url ?url .
+?x mlo:specifies/xcri:applyUntil ?apply .
+?x mlo:credit [ cm:level ?OUCourseLevel ; cm:scheme <http://data.open.ac.uk/xcri/credit/scheme/the_open_university> ; cm:value ?numCredits ] .
+?x dc11:description ?description .
+} 

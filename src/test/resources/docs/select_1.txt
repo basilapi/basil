@@ -1,0 +1,7 @@
+This API shows a list of courses available in the given geoid
+
+geoid must be a geonames location id
+
+results are data.open.ac.uk URIs
+
+

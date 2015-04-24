@@ -1,0 +1,24 @@
+# X-Basil-Endpoint: http://data.open.ac.uk/sparql
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX dc11: <http://purl.org/dc/elements/1.1/>
+PREFIX oucourse: <http://data.open.ac.uk/courses/ontology/>
+PREFIX oco: <http://data.open.ac.uk/saou/ontology#>
+PREFIX courseware: <http://courseware.rkbexplorer.com/ontologies/courseware#>
+PREFIX aiiso: <http://purl.org/vocab/aiiso/schema#>
+PREFIX mlo: <http://purl.org/net/mlo/>
+PREFIX gr: <http://purl.org/goodrelations/v1#>
+PREFIX xcri: <http://xcri.org/profiles/catalog/1.2/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX cm: <http://purl.org/net/cm/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT DISTINCT ?type
+WHERE {
+ SERVICE <http://dbpedia.org/sparql> {
+    ?_x_iri a ?type
+ } . 
+ SERVICE <http://data.open.ac.uk/sparql>{
+    ?_x_iri a ?type
+ } . 
+ 
+}

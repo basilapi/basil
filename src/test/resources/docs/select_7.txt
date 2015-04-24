@@ -1,0 +1,4 @@
+Open Education Resources related to qualifications from the The Open University.
+
+Requires a qualification code, eg: q18, q51, q70, qd, q36, x86, w39, q61, q64
+
