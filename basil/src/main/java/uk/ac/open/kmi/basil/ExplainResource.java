@@ -1,29 +1,23 @@
 package uk.ac.open.kmi.basil;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-
-import uk.ac.open.kmi.basil.sparql.QueryParameter;
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.sparql.VariablesBinder;
-import uk.ac.open.kmi.basil.store.Store;
-
 import com.hp.hpl.jena.query.Query;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+import uk.ac.open.kmi.basil.sparql.QueryParameter;
+import uk.ac.open.kmi.basil.sparql.Specification;
+import uk.ac.open.kmi.basil.sparql.VariablesBinder;
+import uk.ac.open.kmi.basil.store.Store;
 
-@Path("{id:([^/]+)}/explain")
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+@Path("{id}/explain")
 @Api(value = "/basil", description = "BASIL operations")
 public class ExplainResource extends AbstractResource {
 

@@ -41,7 +41,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-@Path("{id:([^/]+)}/api{ext:(\\.[\\-a-zA-Z0-9]+)?}")
+@Path("{id}/api{ext}")
 @Api(value = "/basil", description = "BASIL operations")
 public class ApiResource extends AbstractResource {
 
@@ -589,7 +589,7 @@ public class ApiResource extends AbstractResource {
 	}
 
 	private List<MediaType> getAvailableVariants() {
-		return Arrays.asList(new MediaType[] { MediaType.TEXT_PLAIN_TYPE,
+		return Arrays.asList(MediaType.TEXT_PLAIN_TYPE,
 				MoreMediaType.NTRIPLES_TYPE, MediaType.TEXT_XML_TYPE,
 				MediaType.APPLICATION_XML_TYPE,
 				MediaType.APPLICATION_JSON_TYPE, MoreMediaType.RDFJSON_TYPE,
@@ -599,7 +599,7 @@ public class ApiResource extends AbstractResource {
 				MoreMediaType.TEXT_X_NQUADS_TYPE,
 				MoreMediaType.SPARQL_RESULTS_JSON_TYPE,
 				MoreMediaType.SPARQL_RESULTS_XML_TYPE,
-				MoreMediaType.TEXT_CSV_TYPE, MoreMediaType.TEXT_TSV_TYPE });
+				MoreMediaType.TEXT_CSV_TYPE, MoreMediaType.TEXT_TSV_TYPE);
 	}
 
 	public MediaType getFromExtension(String ext) {
@@ -665,7 +665,7 @@ public class ApiResource extends AbstractResource {
 	public Response get(
             @ApiParam(value = "ID of the API specification", required = true)
             @PathParam("id") String id,
-            @ApiParam(value = "Extension of the output data format (e.g., .json, .xml)")
+			@ApiParam(value = "Extension of the output data format (e.g., .json, .xml)", required = false)
 			@PathParam("ext") String extension) {
 		return performQuery(id, requestUri.getQueryParameters(), extension);
 	}

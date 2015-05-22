@@ -26,8 +26,22 @@ public class SpecificationResource extends AbstractResource {
 			.getLogger(SpecificationResource.class);
 
 	/**
+	 * Method to generate API Ids.
+	 * <p/>
+	 * XXX Not sure this is good, but it's an option - enridaga
+	 *
+	 * @return
+	 * @see https://gist.github.com/LeeSanghoon/5811136
+	 */
+	public static String shortUUID() {
+		UUID uuid = UUID.randomUUID();
+		long l = ByteBuffer.wrap(uuid.toString().getBytes()).getLong();
+		return Long.toString(l, Character.MAX_RADIX);
+	}
+
+	/**
 	 * Creates a new Stone
-	 * 
+	 *
 	 * @param body
 	 * @return
 	 */
@@ -98,24 +112,24 @@ public class SpecificationResource extends AbstractResource {
 
 	/**
 	 * Replace the spec of an API with a new version.
-	 * 
+	 *
 	 * @param id
 	 * @param body
 	 * @return
 	 */
 	@PUT
-	@Path("{id:([^/]+)}")
+	@Path("{id}")
 	@Produces("text/plain")
-    @ApiOperation(value = "Update existing API specification",
-            response = URI.class)
-    @ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
-            @ApiResponse(code = 200, message = "Specification updated"),
-            @ApiResponse(code = 500, message = "Internal error") })
+	@ApiOperation(value = "Update existing API specification",
+			response = URI.class)
+	@ApiResponses(value = {@ApiResponse(code = 400, message = "Body cannot be empty"),
+			@ApiResponse(code = 200, message = "Specification updated"),
+			@ApiResponse(code = 500, message = "Internal error")})
 	public Response replaceSpec(
-            @ApiParam(value = "ID of the API specification", required = true)
-            @PathParam(value = "id") String id,
-            @ApiParam(value = "SPARQL query that substitutes the API specification", required = true)
-            String body) {
+			@ApiParam(value = "ID of the API specification", required = true)
+			@PathParam(value = "id") String id,
+			@ApiParam(value = "SPARQL query that substitutes the API specification", required = true)
+			String body) {
 		log.trace("Called PUT with id: {}", id);
 		return doPUT(id, body);
 	}
@@ -126,28 +140,29 @@ public class SpecificationResource extends AbstractResource {
 	 * @return
 	 */
 	@GET
-	@Path("{id:([^/]+)}")
+	@Path("{id}")
 	public Response redirectToSpec(
-            @PathParam(value = "id") String id) {
+			@PathParam(value = "id") String id) {
 		ResponseBuilder builder = Response.status(303);
 		addHeaders(builder, id);
 		return builder.location(requestUri.getBaseUriBuilder().path(id).path("spec").build()).build();
 	}
+
 	/**
 	 * Gets the spec of an API.
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
 	@GET
-	@Path("{id:([^/]+)}/spec")
+	@Path("{id}/spec")
 	@Produces("text/plain")
-    @ApiOperation(value = "Get the API specification")
-    @ApiResponses(value = { @ApiResponse(code = 404, message = "Specification not found"),
-            @ApiResponse(code = 200, message = "Specification found"),
-            @ApiResponse(code = 500, message = "Internal error") })
+	@ApiOperation(value = "Get the API specification")
+	@ApiResponses(value = { @ApiResponse(code = 404, message = "Specification not found"),
+			@ApiResponse(code = 200, message = "Specification found"),
+			@ApiResponse(code = 500, message = "Internal error")})
 	public Response getSpec(
-            @ApiParam(value = "ID of the API specification", required = true)
+			@ApiParam(value = "ID of the API specification", required = true)
             @PathParam(value = "id") String id) {
 		log.trace("Called GET spec with id: {}", id);
 		try {
@@ -174,20 +189,20 @@ public class SpecificationResource extends AbstractResource {
 
 	/**
 	 * Delete an API
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
 	@DELETE
-	@Path("{id:([^/]+)}")
+	@Path("{id}")
 	@Produces("text/plain")
-    @ApiOperation(value = "Delete API specification")
-    @ApiResponses(value = { @ApiResponse(code = 404, message = "Specification not found"),
-            @ApiResponse(code = 200, message = "Specification deleted"),
-            @ApiResponse(code = 500, message = "Internal error") })
+	@ApiOperation(value = "Delete API specification")
+	@ApiResponses(value = {@ApiResponse(code = 404, message = "Specification not found"),
+			@ApiResponse(code = 200, message = "Specification deleted"),
+			@ApiResponse(code = 500, message = "Internal error")})
 	public Response deleteSpec(
-            @ApiParam(value = "ID of the API specification", required = true)
-            @PathParam(value = "id") String id) {
+			@ApiParam(value = "ID of the API specification", required = true)
+			@PathParam(value = "id") String id) {
 		log.trace("Called DELETE spec with id: {}", id);
 
 		// XXX Not Implemented
@@ -197,17 +212,17 @@ public class SpecificationResource extends AbstractResource {
 
 	/**
 	 * List stones
-	 * 
+	 *
 	 * @return
 	 */
 	@GET
 	@Produces("text/plain")
-    @ApiOperation(value = "Get the list of available API specification",response = List.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 500, message = "Internal error") }
-            )
-    public String list() {
+	@ApiOperation(value = "Get the list of available API specification", response = List.class)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 500, message = "Internal error")}
+	)
+	public String list() {
 		log.trace("Called GET");
 		Store data = getDataStore();
 		StringBuilder sb = new StringBuilder();
@@ -216,19 +231,5 @@ public class SpecificationResource extends AbstractResource {
 			sb.append("\n");
 		}
 		return sb.toString();
-	}
-
-	/**
-	 * Method to generate API Ids.
-	 * 
-	 * XXX Not sure this is good, but it's an option - enridaga
-	 * 
-	 * @return
-	 * @see https://gist.github.com/LeeSanghoon/5811136
-	 */
-	public static String shortUUID() {
-		UUID uuid = UUID.randomUUID();
-		long l = ByteBuffer.wrap(uuid.toString().getBytes()).getLong();
-		return Long.toString(l, Character.MAX_RADIX);
 	}
 }

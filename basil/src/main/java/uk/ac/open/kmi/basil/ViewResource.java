@@ -14,13 +14,13 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import java.io.IOException;
 import java.util.List;
 
-@Path("{id:([^/]+)}/view")
+@Path("{id}/view")
 @Api(value = "/basil", description = "BASIL operations")
 public class ViewResource extends ApiResource {
     private Logger log = LoggerFactory.getLogger(ViewResource.class);
 
 	@PUT
-	@Path("{name:([^/]+)}")
+	@Path("{name}")
 	@Produces("text/plain")
     @ApiOperation(value = "Create a new API view",
             notes = "The operation returns the resource URI of the API view")
@@ -99,8 +99,8 @@ public class ViewResource extends ApiResource {
 	}
 
 	@GET
-	@Path("{name:([^/]+)}")
-    @ApiOperation(value = "See an API view")
+	@Path("{name}")
+	@ApiOperation(value = "See an API view")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "API view not found"),
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Internal error") })
@@ -126,8 +126,8 @@ public class ViewResource extends ApiResource {
 	}
 
 	@DELETE
-	@Path("{name:([^/]+)}")
-    @ApiOperation(value = "Delete API view")
+	@Path("{name}")
+	@ApiOperation(value = "Delete API view")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "API view not found"),
             @ApiResponse(code = 200, message = "API view deleted"),
             @ApiResponse(code = 500, message = "Internal error") })
