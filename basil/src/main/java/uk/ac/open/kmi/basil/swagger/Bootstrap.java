@@ -22,8 +22,8 @@ public class Bootstrap extends HttpServlet {
                 "Tool for building Web APIs on top of SPARQL endpoints.",
                 "",                  /* TOS URL */
                 "",                            /* Contact */
-                "Undefined",                                     /* license */
-                "" /* license URL */
+                "Apache 2.0",                                     /* license */
+                "http://www.apache.org/licenses/LICENSE-2.0" /* license URL */
         );
 
         ConfigFactory.config().setApiInfo(info);
