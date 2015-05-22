@@ -1,7 +1,6 @@
 package uk.ac.open.kmi.basil;
 
-import java.net.HttpURLConnection;
-import java.net.URI;
+import uk.ac.open.kmi.basil.store.Store;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
@@ -10,8 +9,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
-
-import uk.ac.open.kmi.basil.store.Store;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.util.regex.Pattern;
 
 public class AbstractResource {
 
@@ -66,5 +66,17 @@ public class AbstractResource {
 
 	protected Store getDataStore() {
 		return (Store) context.getAttribute(BasilApplication.Registry.Store);
+	}
+
+	protected boolean isValidId(String id) {
+		return Pattern.matches(id, "[^/]+");
+	}
+
+	protected boolean isValidName(String name) {
+		return Pattern.matches(name, "[^/]+");
+	}
+
+	protected boolean isValidExtension(String name) {
+		return Pattern.matches(name, "\\.[\\-a-zA-Z0-9]+)?");
 	}
 }

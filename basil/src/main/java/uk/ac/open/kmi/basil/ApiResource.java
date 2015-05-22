@@ -48,6 +48,12 @@ public class ApiResource extends AbstractResource {
 	private Response performQuery(String id,
 			MultivaluedMap<String, String> parameters, String extension) {
 		try {
+			if (!isValidId(id)) {
+				return Response.status(400).build();
+			}
+			if (!extension.equals("") && !isValidExtension(extension)) {
+				return Response.status(400).build();
+			}
 			Store store = getDataStore();
 			if (!store.existsSpec(id)) {
 				return Response.status(404).build();

@@ -39,6 +39,12 @@ public class ViewResource extends ApiResource {
             @ApiParam(value = "Template of the view", required = true)
             String body) {
 		try {
+			if (!isValidId(id)) {
+				return Response.status(400).build();
+			}
+			if (!isValidName(name)) {
+				return Response.status(400).build();
+			}
 			Engine engine;
 			// Content-type
 			if (requestHeaders.getMediaType() == null) {
@@ -84,6 +90,9 @@ public class ViewResource extends ApiResource {
             @ApiParam(value = "ID of the API specification", required = true)
             @PathParam("id") String id) {
 		try {
+			if (!isValidId(id)) {
+				return Response.status(400).build();
+			}
 			Views views = getDataStore().loadViews(id);
 			if (views.numberOf() == 0) {
 				return Response.noContent().build();
@@ -110,6 +119,12 @@ public class ViewResource extends ApiResource {
             @ApiParam(value = "Name of the view", required = true)
 			@PathParam("name") String name) {
 		try {
+			if (!isValidId(id)) {
+				return Response.status(400).build();
+			}
+			if (!isValidName(name)) {
+				return Response.status(400).build();
+			}
 			Views views = getDataStore().loadViews(id);
 			View view = views.byName(name);
 			if (view == null) {
@@ -138,6 +153,12 @@ public class ViewResource extends ApiResource {
 			@PathParam("name") String name) {
 		Views views;
 		try {
+			if (!isValidId(id)) {
+				return Response.status(400).build();
+			}
+			if (!isValidName(name)) {
+				return Response.status(400).build();
+			}
 			views = getDataStore().loadViews(id);
 			views.remove(name);
 			getDataStore().saveViews(id, views);

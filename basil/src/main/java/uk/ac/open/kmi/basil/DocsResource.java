@@ -33,6 +33,9 @@ public class DocsResource extends AbstractResource {
 	public Response get(@PathParam("id") String id) {
 		log.trace("Calling GET. id={}",id);
 		try {
+			if (!isValidId(id)) {
+				return Response.status(400).build();
+			}
 			Store store = getDataStore();
 			if (!store.existsSpec(id)) {
 				return Response.status(404).build();
@@ -61,6 +64,9 @@ public class DocsResource extends AbstractResource {
 	public Response delete(@PathParam("id") String id) {
 		log.trace("Calling DELETE. id={}",id);
 		try {
+			if (!isValidId(id)) {
+				return Response.status(400).build();
+			}
 			Store store = getDataStore();
 			if (!store.existsSpec(id)) {
 				return Response.status(404).build();
@@ -97,6 +103,12 @@ public class DocsResource extends AbstractResource {
 		log.trace("Calling PUT. id={} name={}",id, name);
 		try {
 			log.trace("Body is: {}",body);
+			if (!isValidId(id)) {
+				return Response.status(400).build();
+			}
+			if (!isValidName(name)) {
+				return Response.status(400).build();
+			}
 			Store data = getDataStore();
 			if(!data.existsSpec(id)){
 				return Response.status(409).entity("API does not exists (create the API first).").build();

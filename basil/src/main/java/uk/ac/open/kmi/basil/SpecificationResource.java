@@ -131,6 +131,9 @@ public class SpecificationResource extends AbstractResource {
 			@ApiParam(value = "SPARQL query that substitutes the API specification", required = true)
 			String body) {
 		log.trace("Called PUT with id: {}", id);
+		if (!isValidId(id)) {
+			return Response.status(400).build();
+		}
 		return doPUT(id, body);
 	}
 
@@ -143,6 +146,9 @@ public class SpecificationResource extends AbstractResource {
 	@Path("{id}")
 	public Response redirectToSpec(
 			@PathParam(value = "id") String id) {
+		if (!isValidId(id)) {
+			return Response.status(400).build();
+		}
 		ResponseBuilder builder = Response.status(303);
 		addHeaders(builder, id);
 		return builder.location(requestUri.getBaseUriBuilder().path(id).path("spec").build()).build();
@@ -166,6 +172,9 @@ public class SpecificationResource extends AbstractResource {
             @PathParam(value = "id") String id) {
 		log.trace("Called GET spec with id: {}", id);
 		try {
+			if (!isValidId(id)) {
+				return Response.status(400).build();
+			}
 
 			Store store = getDataStore();
 			if (!store.existsSpec(id)) {
@@ -204,7 +213,9 @@ public class SpecificationResource extends AbstractResource {
 			@ApiParam(value = "ID of the API specification", required = true)
 			@PathParam(value = "id") String id) {
 		log.trace("Called DELETE spec with id: {}", id);
-
+		if (!isValidId(id)) {
+			return Response.status(400).build();
+		}
 		// XXX Not Implemented
 		return Response.status(501).entity("Not implemented yet\n").build();
 

@@ -30,6 +30,9 @@ public class ExplainResource extends AbstractResource {
     })
 	public Response get(@PathParam("id") String id) {
 		try {
+			if (!isValidId(id)) {
+				return Response.status(400).build();
+			}
 			Store store = getDataStore();
 			if (!store.existsSpec(id)) {
 				return Response.status(404).build();
