@@ -69,14 +69,14 @@ public class AbstractResource {
 	}
 
 	protected boolean isValidId(String id) {
-		return Pattern.matches(id, "[^/]+");
+		return Pattern.matches("([^/]+)", id);
 	}
 
 	protected boolean isValidName(String name) {
-		return Pattern.matches(name, "[^/]+");
+		return Pattern.matches("([^/]+)", name);
 	}
 
-	protected boolean isValidExtension(String name) {
-		return Pattern.matches(name, "\\.[\\-a-zA-Z0-9]+)?");
+	protected boolean isValidExtension(String extentsion) {
+		return Pattern.matches("(\\.[\\-a-zA-Z0-9]+)?", extentsion);
 	}
 }

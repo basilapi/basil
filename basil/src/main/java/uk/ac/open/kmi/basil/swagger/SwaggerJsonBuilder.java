@@ -1,43 +1,29 @@
 package uk.ac.open.kmi.basil.swagger;
 
-import javax.ws.rs.core.MediaType;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
 import uk.ac.open.kmi.basil.MoreMediaType;
 import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.doc.Doc.Field;
 import uk.ac.open.kmi.basil.sparql.QueryParameter;
 import uk.ac.open.kmi.basil.sparql.Specification;
 
+import javax.ws.rs.core.MediaType;
+
 public class SwaggerJsonBuilder {
-	public static enum Types {
-		List("List"), String("string");
-		private String strval;
-
-		Types(String strval) {
-			this.strval = strval;
-		}
-
-		public String toString() {
-			return this.strval;
-		}
-	};
-
 	@SuppressWarnings("unchecked")
 	public static JSONObject build(String id, Specification spec, Doc doc,
-			String basilRoot) {
+								   String basilRoot) {
 		JSONObject root = new JSONObject();
 		root.put("swaggerVersion", "1.2");
-		root.put("basePath", basilRoot );
-		root.put("resourcePath", id );
+		root.put("basePath", basilRoot.substring(0, basilRoot.length() - 1));
+		root.put("resourcePath", id);
 		JSONArray apis = new JSONArray();
 
 		// For each API
 		JSONObject api = new JSONObject();
-		api.put("path", "/"+id+"/api");
-		api.put("resourcePath", "/"+id+"/api");
+		api.put("path", "/" + id + "/api");
+		api.put("resourcePath", "/" + id + "/api");
 		JSONArray operations = new JSONArray();
 		JSONObject op = new JSONObject();
 		op.put("method", "GET");
@@ -45,7 +31,7 @@ public class SwaggerJsonBuilder {
 		op.put("summary", doc.get(Field.DESCRIPTION));
 		op.put("type", Types.List.toString());
 		JSONArray produces = new JSONArray();
-		for(MediaType kt : MoreMediaType.extensions.values()){
+		for (MediaType kt : MoreMediaType.extensions.values()) {
 			produces.add(kt.toString());
 		}
 		op.put("produces", produces);
@@ -73,5 +59,18 @@ public class SwaggerJsonBuilder {
 		apis.add(api);
 		root.put("apis", apis);
 		return root;
+	}
+
+	public enum Types {
+		List("List"), String("string");
+		private String strval;
+
+		Types(String strval) {
+			this.strval = strval;
+		}
+
+		public String toString() {
+			return this.strval;
+		}
 	}
 }
