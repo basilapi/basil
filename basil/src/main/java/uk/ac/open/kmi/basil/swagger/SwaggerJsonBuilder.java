@@ -55,7 +55,7 @@ public class SwaggerJsonBuilder {
 		}
 		par = new JSONObject();
 		par.put("name", "ext");
-		par.put("description", "Extension of the output data format (e.g., .json, .xml)"); // TODO See issue #16
+		par.put("description", "Extension of the output data format (e.g., .json, .xml)");
 		par.put("required", "false");
 		par.put("type", Types.String.toString());
 		par.put("paramType", "path");
