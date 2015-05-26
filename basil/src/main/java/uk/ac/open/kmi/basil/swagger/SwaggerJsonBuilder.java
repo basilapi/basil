@@ -22,7 +22,7 @@ public class SwaggerJsonBuilder {
 
 		// For each API
 		JSONObject api = new JSONObject();
-		api.put("path", "/" + id + "/api");
+		api.put("path", "/" + id + "/api{ext}");
 		api.put("resourcePath", "/" + id + "/api");
 		JSONArray operations = new JSONArray();
 		JSONObject op = new JSONObject();
@@ -53,6 +53,14 @@ public class SwaggerJsonBuilder {
 			par.put("paramType", "query");
 			params.add(par);
 		}
+		par = new JSONObject();
+		par.put("name", "ext");
+		par.put("description", "Extension of the output data format (e.g., .json, .xml)"); // TODO See issue #16
+		par.put("required", "false");
+		par.put("type", Types.String.toString());
+		par.put("paramType", "path");
+		par.put("allowMultiple", "false");
+		params.add(par);
 		op.put("parameters", params);
 		operations.add(op);
 		api.put("operations", operations);
