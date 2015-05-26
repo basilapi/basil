@@ -40,7 +40,7 @@ public class SwaggerUIBuilder {
         html.append("        onFailure: function(data) {\n");
         html.append("          log(\"Unable to Load SwaggerUI\");\n");
         html.append("        },\n");
-        html.append("        docExpansion: \"list\",\n");
+        html.append("        docExpansion: \"full\",\n");
         html.append("        apisSorter: \"alpha\"\n");
         html.append("      });\n");
         html.append("\n");
