@@ -19,7 +19,7 @@ import java.io.IOException;
 public class ApiDocsResource extends AbstractResource {
 	
 	@GET
-	@Produces({"application/json", "text/html"})
+	@Produces({"application/json", "text/html", "*/*"})
 	@ApiOperation(value = "Get API Swagger Description")
 	@ApiResponses(value = {
     		@ApiResponse(code = 200, message = "OK"),
@@ -36,20 +36,20 @@ public class ApiDocsResource extends AbstractResource {
 			if (!store.existsSpec(id)) {
 				return Response.status(404).build();
 			}
-			if (accept.contains("application/json")) {
+			 if (accept.contains("text/html")) {
+				String msg = SwaggerUIBuilder.build(requestUri);
+				ResponseBuilder builder = Response.ok(msg);
+				addHeaders(builder, id);
+				return builder.build();
+			}else if (accept.contains("application/json") || accept.contains("*/*")) {
 				Specification specification = store.loadSpec(id);
 				Doc docs = store.loadDoc(id);
 				JSONObject o = SwaggerJsonBuilder.build(id, specification, docs, requestUri.getBaseUri().toString());
 				ResponseBuilder builder = Response.ok(o.toJSONString());
 				addHeaders(builder, id);
 				return builder.build();
-			} else if (accept.contains("text/html")) {
-				String msg = SwaggerUIBuilder.build(requestUri);
-				ResponseBuilder builder = Response.ok(msg);
-				addHeaders(builder, id);
-				return builder.build();
-			}
-			return Response.status(405).build();
+			} 
+			return Response.status(406).build();
 		} catch (IOException e) {
 			throw new WebApplicationException(e);
 		}
