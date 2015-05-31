@@ -7,6 +7,14 @@ import javax.ws.rs.core.UriInfo;
  */
 public class SwaggerUIBuilder {
     public static String build(UriInfo swaggerUri) {
+    	// Base URL
+    	StringBuilder bb = new StringBuilder();
+    	bb.append(swaggerUri.getBaseUri().getHost());
+    	if(swaggerUri.getBaseUri().getPort() > 0){
+    		bb.append(":").append(swaggerUri.getBaseUri().getPort());
+    	}
+        String base = bb.toString();
+    	
         StringBuilder html = new StringBuilder();
         html.append("<!DOCTYPE html>\n");
         html.append("<html>\n");
@@ -14,22 +22,22 @@ public class SwaggerUIBuilder {
         html.append("  <title>Swagger UI</title>\n");
         html.append("  <link rel=\"icon\" type=\"image/png\" href=\"images/favicon-32x32.png\" sizes=\"32x32\" />\n");
         html.append("  <link rel=\"icon\" type=\"image/png\" href=\"images/favicon-16x16.png\" sizes=\"16x16\" />\n");
-        html.append("  <link href='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/css/typography.css' media='screen' rel='stylesheet' type='text/css'/>\n");
-        html.append("  <link href='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/css/reset.css' media='screen' rel='stylesheet' type='text/css'/>\n");
-        html.append("  <link href='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/css/screen.css' media='screen' rel='stylesheet' type='text/css'/>\n");
-        html.append("  <link href='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/css/reset.css' media='print' rel='stylesheet' type='text/css'/>\n");
-        html.append("  <link href='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/css/print.css' media='print' rel='stylesheet' type='text/css'/>\n");
-        html.append("  <script src='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/lib/jquery-1.8.0.min.js' type='text/javascript'></script>\n");
-        html.append("  <script src='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/lib/jquery.slideto.min.js' type='text/javascript'></script>\n");
-        html.append("  <script src='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/lib/jquery.wiggle.min.js' type='text/javascript'></script>\n");
-        html.append("  <script src='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/lib/jquery.ba-bbq.min.js' type='text/javascript'></script>\n");
-        html.append("  <script src='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/lib/handlebars-2.0.0.js' type='text/javascript'></script>\n");
-        html.append("  <script src='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/lib/underscore-min.js' type='text/javascript'></script>\n");
-        html.append("  <script src='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/lib/backbone-min.js' type='text/javascript'></script>\n");
-        html.append("  <script src='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/swagger-ui.js' type='text/javascript'></script>\n");
-        html.append("  <script src='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/lib/highlight.7.3.pack.js' type='text/javascript'></script>\n");
-        html.append("  <script src='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/lib/marked.js' type='text/javascript'></script>\n");
-        html.append("  <script src='http://").append(swaggerUri.getBaseUri().getHost()).append(":").append(swaggerUri.getBaseUri().getPort()).append("/static/swagger-ui/lib/swagger-oauth.js' type='text/javascript'></script>\n");
+        html.append("  <link href='http://").append(base).append("/static/swagger-ui/css/typography.css' media='screen' rel='stylesheet' type='text/css'/>\n");
+        html.append("  <link href='http://").append(base).append("/static/swagger-ui/css/reset.css' media='screen' rel='stylesheet' type='text/css'/>\n");
+        html.append("  <link href='http://").append(base).append("/static/swagger-ui/css/screen.css' media='screen' rel='stylesheet' type='text/css'/>\n");
+        html.append("  <link href='http://").append(base).append("/static/swagger-ui/css/reset.css' media='print' rel='stylesheet' type='text/css'/>\n");
+        html.append("  <link href='http://").append(base).append("/static/swagger-ui/css/print.css' media='print' rel='stylesheet' type='text/css'/>\n");
+        html.append("  <script src='http://").append(base).append("/static/swagger-ui/lib/jquery-1.8.0.min.js' type='text/javascript'></script>\n");
+        html.append("  <script src='http://").append(base).append("/static/swagger-ui/lib/jquery.slideto.min.js' type='text/javascript'></script>\n");
+        html.append("  <script src='http://").append(base).append("/static/swagger-ui/lib/jquery.wiggle.min.js' type='text/javascript'></script>\n");
+        html.append("  <script src='http://").append(base).append("/static/swagger-ui/lib/jquery.ba-bbq.min.js' type='text/javascript'></script>\n");
+        html.append("  <script src='http://").append(base).append("/static/swagger-ui/lib/handlebars-2.0.0.js' type='text/javascript'></script>\n");
+        html.append("  <script src='http://").append(base).append("/static/swagger-ui/lib/underscore-min.js' type='text/javascript'></script>\n");
+        html.append("  <script src='http://").append(base).append("/static/swagger-ui/lib/backbone-min.js' type='text/javascript'></script>\n");
+        html.append("  <script src='http://").append(base).append("/static/swagger-ui/swagger-ui.js' type='text/javascript'></script>\n");
+        html.append("  <script src='http://").append(base).append("/static/swagger-ui/lib/highlight.7.3.pack.js' type='text/javascript'></script>\n");
+        html.append("  <script src='http://").append(base).append("/static/swagger-ui/lib/marked.js' type='text/javascript'></script>\n");
+        html.append("  <script src='http://").append(base).append("/static/swagger-ui/lib/swagger-oauth.js' type='text/javascript'></script>\n");
         html.append("\n");
         html.append("  <script type=\"text/javascript\">\n");
         html.append("    $(function () {\n");
