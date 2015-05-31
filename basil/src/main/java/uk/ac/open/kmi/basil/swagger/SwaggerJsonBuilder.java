@@ -22,7 +22,7 @@ public class SwaggerJsonBuilder {
 
 		// For each API
 		JSONObject api = new JSONObject();
-		api.put("path", "/" + id + "/api{ext}");
+		api.put("path", "/" + id + "/api");
 		api.put("resourcePath", "/" + id + "/api");
 		JSONArray operations = new JSONArray();
 		JSONObject op = new JSONObject();
@@ -36,6 +36,7 @@ public class SwaggerJsonBuilder {
 		}
 		op.put("produces", produces);
 		JSONArray params = new JSONArray();
+		JSONArray params2 = new JSONArray();
 		JSONObject par;
 //		par= new JSONObject();
 //		par.put("name", "id");
@@ -52,7 +53,22 @@ public class SwaggerJsonBuilder {
 			par.put("type", Types.String.toString());
 			par.put("paramType", "query");
 			params.add(par);
+			params2.add(par);
 		}
+		op.put("parameters", params);
+		operations.add(op);
+
+		JSONObject api2 = new JSONObject();
+		api2.put("path", "/" + id + "/api{ext}");
+		api2.put("resourcePath", "/" + id + "/api");
+		JSONArray operations2 = new JSONArray();
+		JSONObject op2 = new JSONObject();
+		op2.put("method", "GET");
+		op2.put("nickname", "APIext");
+		op2.put("summary", doc.get(Field.DESCRIPTION));
+		op2.put("type", Types.List.toString());
+		op2.put("produces", produces);
+
 		par = new JSONObject();
 		par.put("name", "ext");
 		par.put("description", "Extension of the output data format (e.g., .json, .xml)");
@@ -60,11 +76,15 @@ public class SwaggerJsonBuilder {
 		par.put("type", Types.String.toString());
 		par.put("paramType", "path");
 		par.put("allowMultiple", "false");
-		params.add(par);
-		op.put("parameters", params);
-		operations.add(op);
+
+		params2.add(par);
+		op2.put("parameters", params2);
+		operations2.add(op2);
+
 		api.put("operations", operations);
+		api2.put("operations", operations2);
 		apis.add(api);
+		apis.add(api2);
 		root.put("apis", apis);
 		return root;
 	}

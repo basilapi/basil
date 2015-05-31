@@ -23,6 +23,8 @@ import org.apache.jena.riot.system.PrefixMapStd;
 import org.apache.jena.riot.writer.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.basil.sparql.QueryParameter;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.sparql.VariablesBinder;
@@ -39,11 +41,16 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URI;
 import java.util.*;
 
-@Path("{id}/api{ext}")
+@Path("{id}")
 @Api(value = "/basil", description = "BASIL operations")
 public class ApiResource extends AbstractResource {
+
+	private static Logger log = LoggerFactory
+			.getLogger(ApiResource.class);
 
 	private Response performQuery(String id,
 			MultivaluedMap<String, String> parameters, String extension) {
@@ -645,6 +652,7 @@ public class ApiResource extends AbstractResource {
 		return null;
 	}
 
+	@Path("api{ext}")
 	@POST
 	@Consumes("application/x-www-form-urlencoded")
     @ApiOperation(value = "Invoke API")
@@ -652,8 +660,8 @@ public class ApiResource extends AbstractResource {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Internal error") }
     )
-	public Response post(
-            @ApiParam(value = "ID of the API specification", required = true)
+	public Response postExt(
+			@ApiParam(value = "ID of the API specification", required = true)
             @PathParam("id") String id,
             @ApiParam(value = "Extension of the output data format (e.g., .json, .xml)")
             @PathParam("ext") String extension,
@@ -662,17 +670,141 @@ public class ApiResource extends AbstractResource {
 		return performQuery(id, form, extension);
 	}
 
+	@Path("api{ext}")
 	@GET
-    @ApiOperation(value = "Invoke API")
-    @ApiResponses(value = {
+	@ApiOperation(value = "Invoke API with a specific extension")
+	@ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Internal error") }
     )
-	public Response get(
-            @ApiParam(value = "ID of the API specification", required = true)
+	public Response getExt(
+			@ApiParam(value = "ID of the API specification", required = true)
             @PathParam("id") String id,
 			@ApiParam(value = "Extension of the output data format (e.g., .json, .xml)", required = false)
 			@PathParam("ext") String extension) {
 		return performQuery(id, requestUri.getQueryParameters(), extension);
+	}
+
+	@Path("api")
+	@GET
+	@ApiOperation(value = "Invoke API")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 500, message = "Internal error")}
+	)
+	public Response get(
+			@ApiParam(value = "ID of the API specification", required = true)
+			@PathParam("id") String id
+	) {
+		return performQuery(id, requestUri.getQueryParameters(), "");
+	}
+
+	/**
+	 * Replace the spec of an API with a new version.
+	 *
+	 * @param id
+	 * @param body
+	 * @return
+	 */
+	@PUT
+	@Produces("text/plain")
+	@ApiOperation(value = "Update existing API specification",
+			response = URI.class)
+	@ApiResponses(value = {@ApiResponse(code = 400, message = "Body cannot be empty"),
+			@ApiResponse(code = 200, message = "Specification updated"),
+			@ApiResponse(code = 500, message = "Internal error")})
+	public Response replaceSpec(
+			@ApiParam(value = "ID of the API specification", required = true)
+			@PathParam(value = "id") String id,
+			@ApiParam(value = "SPARQL query that substitutes the API specification", required = true)
+			String body) {
+		log.trace("Called PUT with id: {}", id);
+		if (!isValidId(id)) {
+			return Response.status(400).build();
+		}
+		return new SpecificationResource().doPUT(id, body);
+	}
+
+	/**
+	 * Redirect to /spec
+	 *
+	 * @param id
+	 * @return
+	 */
+	@GET
+	public Response redirectToSpec(
+			@PathParam(value = "id") String id) {
+		if (!isValidId(id)) {
+			return Response.status(400).build();
+		}
+		ResponseBuilder builder = Response.status(303);
+		addHeaders(builder, id);
+		return builder.location(requestUri.getBaseUriBuilder().path(id).path("spec").build()).build();
+	}
+
+	/**
+	 * Gets the spec of an API.
+	 *
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Path("spec")
+	@Produces("text/plain")
+	@ApiOperation(value = "Get the API specification")
+	@ApiResponses(value = {@ApiResponse(code = 404, message = "Specification not found"),
+			@ApiResponse(code = 200, message = "Specification found"),
+			@ApiResponse(code = 500, message = "Internal error")})
+	public Response getSpec(
+			@ApiParam(value = "ID of the API specification", required = true)
+			@PathParam(value = "id") String id) {
+		log.trace("Called GET spec with id: {}", id);
+		try {
+			if (!isValidId(id)) {
+				return Response.status(400).build();
+			}
+
+			Store store = getDataStore();
+			if (!store.existsSpec(id)) {
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}
+
+			Specification spec = store.loadSpec(id);
+			ResponseBuilder response = Response.ok();
+			response.header(Headers.Endpoint, spec.getEndpoint());
+			addHeaders(response, id);
+			response.entity(spec.getQuery());
+
+			return response.build();
+		} catch (Exception e) {
+			log.error("An error occurred", e);
+			throw new WebApplicationException(Response
+					.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					.entity(e.getMessage()).build());
+		}
+	}
+
+	/**
+	 * Delete an API
+	 *
+	 * @param id
+	 * @return
+	 */
+	@DELETE
+	@Produces("text/plain")
+	@ApiOperation(value = "Delete API specification")
+	@ApiResponses(value = {@ApiResponse(code = 404, message = "Specification not found"),
+			@ApiResponse(code = 200, message = "Specification deleted"),
+			@ApiResponse(code = 500, message = "Internal error")})
+	public Response deleteSpec(
+			@ApiParam(value = "ID of the API specification", required = true)
+			@PathParam(value = "id") String id) {
+		log.trace("Called DELETE spec with id: {}", id);
+		if (!isValidId(id)) {
+			return Response.status(400).build();
+		}
+		// XXX Not Implemented
+		return Response.status(501).entity("Not implemented yet\n").build();
+
 	}
 }

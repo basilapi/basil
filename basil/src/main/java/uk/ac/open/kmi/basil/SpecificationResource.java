@@ -62,7 +62,7 @@ public class SpecificationResource extends AbstractResource {
 		return doPUT(id, body);
 	}
 
-	private Response doPUT(String id, String body) {
+	protected Response doPUT(String id, String body) {
 		try {
 			if (body.equals("")) {
 				return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
@@ -110,116 +110,7 @@ public class SpecificationResource extends AbstractResource {
 		}
 	}
 
-	/**
-	 * Replace the spec of an API with a new version.
-	 *
-	 * @param id
-	 * @param body
-	 * @return
-	 */
-	@PUT
-	@Path("{id}")
-	@Produces("text/plain")
-	@ApiOperation(value = "Update existing API specification",
-			response = URI.class)
-	@ApiResponses(value = {@ApiResponse(code = 400, message = "Body cannot be empty"),
-			@ApiResponse(code = 200, message = "Specification updated"),
-			@ApiResponse(code = 500, message = "Internal error")})
-	public Response replaceSpec(
-			@ApiParam(value = "ID of the API specification", required = true)
-			@PathParam(value = "id") String id,
-			@ApiParam(value = "SPARQL query that substitutes the API specification", required = true)
-			String body) {
-		log.trace("Called PUT with id: {}", id);
-		if (!isValidId(id)) {
-			return Response.status(400).build();
-		}
-		return doPUT(id, body);
-	}
 
-	/**
-	 * Redirect to /spec
-	 * @param id
-	 * @return
-	 */
-	@GET
-	@Path("{id}")
-	public Response redirectToSpec(
-			@PathParam(value = "id") String id) {
-		if (!isValidId(id)) {
-			return Response.status(400).build();
-		}
-		ResponseBuilder builder = Response.status(303);
-		addHeaders(builder, id);
-		return builder.location(requestUri.getBaseUriBuilder().path(id).path("spec").build()).build();
-	}
-
-	/**
-	 * Gets the spec of an API.
-	 *
-	 * @param id
-	 * @return
-	 */
-	@GET
-	@Path("{id}/spec")
-	@Produces("text/plain")
-	@ApiOperation(value = "Get the API specification")
-	@ApiResponses(value = { @ApiResponse(code = 404, message = "Specification not found"),
-			@ApiResponse(code = 200, message = "Specification found"),
-			@ApiResponse(code = 500, message = "Internal error")})
-	public Response getSpec(
-			@ApiParam(value = "ID of the API specification", required = true)
-            @PathParam(value = "id") String id) {
-		log.trace("Called GET spec with id: {}", id);
-		try {
-			if (!isValidId(id)) {
-				return Response.status(400).build();
-			}
-
-			Store store = getDataStore();
-			if (!store.existsSpec(id)) {
-				return Response.status(Status.NOT_FOUND).build();
-			}
-
-			Specification spec = store.loadSpec(id);
-			ResponseBuilder response = Response.ok();
-			response.header(Headers.Endpoint, spec.getEndpoint());
-			addHeaders(response, id);
-			response.entity(spec.getQuery());
-
-			return response.build();
-		} catch (Exception e) {
-			log.error("An error occurred", e);
-			throw new WebApplicationException(Response
-					.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-					.entity(e.getMessage()).build());
-		}
-	}
-
-	/**
-	 * Delete an API
-	 *
-	 * @param id
-	 * @return
-	 */
-	@DELETE
-	@Path("{id}")
-	@Produces("text/plain")
-	@ApiOperation(value = "Delete API specification")
-	@ApiResponses(value = {@ApiResponse(code = 404, message = "Specification not found"),
-			@ApiResponse(code = 200, message = "Specification deleted"),
-			@ApiResponse(code = 500, message = "Internal error")})
-	public Response deleteSpec(
-			@ApiParam(value = "ID of the API specification", required = true)
-			@PathParam(value = "id") String id) {
-		log.trace("Called DELETE spec with id: {}", id);
-		if (!isValidId(id)) {
-			return Response.status(400).build();
-		}
-		// XXX Not Implemented
-		return Response.status(501).entity("Not implemented yet\n").build();
-
-	}
 
 	/**
 	 * List stones
