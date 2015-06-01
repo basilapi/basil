@@ -23,8 +23,6 @@ public class Standalone {
 		public Cli(String[] args) {
 			this.args = args;
 			options.addOption("h", "help", false, "Show this help.");
-			options.addOption("c", "config", true,
-					"Configuration file path (required).");
 			options.addOption("p", "port", true,
 					"Set the port the server will listen to (defaults to 8080).");
 		}
@@ -33,7 +31,7 @@ public class Standalone {
 		 * Prints help.
 		 */
 		private void help() {
-			String syntax = "java [java-opts] -jar [jarfile] -c [config-file]";
+			String syntax = "java [java-opts] -jar [jarfile] ";
 			new HelpFormatter().printHelp(syntax, options);
 			System.exit(0);
 		}
