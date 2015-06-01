@@ -1,5 +1,7 @@
 # BASIL #
-Tool for building Web APIs on top of SPARQL endpoints.
+BASIL is designed as middleware system that mediates between SPARQL endpoints and applications.
+
+With BASIL you can build Web APIs on top of SPARQL endpoints.
 
 ## Build with Maven ##
 
