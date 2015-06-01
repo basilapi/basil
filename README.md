@@ -32,6 +32,10 @@ ERROR StatusLogger No log4j2 configuration file found. Using default configurati
 
 You can specify a configuration for logging:
 
+```
+$ java -jar basil-server-0.2.0-SNAPSHOT.jar -Dlog4j.configurationFile=...
+```
+
 ## Run with Maven ##
 
 ```
