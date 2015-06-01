@@ -3,6 +3,7 @@ BASIL is designed as middleware system that mediates between SPARQL endpoints an
 
 With BASIL you can build Web APIs on top of SPARQL endpoints.
 
+BASIL stores SPARQL queries and builds APIs with standard and customizable formats.
 
 ## Build with Maven ##
 
