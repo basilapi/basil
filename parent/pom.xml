@@ -21,6 +21,7 @@
 		<!-- jetty -->
 		<org.eclipse.jetty.version>9.2.3.v20140905</org.eclipse.jetty.version>
 	</properties>
+	
 	<dependencyManagement>
 	<dependencies>
 		<!-- Logging -->
@@ -178,5 +179,32 @@
 		
 	</dependencies>
 </dependencyManagement>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/the-open-university/basil/issues</url>
+	</issueManagement>
+	
+	
+    <scm>
+        <url>https://github.com/the-open-university/basil</url>
+        <connection>scm:git:git://github.com/the-open-university/basil.git</connection>
+        <developerConnection>scm:git:git@github.com:the-open-university/basil.git</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <email>enrico.daga@open.ac.uk</email>
+            <name>Enrico Daga</name>
+            <url>https://github.com/enridaga</url>
+            <id>enridaga</id>
+        </developer>
+        <developer>
+            <email>luca.panziera@open.ac.uk</email>
+            <name>Luca Panziera</name>
+            <url>https://github.com/izziblues</url>
+            <id>izziblues</id>
+        </developer>
+    </developers>
+    
 </project>
 
