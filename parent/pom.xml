@@ -20,6 +20,9 @@
 		<log4j.version>2.1</log4j.version>
 		<!-- jetty -->
 		<org.eclipse.jetty.version>9.2.3.v20140905</org.eclipse.jetty.version>
+		
+		<!-- basil version -->
+		<basil.version>0.2.0-SNAPSHOT</basil.version>
 	</properties>
 	
 	<dependencyManagement>
