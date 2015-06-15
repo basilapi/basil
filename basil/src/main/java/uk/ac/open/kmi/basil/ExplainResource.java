@@ -23,8 +23,8 @@ public class ExplainResource extends AbstractResource {
 
 	@GET
 	@Produces("text/plain")
-	@ApiOperation(value = "Explain API invokation")
-    @ApiResponses(value = {
+	@ApiOperation(value = "Explain API invocation")
+	@ApiResponses(value = {
     		@ApiResponse(code = 200, message = "OK"),
     		@ApiResponse(code = 500, message = "Internal error") 
     })
