@@ -1,7 +1,8 @@
 package uk.ac.open.kmi.basil.swagger;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import uk.ac.open.kmi.basil.MoreMediaType;
 import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.doc.Doc.Field;
@@ -12,80 +13,80 @@ import javax.ws.rs.core.MediaType;
 
 public class SwaggerJsonBuilder {
 	@SuppressWarnings("unchecked")
-	public static JSONObject build(String id, Specification spec, Doc doc,
+	public static JsonObject build(String id, Specification spec, Doc doc,
 								   String basilRoot) {
-		JSONObject root = new JSONObject();
-		root.put("swaggerVersion", "1.2");
-		root.put("basePath", basilRoot.substring(0, basilRoot.length() - 1));
-		root.put("resourcePath", id);
-		JSONArray apis = new JSONArray();
+		JsonObject root = new JsonObject();
+		root.add("swaggerVersion", new JsonPrimitive("1.2"));
+		root.add("basePath", new JsonPrimitive(basilRoot.substring(0, basilRoot.length() - 1)));
+		root.add("resourcePath", new JsonPrimitive(id));
+		JsonArray apis = new JsonArray();
 
 		// For each API
-		JSONObject api = new JSONObject();
-		api.put("path", "/" + id + "/api");
-		api.put("resourcePath", "/" + id + "/api");
-		JSONArray operations = new JSONArray();
-		JSONObject op = new JSONObject();
-		op.put("method", "GET");
-		op.put("nickname", "API");
-		op.put("summary", doc.get(Field.DESCRIPTION));
-		op.put("type", Types.List.toString());
-		JSONArray produces = new JSONArray();
+		JsonObject api = new JsonObject();
+		api.add("path", new JsonPrimitive("/" + id + "/api"));
+		api.add("resourcePath", new JsonPrimitive("/" + id + "/api"));
+		JsonArray operations = new JsonArray();
+		JsonObject op = new JsonObject();
+		op.add("method", new JsonPrimitive("GET"));
+		op.add("nickname", new JsonPrimitive("API"));
+		op.add("summary", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
+		op.add("type", new JsonPrimitive(Types.List.toString()));
+		JsonArray produces = new JsonArray();
 		for (MediaType kt : MoreMediaType.extensions.values()) {
-			produces.add(kt.toString());
+			produces.add(new JsonPrimitive(kt.toString()));
 		}
-		op.put("produces", produces);
-		JSONArray params = new JSONArray();
-		JSONArray params2 = new JSONArray();
-		JSONObject par;
-//		par= new JSONObject();
-//		par.put("name", "id");
-//		par.put("description", "Id of the BASIL API");
-//		par.put("required", true);
-//		par.put("type", Types.String.toString());
-//		par.put("paramType", "path");
+		op.add("produces", produces);
+		JsonArray params = new JsonArray();
+		JsonArray params2 = new JsonArray();
+		JsonObject par;
+//		par= new JsonObject();
+//		par.add("name", "id");
+//		par.add("description", "Id of the BASIL API");
+//		par.add("required", true);
+//		par.add("type", Types.String.toString());
+//		par.add("paramType", "path");
 //		params.add(par);
 		for (QueryParameter p : spec.getParameters()) {
-			par = new JSONObject();
-			par.put("name", p.getName());
-			par.put("description", ""); // TODO See issue #16
-			par.put("required", !p.isOptional());
-			par.put("type", Types.String.toString());
-			par.put("paramType", "query");
+			par = new JsonObject();
+			par.add("name", new JsonPrimitive(p.getName()));
+			par.add("description", new JsonPrimitive("")); // TODO See issue #16
+			par.add("required", new JsonPrimitive(!p.isOptional()));
+			par.add("type", new JsonPrimitive(Types.String.toString()));
+			par.add("paramType", new JsonPrimitive("query"));
 			params.add(par);
 			params2.add(par);
 		}
-		op.put("parameters", params);
+		op.add("parameters", params);
 		operations.add(op);
 
-		JSONObject api2 = new JSONObject();
-		api2.put("path", "/" + id + "/api{ext}");
-		api2.put("resourcePath", "/" + id + "/api");
-		JSONArray operations2 = new JSONArray();
-		JSONObject op2 = new JSONObject();
-		op2.put("method", "GET");
-		op2.put("nickname", "APIext");
-		op2.put("summary", doc.get(Field.DESCRIPTION));
-		op2.put("type", Types.List.toString());
-		op2.put("produces", produces);
+		JsonObject api2 = new JsonObject();
+		api2.add("path", new JsonPrimitive("/" + id + "/api{ext}"));
+		api2.add("resourcePath", new JsonPrimitive("/" + id + "/api"));
+		JsonArray operations2 = new JsonArray();
+		JsonObject op2 = new JsonObject();
+		op2.add("method", new JsonPrimitive("GET"));
+		op2.add("nickname", new JsonPrimitive("APIext"));
+		op2.add("summary", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
+		op2.add("type", new JsonPrimitive(Types.List.toString()));
+		op2.add("produces", produces);
 
-		par = new JSONObject();
-		par.put("name", "ext");
-		par.put("description", "Extension of the output data format (e.g., .json, .xml)");
-		par.put("required", "false");
-		par.put("type", Types.String.toString());
-		par.put("paramType", "path");
-		par.put("allowMultiple", "false");
+		par = new JsonObject();
+		par.add("name", new JsonPrimitive("ext"));
+		par.add("description", new JsonPrimitive("Extension of the output data format (e.g., .json, .xml)"));
+		par.add("required", new JsonPrimitive("false"));
+		par.add("type", new JsonPrimitive(Types.String.toString()));
+		par.add("paramType", new JsonPrimitive("path"));
+		par.add("allowMultiple", new JsonPrimitive("false"));
 
 		params2.add(par);
-		op2.put("parameters", params2);
+		op2.add("parameters", params2);
 		operations2.add(op2);
 
-		api.put("operations", operations);
-		api2.put("operations", operations2);
+		api.add("operations", operations);
+		api2.add("operations", operations2);
 		apis.add(api);
 		apis.add(api2);
-		root.put("apis", apis);
+		root.add("apis", apis);
 		return root;
 	}
 

@@ -1,5 +1,8 @@
 package uk.ac.open.kmi.basil;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.wordnik.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +24,14 @@ public class SpecificationResource extends AbstractResource {
 
 
 	/**
-	 * Creates a new Stone
+	 * Creates a new API
 	 *
 	 * @param body
 	 * @return
 	 */
 	@PUT
-	@Produces("text/plain")
-    @ApiOperation(value = "Create a new API specification",
+	@Produces("application/json")
+	@ApiOperation(value = "Create a new API specification",
             notes = "The operation returns the resource URI of the API specification",
             response = URI.class)
     @ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
@@ -49,8 +52,10 @@ public class SpecificationResource extends AbstractResource {
 			URI spec = requestUri.getBaseUriBuilder().path(id).path("spec")
 						.build();
 			log.info("Created  spec at: {}", spec);
-			response = Response.created(api).entity(
-						"Created: " + api.toString());
+			JsonObject m = new JsonObject();
+			m.add("message", new JsonPrimitive("Created: " + api.toString()));
+			m.add("location", new JsonPrimitive(api.toString()));
+			response = Response.created(api).entity(m.toString());
 
 			addHeaders(response, id);
 
@@ -69,7 +74,7 @@ public class SpecificationResource extends AbstractResource {
 	 * @return
 	 */
 	@GET
-	@Produces("text/plain")
+	@Produces("application/json")
 	@ApiOperation(value = "Get the list of available API specifications", response = List.class)
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "OK"),
@@ -77,11 +82,10 @@ public class SpecificationResource extends AbstractResource {
 	)
 	public String list() {
 		log.trace("Called GET");
-		StringBuilder sb = new StringBuilder();
+		JsonArray r = new JsonArray();
 		for (String api : getApiManager().listApis()) {
-			sb.append(requestUri.getBaseUriBuilder().path(api));
-			sb.append("\n");
+			r.add(new JsonPrimitive(String.valueOf(requestUri.getBaseUriBuilder().path(api))));
 		}
-		return sb.toString();
+		return r.toString();
 	}
 }

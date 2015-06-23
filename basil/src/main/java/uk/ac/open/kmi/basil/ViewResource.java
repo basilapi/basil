@@ -1,5 +1,8 @@
 package uk.ac.open.kmi.basil;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.wordnik.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +14,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 @Path("{id}/view")
@@ -20,8 +24,8 @@ public class ViewResource extends AbstractResource {
 
 	@PUT
 	@Path("{name}")
-	@Produces("text/plain")
-    @ApiOperation(value = "Create a new API view",
+	@Produces("application/json")
+	@ApiOperation(value = "Create a new API view",
             notes = "The operation returns the resource URI of the API view")
     @ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
             @ApiResponse(code = 201, message = "View created"),
@@ -46,8 +50,11 @@ public class ViewResource extends AbstractResource {
 				String mediaType = requestHeaders.getMediaType().getType();
 				engine = Engine.byContentType(mediaType);
 				if (engine == null) {
+					JsonObject m = new JsonObject();
+					m.add("message", new JsonPrimitive("Unsupported media type: " + mediaType));
+					m.add("unsupportedMediaType", new JsonPrimitive(mediaType));
 					return Response.serverError()
-							.entity("Unsupported content type: " + mediaType)
+							.entity(m.toString())
 							.build();
 				}
 			}
@@ -71,8 +78,8 @@ public class ViewResource extends AbstractResource {
 	}
 
 	@GET
-	@Produces({"text/plain", "text/html"})
-    @ApiOperation(value = "Get the list of available views of an API",response = List.class)
+	@Produces("application/json")
+	@ApiOperation(value = "Get the list of available views of an API",response = List.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Internal error") }
@@ -85,11 +92,8 @@ public class ViewResource extends AbstractResource {
 			if (views.numberOf() == 0) {
 				return Response.noContent().build();
 			}
-			StringBuilder sb = new StringBuilder();
-			for (String ext : views.getNames()) {
-				sb.append(ext).append("\n");
-			}
-			return Response.ok(sb.toString()).build();
+			Gson gson = new Gson();
+			return Response.ok(gson.toJson(views.getNames())).build();
 		} catch (Exception e) {
 			return Response.serverError().entity(e.getMessage()).build();
 		}
@@ -123,6 +127,7 @@ public class ViewResource extends AbstractResource {
 
 	@DELETE
 	@Path("{name}")
+	@Produces("application/json")
 	@ApiOperation(value = "Delete API view")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "API view not found"),
             @ApiResponse(code = 200, message = "API view deleted"),
@@ -135,7 +140,11 @@ public class ViewResource extends AbstractResource {
 		try {
 			getApiManager().deleteView(id, name);
 			log.debug("View deleted: {}:{} ", id, name);
-			return Response.noContent().build();
+			URI view = requestUri.getBaseUriBuilder().path(id).path("view").path("name").build();
+			JsonObject m = new JsonObject();
+			m.add("message", new JsonPrimitive("View deleted: " + view.toString()));
+			m.add("location", new JsonPrimitive(view.toString()));
+			return Response.ok().entity(m.toString()).build();
 		} catch (IOException e) {
 			log.error("", e);
 			return Response.serverError().build();

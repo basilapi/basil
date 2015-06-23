@@ -1,5 +1,7 @@
 package uk.ac.open.kmi.basil;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.hp.hpl.jena.query.Query;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -21,7 +23,7 @@ import java.util.List;
 public class ExplainResource extends AbstractResource {
 
 	@GET
-	@Produces("text/plain")
+	@Produces("application/json")
 	@ApiOperation(value = "Explain API invocation")
 	@ApiResponses(value = {
     		@ApiResponse(code = 200, message = "OK"),
@@ -48,7 +50,10 @@ public class ExplainResource extends AbstractResource {
 			}
 
 			Query q = binder.toQuery();
-			ResponseBuilder builder = Response.ok(q.toString());
+			JsonObject m = new JsonObject();
+			m.add("query", new JsonPrimitive(q.toString()));
+
+			ResponseBuilder builder = Response.ok(m.toString());
 			addHeaders(builder, id);
 			builder.header(Headers.Endpoint, specification.getEndpoint());
 			return builder.build();

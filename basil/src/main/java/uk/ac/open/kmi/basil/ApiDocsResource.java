@@ -1,7 +1,7 @@
 package uk.ac.open.kmi.basil;
 
+import com.google.gson.JsonObject;
 import com.wordnik.swagger.annotations.*;
-import org.json.simple.JSONObject;
 import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.swagger.SwaggerJsonBuilder;
@@ -40,8 +40,8 @@ public class ApiDocsResource extends AbstractResource {
 			}else if (accept.contains("application/json") || accept.contains("*/*")) {
 				 Specification specification = getApiManager().getSpecification(id);
 				 Doc docs = getApiManager().getDoc(id);
-				JSONObject o = SwaggerJsonBuilder.build(id, specification, docs, requestUri.getBaseUri().toString());
-				ResponseBuilder builder = Response.ok(o.toJSONString());
+				 JsonObject o = SwaggerJsonBuilder.build(id, specification, docs, requestUri.getBaseUri().toString());
+				 ResponseBuilder builder = Response.ok(o.toString());
 				addHeaders(builder, id);
 				return builder.build();
 			} 

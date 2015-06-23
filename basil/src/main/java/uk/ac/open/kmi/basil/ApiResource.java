@@ -1,5 +1,8 @@
 package uk.ac.open.kmi.basil;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
@@ -23,8 +26,6 @@ import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapNull;
 import org.apache.jena.riot.system.PrefixMapStd;
 import org.apache.jena.riot.writer.*;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.basil.core.InvocationResult;
@@ -199,9 +200,9 @@ public class ApiResource extends AbstractResource {
 		}
 
 		if (MediaType.APPLICATION_JSON_TYPE.equals(type)) {
-			JSONObject o = new JSONObject();
-			o.put("bool", b);
-			return o.toJSONString() + "\n";
+			JsonObject o = new JsonObject();
+			o.add("bool", new JsonPrimitive(b));
+			return o.toString() + "\n";
 		}
 
 		// sparql-results+xml
@@ -348,23 +349,23 @@ public class ApiResource extends AbstractResource {
 		// application/json
 		if (MediaType.APPLICATION_JSON_TYPE.equals(type)) {
 			Iterator<Triple> tr = model.getGraph().find(null, null, null);
-			JSONObject o = new JSONObject();
-			JSONArray vars = new JSONArray();
-			vars.add("subject");
-			vars.add("predicate");
-			vars.add("object");
-			o.put("vars", vars);
-			JSONArray items = new JSONArray();
+			JsonObject o = new JsonObject();
+			JsonArray vars = new JsonArray();
+			vars.add(new JsonPrimitive("subject"));
+			vars.add(new JsonPrimitive("predicate"));
+			vars.add(new JsonPrimitive("object"));
+			o.add("vars", vars);
+			JsonArray items = new JsonArray();
 			while (tr.hasNext()) {
 				Triple t = tr.next();
-				JSONObject item = new JSONObject();
-				item.put("subject", t.getSubject().toString());
-				item.put("predicate", t.getPredicate().toString());
-				item.put("object", t.getObject().toString());
+				JsonObject item = new JsonObject();
+				item.add("subject", new JsonPrimitive(t.getSubject().toString()));
+				item.add("predicate", new JsonPrimitive(t.getPredicate().toString()));
+				item.add("object", new JsonPrimitive(t.getObject().toString()));
 				items.add(item);
 			}
-			o.put("items", items);
-			return o.toJSONString() + "\n";
+			o.add("items", items);
+			return o.toString() + "\n";
 		}
 
 		// application/rdf+json
@@ -489,36 +490,36 @@ public class ApiResource extends AbstractResource {
 
 		// application/json
 		if (MediaType.APPLICATION_JSON_TYPE.equals(type)) {
-			JSONObject o = new JSONObject();
-			JSONArray vars = new JSONArray();
+			JsonObject o = new JsonObject();
+			JsonArray vars = new JsonArray();
 			for (String v : rs.getResultVars()) {
-				vars.add(v);
+				vars.add(new JsonPrimitive(v));
 			}
-			o.put("vars", vars);
-			JSONArray items = new JSONArray();
+			o.add("vars", vars);
+			JsonArray items = new JsonArray();
 			while (rs.hasNext()) {
 				QuerySolution t = rs.next();
-				JSONObject item = new JSONObject();
+				JsonObject item = new JsonObject();
 				Iterator<String> vi = t.varNames();
 				while (vi.hasNext()) {
-//					JSONObject cell = new JSONObject();
+//					JsonObject cell = new JsonObject();
 					String vn = vi.next();
 					RDFNode n = t.get(vn);
 //					if (n.isAnon()) {
-//						cell.put("type", "anon");
+//						cell.add("type", "anon");
 //					} else if (n.isLiteral()) {
-//						cell.put("type", "literal");
+//						cell.add("type", "literal");
 //					} else if (n.isURIResource()) {
-//						cell.put("type", "uri");
+//						cell.add("type", "uri");
 //					}
-//					cell.put("value", n.toString());
-//					item.put(vn, cell);
-					item.put(vn, n.toString());
+//					cell.add("value", n.toString());
+//					item.add(vn, cell);
+					item.add(vn, new JsonPrimitive(n.toString()));
 				}
 				items.add(item);
 			}
-			o.put("items", items);
-			return o.toJSONString() + "\n";
+			o.add("items", items);
+			return o.toString() + "\n";
 		}
 
 		// sparql-results+xml
@@ -662,7 +663,7 @@ public class ApiResource extends AbstractResource {
 	 * @return
 	 */
 	@PUT
-	@Produces("text/plain")
+	@Produces("application/json")
 	@ApiOperation(value = "Update existing API specification",
 			response = URI.class)
 	@ApiResponses(value = {@ApiResponse(code = 400, message = "Body cannot be empty"),
@@ -680,8 +681,10 @@ public class ApiResource extends AbstractResource {
 			ResponseBuilder response;
 			URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
 			log.info("Replaced spec at: {}", spec);
-			response = Response.ok(spec).entity(
-					"Replaced: " + spec.toString() + "\n");
+			JsonObject m = new JsonObject();
+			m.add("message", new JsonPrimitive("Replaced: " + spec.toString()));
+			m.add("location", new JsonPrimitive(spec.toString()));
+			response = Response.ok(spec).entity(m.toString());
 
 			addHeaders(response, id);
 
@@ -753,7 +756,7 @@ public class ApiResource extends AbstractResource {
 	 * @return
 	 */
 	@DELETE
-	@Produces("text/plain")
+	@Produces("application/json")
 	@ApiOperation(value = "Delete API specification")
 	@ApiResponses(value = {@ApiResponse(code = 404, message = "Specification not found"),
 			@ApiResponse(code = 200, message = "Specification deleted"),
@@ -766,8 +769,10 @@ public class ApiResource extends AbstractResource {
 			getApiManager().deleteApi(id);
 			URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
 			ResponseBuilder response;
-			response = Response.ok().entity(
-					"Deleted: " + spec.toString());
+			JsonObject m = new JsonObject();
+			m.add("message", new JsonPrimitive("Deleted: " + spec.toString()));
+			m.add("location", new JsonPrimitive(spec.toString()));
+			response = Response.ok().entity(m.toString());
 			addHeaders(response, id);
 
 			return response.build();
@@ -787,7 +792,7 @@ public class ApiResource extends AbstractResource {
 	 */
 	@GET
 	@Path("clone")
-	@Produces("text/plain")
+	@Produces("application/json")
 	@ApiOperation(value = "Get a clone of an API")
 	@ApiResponses(value = {@ApiResponse(code = 404, message = "Specification not found"),
 			@ApiResponse(code = 200, message = "API clones"),
@@ -805,8 +810,10 @@ public class ApiResource extends AbstractResource {
 			ResponseBuilder response;
 			URI spec = requestUri.getBaseUriBuilder().path(newId).path("spec").build();
 			log.info("Cloned spec at: {}", spec);
-			response = Response.ok(spec).entity(
-					"Cloned at: " + spec.toString() + "\n");
+			JsonObject m = new JsonObject();
+			m.add("message", new JsonPrimitive("Cloned at: " + spec.toString()));
+			m.add("location", new JsonPrimitive(spec.toString()));
+			response = Response.ok(spec).entity(m.toString());
 			addHeaders(response, newId);
 
 			return response.build();
