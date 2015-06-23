@@ -3,7 +3,9 @@ package uk.ac.open.kmi.basil;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.*;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
@@ -25,10 +27,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.open.kmi.basil.sparql.QueryParameter;
+import uk.ac.open.kmi.basil.core.InvocationResult;
+import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
 import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.sparql.VariablesBinder;
-import uk.ac.open.kmi.basil.store.Store;
 import uk.ac.open.kmi.basil.view.Items;
 import uk.ac.open.kmi.basil.view.View;
 import uk.ac.open.kmi.basil.view.Views;
@@ -39,11 +40,15 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @Path("{id}")
 @Api(value = "/basil", description = "BASIL operations")
@@ -55,45 +60,7 @@ public class ApiResource extends AbstractResource {
 	private Response performQuery(String id,
 			MultivaluedMap<String, String> parameters, String extension) {
 		try {
-			if (!isValidId(id)) {
-				return Response.status(400).build();
-			}
-			if (!extension.equals("") && !isValidExtension(extension)) {
-				return Response.status(400).build();
-			}
-			Store store = getDataStore();
-			if (!store.existsSpec(id)) {
-				return Response.status(404).build();
-			}
-
-			Specification specification = store.loadSpec(id);
-			VariablesBinder binder = new VariablesBinder(specification);
-
-			List<String> missing = new ArrayList<String>();
-			for (QueryParameter qp : specification.getParameters()) {
-				if (parameters.containsKey(qp.getName())) {
-					List<String> values = parameters.get(qp.getName());
-					binder.bind(qp.getName(), values.get(0));
-				} else if (!qp.isOptional()) {
-					missing.add(qp.getName());
-				}
-			}
-
-			if (!missing.isEmpty()) {
-				StringBuilder ms = new StringBuilder();
-				ms.append("Missing mandatory query parameters: ");
-				for (String p : missing) {
-					ms.append(p);
-					ms.append("\t");
-				}
-				ms.append("\n");
-				return Response.status(400).entity(ms.toString()).build();
-			}
-
-			Query q = binder.toQuery();
-			QueryExecution qe = QueryExecutionFactory.sparqlService(
-					specification.getEndpoint(), q);
-			Object entity = null;
+			InvocationResult r = getApiManager().invokeApi(id, parameters);
 
 			MediaType type = null;
 			// If we have an extension
@@ -104,24 +71,19 @@ public class ApiResource extends AbstractResource {
 
 				// No extension, check if the extension is the name of a view
 				if (type == null) {
-					Views views = store.loadViews(id);
+					Views views = getApiManager().listViews(id);
 					if (views.exists(extension)) {
 						View view = views.byName(extension);
 						StringWriter writer = new StringWriter();
 						Items data = null;
-						if (q.isSelectType()) {
-							data = Items.create(qe.execSelect());
-						} else if (q.isConstructType()) {
-							data = Items.create(qe.execConstructTriples());
-						} else if (q.isAskType()) {
-							data = Items.create(qe.execAsk());
-						} else if (q.isDescribeType()) {
-							data = Items.create(qe.execDescribeTriples());
-						} else {
-							return Response
-									.serverError()
-									.entity("Unsupported query type: "
-											+ q.getQueryType()).build();
+						if (r.getResult() instanceof ResultSet) {
+							data = Items.create((ResultSet) r.getResult());
+						} else if (r.getResult() instanceof Model) {
+							data = Items.create((((Model) r.getResult()).getGraph().find(null, null, null)));
+						} else if (r.getResult() instanceof Boolean) {
+							data = Items.create((Boolean) r.getResult());
+						} else if (r.getResult() instanceof List) {
+							data = Items.create((List<Map<String, String>>) r.getResult());
 						}
 						view.getEngine().exec(writer, view.getTemplate(), data);
 						// Yeah!
@@ -146,22 +108,15 @@ public class ApiResource extends AbstractResource {
 				return buildNotAcceptable();
 			}
 
-			if (q.isSelectType()) {
-				entity = prepareEntity(type, qe.execSelect());
-			} else if (q.isConstructType()) {
-				entity = prepareEntity(type, qe.execConstruct(), q
+			Object entity = null;
+			if (r.getResult() instanceof ResultSet) {
+				entity = prepareEntity(type, (ResultSet) r.getResult());
+			} else if (r.getResult() instanceof Model) {
+				entity = prepareEntity(type, (Model) r.getResult(), r.getQuery()
 						.getPrefixMapping().getNsPrefixMap());
-			} else if (q.isAskType()) {
-				entity = prepareEntity(type, qe.execAsk());
-			} else if (q.isDescribeType()) {
-				entity = prepareEntity(type, qe.execDescribe(), q
-						.getPrefixMapping().getNsPrefixMap());
-			} else {
-				return Response.serverError()
-						.entity("Unsupported query type: " + q.getQueryType())
-						.build();
+			} else if (r.getResult() instanceof Boolean) {
+				entity = prepareEntity(type, (Boolean) r.getResult());
 			}
-
 			// If entity is null then format is not acceptable
 			// ie we don't have an implementation of that object/type map
 			if (entity == null) {
@@ -719,10 +674,25 @@ public class ApiResource extends AbstractResource {
 			@ApiParam(value = "SPARQL query that substitutes the API specification", required = true)
 			String body) {
 		log.trace("Called PUT with id: {}", id);
-		if (!isValidId(id)) {
-			return Response.status(400).build();
+		try {
+			getApiManager().replaceSpecification(id, body);
+
+			ResponseBuilder response;
+			URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
+			log.info("Replaced spec at: {}", spec);
+			response = Response.ok(spec).entity(
+					"Replaced: " + spec.toString() + "\n");
+
+			addHeaders(response, id);
+
+			return response.build();
+		} catch (SpecificationParsingException e) {
+			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					.header(Headers.Error, e.getMessage()).build();
+		} catch (IOException e) {
+			return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					.header(Headers.Error, e.getMessage()).build();
 		}
-		return new SpecificationResource().doPUT(id, body);
 	}
 
 	/**
@@ -734,9 +704,6 @@ public class ApiResource extends AbstractResource {
 	@GET
 	public Response redirectToSpec(
 			@PathParam(value = "id") String id) {
-		if (!isValidId(id)) {
-			return Response.status(400).build();
-		}
 		ResponseBuilder builder = Response.status(303);
 		addHeaders(builder, id);
 		return builder.location(requestUri.getBaseUriBuilder().path(id).path("spec").build()).build();
@@ -760,16 +727,11 @@ public class ApiResource extends AbstractResource {
 			@PathParam(value = "id") String id) {
 		log.trace("Called GET spec with id: {}", id);
 		try {
-			if (!isValidId(id)) {
-				return Response.status(400).build();
-			}
 
-			Store store = getDataStore();
-			if (!store.existsSpec(id)) {
+			Specification spec = getApiManager().getSpecification(id);
+			if (spec == null) {
 				return Response.status(Response.Status.NOT_FOUND).build();
 			}
-
-			Specification spec = store.loadSpec(id);
 			ResponseBuilder response = Response.ok();
 			response.header(Headers.Endpoint, spec.getEndpoint());
 			addHeaders(response, id);
@@ -800,11 +762,59 @@ public class ApiResource extends AbstractResource {
 			@ApiParam(value = "ID of the API specification", required = true)
 			@PathParam(value = "id") String id) {
 		log.trace("Called DELETE spec with id: {}", id);
-		if (!isValidId(id)) {
-			return Response.status(400).build();
-		}
-		// XXX Not Implemented
-		return Response.status(501).entity("Not implemented yet\n").build();
+		try {
+			getApiManager().deleteApi(id);
+			URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
+			ResponseBuilder response;
+			response = Response.ok().entity(
+					"Deleted: " + spec.toString());
+			addHeaders(response, id);
 
+			return response.build();
+		} catch (IOException e) {
+			throw new WebApplicationException(Response
+					.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					.entity(e.getMessage()).build());
+		}
+
+	}
+
+	/**
+	 * Gets a new clone of an API.
+	 *
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Path("clone")
+	@Produces("text/plain")
+	@ApiOperation(value = "Get a clone of an API")
+	@ApiResponses(value = {@ApiResponse(code = 404, message = "Specification not found"),
+			@ApiResponse(code = 200, message = "API clones"),
+			@ApiResponse(code = 500, message = "Internal error")})
+	public Response getClone(
+			@ApiParam(value = "ID of the API specification", required = true)
+			@PathParam(value = "id") String id) {
+		log.trace("Called GET clone with id: {}", id);
+		try {
+
+			String newId = getApiManager().cloneSpecification(id);
+			if (newId == null) {
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}
+			ResponseBuilder response;
+			URI spec = requestUri.getBaseUriBuilder().path(newId).path("spec").build();
+			log.info("Cloned spec at: {}", spec);
+			response = Response.ok(spec).entity(
+					"Cloned at: " + spec.toString() + "\n");
+			addHeaders(response, newId);
+
+			return response.build();
+		} catch (Exception e) {
+			log.error("An error occurred", e);
+			throw new WebApplicationException(Response
+					.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					.entity(e.getMessage()).build());
+		}
 	}
 }

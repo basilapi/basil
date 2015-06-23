@@ -1,33 +1,29 @@
 package uk.ac.open.kmi.basil.store;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.ac.open.kmi.basil.sparql.QueryParameter;
 import uk.ac.open.kmi.basil.sparql.QueryParameter.Type;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
 import uk.ac.open.kmi.basil.sparql.TestUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+
 public class FileStoreTest {
 
 	private static Logger log = LoggerFactory.getLogger(FileStoreTest.class);
-
-	private FileStore store;
 	private static File home;
+	@Rule
+	public TestName testName = new TestName();
+	private FileStore store;
 
 	@BeforeClass
 	public static void beforeClass() throws URISyntaxException {
@@ -44,11 +40,8 @@ public class FileStoreTest {
 		FileUtils.deleteDirectory(home);
 		home.mkdirs();
 		store = new FileStore(home);
-		
-	}
 
-	@Rule
-	public TestName testName = new TestName();
+	}
 
 	@Test
 	public void serializeQueryParameter() throws IOException,

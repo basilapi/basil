@@ -3,7 +3,6 @@ package uk.ac.open.kmi.basil;
 import com.wordnik.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.open.kmi.basil.store.Store;
 import uk.ac.open.kmi.basil.view.Engine;
 import uk.ac.open.kmi.basil.view.View;
 import uk.ac.open.kmi.basil.view.Views;
@@ -16,8 +15,8 @@ import java.util.List;
 
 @Path("{id}/view")
 @Api(value = "/basil", description = "BASIL operations")
-public class ViewResource extends ApiResource {
-    private Logger log = LoggerFactory.getLogger(ViewResource.class);
+public class ViewResource extends AbstractResource {
+	private Logger log = LoggerFactory.getLogger(ViewResource.class);
 
 	@PUT
 	@Path("{name}")
@@ -39,12 +38,6 @@ public class ViewResource extends ApiResource {
             @ApiParam(value = "Template of the view", required = true)
             String body) {
 		try {
-			if (!isValidId(id)) {
-				return Response.status(400).build();
-			}
-			if (!isValidName(name)) {
-				return Response.status(400).build();
-			}
 			Engine engine;
 			// Content-type
 			if (requestHeaders.getMediaType() == null) {
@@ -59,14 +52,12 @@ public class ViewResource extends ApiResource {
 				}
 			}
 
-			Store data = getDataStore();
-			Views views = data.loadViews(id);
+			Views views = getApiManager().listViews(id);
 			boolean created = true;
 			if (views.exists(name)) {
 				created = false;
 			}
-			views.put(type, name, body, engine);
-			data.saveViews(id, views);
+			getApiManager().createView(id, type, name, body, engine);
 			if (created) {
 				return Response.created(
 						requestUri.getBaseUriBuilder().path(id).path(name).build())
@@ -90,10 +81,7 @@ public class ViewResource extends ApiResource {
             @ApiParam(value = "ID of the API specification", required = true)
             @PathParam("id") String id) {
 		try {
-			if (!isValidId(id)) {
-				return Response.status(400).build();
-			}
-			Views views = getDataStore().loadViews(id);
+			Views views = getApiManager().listViews(id);
 			if (views.numberOf() == 0) {
 				return Response.noContent().build();
 			}
@@ -119,14 +107,7 @@ public class ViewResource extends ApiResource {
             @ApiParam(value = "Name of the view", required = true)
 			@PathParam("name") String name) {
 		try {
-			if (!isValidId(id)) {
-				return Response.status(400).build();
-			}
-			if (!isValidName(name)) {
-				return Response.status(400).build();
-			}
-			Views views = getDataStore().loadViews(id);
-			View view = views.byName(name);
+			View view = getApiManager().getView(id, name);
 			if (view == null) {
 				return Response.status(404).entity("Not found").build();
 			}
@@ -151,17 +132,8 @@ public class ViewResource extends ApiResource {
             @PathParam("id") String id,
             @ApiParam(value = "Name of the view", required = true)
 			@PathParam("name") String name) {
-		Views views;
 		try {
-			if (!isValidId(id)) {
-				return Response.status(400).build();
-			}
-			if (!isValidName(name)) {
-				return Response.status(400).build();
-			}
-			views = getDataStore().loadViews(id);
-			views.remove(name);
-			getDataStore().saveViews(id, views);
+			getApiManager().deleteView(id, name);
 			log.debug("View deleted: {}:{} ", id, name);
 			return Response.noContent().build();
 		} catch (IOException e) {

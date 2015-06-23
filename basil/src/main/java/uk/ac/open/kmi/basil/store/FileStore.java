@@ -1,22 +1,14 @@
 package uk.ac.open.kmi.basil.store;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.view.Views;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileStore implements Store {
 	private Logger log = LoggerFactory.getLogger(FileStore.class);
@@ -34,7 +26,7 @@ public class FileStore implements Store {
 		return newFile;
 	}
 
-	void write(String id, Serializable o, String ext) throws IOException {
+	synchronized void write(String id, Serializable o, String ext) throws IOException {
 		log.trace("writing {}.{}", id, ext);
 		try {
 			File file = getFile(id, ext);
@@ -48,7 +40,7 @@ public class FileStore implements Store {
 		}
 	}
 
-	boolean delete(String id, String ext) throws IOException {
+	synchronized private boolean delete(String id, String ext) throws IOException {
 		log.trace("deleting {}.{}", id, ext);
 		try {
 			File file = getFile(id, ext);
@@ -57,9 +49,9 @@ public class FileStore implements Store {
 			throw i;
 		}
 	}
-	
 
-	Object read(String id, String ext) throws IOException,
+
+	synchronized Object read(String id, String ext) throws IOException,
 			ClassNotFoundException {
 		log.trace("reading {}.{}", id, ext);
 		try {
@@ -78,7 +70,7 @@ public class FileStore implements Store {
 		}
 	}
 
-	public Specification loadSpec(String id) throws IOException {
+	synchronized public Specification loadSpec(String id) throws IOException {
 		try {
 			return (Specification) read(id, "spec");
 		} catch (ClassNotFoundException e) {
@@ -88,11 +80,11 @@ public class FileStore implements Store {
 		}
 	}
 
-	public void saveSpec(String id, Specification spec) throws IOException {
+	synchronized public void saveSpec(String id, Specification spec) throws IOException {
 		write(id, spec, "spec");
 	}
 
-	public boolean existsSpec(String id) {
+	synchronized public boolean existsSpec(String id) {
 		try {
 			return getFile(id, "spec").exists();
 		} catch (IOException e) {
@@ -101,7 +93,7 @@ public class FileStore implements Store {
 		}
 	}
 
-	public List<String> listSpecs() {
+	synchronized public List<String> listSpecs() {
 		List<String> specs = new ArrayList<String>();
 		for (File f : org.apache.commons.io.FileUtils.listFiles(home,
 				new String[] { "spec" }, false)) {
@@ -110,7 +102,7 @@ public class FileStore implements Store {
 		return specs;
 	}
 
-	public Views loadViews(String id) throws IOException {
+	synchronized public Views loadViews(String id) throws IOException {
 		try {
 			try {
 				return (Views) read(id, "views");
@@ -122,7 +114,7 @@ public class FileStore implements Store {
 		}
 	}
 
-	public Doc loadDoc(String id) throws IOException {
+	synchronized public Doc loadDoc(String id) throws IOException {
 		try {
 			try {
 				return (Doc) read(id, "doc");
@@ -134,16 +126,19 @@ public class FileStore implements Store {
 		}
 	}
 
-	public boolean deleteDoc(String id) throws IOException {
+	synchronized public boolean deleteDoc(String id) throws IOException {
 		return delete(id, "doc");
 	}
 
-	public void saveViews(String id, Views views) throws IOException {
+	synchronized public boolean deleteSpec(String id) throws IOException {
+		return delete(id, "spec") && delete(id, "views");
+	}
+
+	synchronized public void saveViews(String id, Views views) throws IOException {
 		write(id, views, "views");
 	}
 
-	@Override
-	public void saveDoc(String id, Doc doc) throws IOException {
+	synchronized public void saveDoc(String id, Doc doc) throws IOException {
 		write(id, doc, "doc");
 	}
 }

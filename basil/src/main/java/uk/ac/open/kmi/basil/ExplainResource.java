@@ -8,7 +8,6 @@ import com.wordnik.swagger.annotations.ApiResponses;
 import uk.ac.open.kmi.basil.sparql.QueryParameter;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.sparql.VariablesBinder;
-import uk.ac.open.kmi.basil.store.Store;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -30,15 +29,12 @@ public class ExplainResource extends AbstractResource {
     })
 	public Response get(@PathParam("id") String id) {
 		try {
-			if (!isValidId(id)) {
-				return Response.status(400).build();
-			}
-			Store store = getDataStore();
-			if (!store.existsSpec(id)) {
+
+			if (!getApiManager().existsSpec(id)) {
 				return Response.status(404).build();
 			}
 
-			Specification specification = store.loadSpec(id);
+			Specification specification = getApiManager().getSpecification(id);
 			VariablesBinder binder = new VariablesBinder(specification);
 
 			List<String> missing = new ArrayList<String>();

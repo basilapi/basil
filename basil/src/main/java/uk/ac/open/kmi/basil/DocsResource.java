@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.doc.Doc.Field;
-import uk.ac.open.kmi.basil.store.Store;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -33,14 +32,10 @@ public class DocsResource extends AbstractResource {
 	public Response get(@PathParam("id") String id) {
 		log.trace("Calling GET. id={}",id);
 		try {
-			if (!isValidId(id)) {
-				return Response.status(400).build();
-			}
-			Store store = getDataStore();
-			if (!store.existsSpec(id)) {
+			if (getApiManager().getSpecification(id) == null) {
 				return Response.status(404).build();
 			}
-			Doc doc = getDataStore().loadDoc(id);
+			Doc doc = getApiManager().getDoc(id);
 			ResponseBuilder builder;
 			if(doc.isEmpty()){
 				builder = Response.noContent();
@@ -64,14 +59,12 @@ public class DocsResource extends AbstractResource {
 	public Response delete(@PathParam("id") String id) {
 		log.trace("Calling DELETE. id={}",id);
 		try {
-			if (!isValidId(id)) {
-				return Response.status(400).build();
-			}
-			Store store = getDataStore();
-			if (!store.existsSpec(id)) {
+
+
+			if (getApiManager().getSpecification(id) == null) {
 				return Response.status(404).build();
 			}
-			boolean success = getDataStore().deleteDoc(id);
+			boolean success = getApiManager().deleteDoc(id);
 			ResponseBuilder builder;
 			if(success){
 				builder = Response.noContent();
@@ -103,32 +96,13 @@ public class DocsResource extends AbstractResource {
 		log.trace("Calling PUT. id={} name={}",id, name);
 		try {
 			log.trace("Body is: {}",body);
-			if (!isValidId(id)) {
-				return Response.status(400).build();
-			}
-			if (!isValidName(name)) {
-				return Response.status(400).build();
-			}
-			Store data = getDataStore();
-			if(!data.existsSpec(id)){
+
+			if (!getApiManager().existsSpec(id)) {
 				return Response.status(409).entity("API does not exists (create the API first).").build();
 			}
-			Doc doc = data.loadDoc(id);
-			boolean created = true;
-			if (!doc.isEmpty()) {
-				created = false;
-			}
-			doc.set(Field.NAME, name);
-			doc.set(Field.DESCRIPTION, body);
-			data.saveDoc(id, doc);
+			getApiManager().createDoc(id, name, body);
 			ResponseBuilder builder;
-			if (created) {
-				builder = Response.created(
-						requestUri.getBaseUriBuilder().path(id).path(name).build())
-						;
-			} else {
-				builder = Response.ok();
-			}
+			builder = Response.created(requestUri.getBaseUriBuilder().path(id).path(name).build());
 			addHeaders(builder, id);
 			return builder.build();
 		} catch (Exception e) {

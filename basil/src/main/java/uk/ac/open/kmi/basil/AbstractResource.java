@@ -1,5 +1,7 @@
 package uk.ac.open.kmi.basil;
 
+import uk.ac.open.kmi.basil.core.ApiManager;
+import uk.ac.open.kmi.basil.core.ApiManagerImpl;
 import uk.ac.open.kmi.basil.store.Store;
 
 import javax.servlet.ServletContext;
@@ -11,7 +13,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.regex.Pattern;
 
 public class AbstractResource {
 
@@ -23,6 +24,14 @@ public class AbstractResource {
 
 	@Context
 	protected ServletContext context;
+	private ApiManager apiManager;
+
+	protected ApiManager getApiManager() {
+		if (apiManager == null) {
+			apiManager = new ApiManagerImpl(getDataStore());
+		}
+		return apiManager;
+	}
 
 	protected final ResponseBuilder addHeaders(ResponseBuilder builder,
 			String id) {
@@ -64,19 +73,7 @@ public class AbstractResource {
 		return value;
 	}
 
-	protected Store getDataStore() {
+	private Store getDataStore() {
 		return (Store) context.getAttribute(BasilApplication.Registry.Store);
-	}
-
-	protected boolean isValidId(String id) {
-		return Pattern.matches("([^/]+)", id);
-	}
-
-	protected boolean isValidName(String name) {
-		return Pattern.matches("([^/]+)", name);
-	}
-
-	protected boolean isValidExtension(String extentsion) {
-		return Pattern.matches("(\\.[\\-a-zA-Z0-9]+)?", extentsion);
 	}
 }
