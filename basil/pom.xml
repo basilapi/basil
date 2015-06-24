@@ -125,12 +125,6 @@
 			<artifactId>jetty-webapp</artifactId>
 		</dependency>
 		
-		<!-- Standalone -->
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-        </dependency>
-        
 		<!-- Swagger -->
 		<dependency>
 			<groupId>com.wordnik</groupId>

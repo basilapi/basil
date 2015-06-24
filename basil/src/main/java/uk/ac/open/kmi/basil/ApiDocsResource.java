@@ -1,16 +1,27 @@
 package uk.ac.open.kmi.basil;
 
-import com.google.gson.JsonObject;
-import com.wordnik.swagger.annotations.*;
+import java.io.IOException;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+
 import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.swagger.SwaggerJsonBuilder;
 import uk.ac.open.kmi.basil.swagger.SwaggerUIBuilder;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import java.io.IOException;
+import com.google.gson.JsonObject;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 
 
 @Path("{id}/api-docs")

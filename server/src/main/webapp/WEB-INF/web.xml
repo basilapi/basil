@@ -65,7 +65,7 @@
 		<servlet-name>BASIL</servlet-name>
 		<url-pattern>/basil/*</url-pattern>
 	</servlet-mapping>
-
+ 
     <servlet>
         <servlet-name>Jersey2Config</servlet-name>
         <servlet-class>com.wordnik.swagger.jersey.config.JerseyJaxrsConfig</servlet-class>
@@ -90,9 +90,16 @@
         <load-on-startup>2</load-on-startup>
     </servlet>
 
+    
     <servlet-mapping>
         <servlet-name>default</servlet-name>
-        <url-pattern>/basil/docs/*</url-pattern>
+        <url-pattern>/ui/*</url-pattern>
     </servlet-mapping>
-
+    
+    <welcome-file-list>
+	   <welcome-file>static/ui/index.html</welcome-file>
+	   <welcome-file>index.html</welcome-file>
+	   <welcome-file>index.htm</welcome-file>
+	   <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
 </web-app>
