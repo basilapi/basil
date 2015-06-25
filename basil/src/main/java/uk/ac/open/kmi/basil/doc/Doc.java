@@ -25,11 +25,18 @@ public class Doc implements Serializable {
 		doc.put(field, value);
 	}
 
+	/**
+	 * Returns an empty string if null
+	 * 
+	 * @param f
+	 * @return
+	 */
 	public String get(Field f) {
-		return doc.get(f);
+		String v = doc.get(f);
+		return (v == null) ? "" : v;
 	}
-	
-	public boolean isEmpty(){
+
+	public boolean isEmpty() {
 		return get(Field.NAME) == null && get(Field.DESCRIPTION) == null;
 	}
 }
