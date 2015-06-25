@@ -44,7 +44,7 @@ $ java -jar basil-server-0.2.0-SNAPSHOT.jar -Dlog4j.configurationFile=...
 
 ```
 #!shell
-$ cd basil
+$ cd server
 $ mvn jetty:run
 ```
 
