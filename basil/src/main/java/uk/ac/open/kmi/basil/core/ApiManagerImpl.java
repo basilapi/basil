@@ -175,22 +175,18 @@ public class ApiManagerImpl implements ApiManager {
         data.saveViews(id, views);
     }
 
-    @Override
     public Doc getDoc(String id) throws IOException {
         return data.loadDoc(id);
     }
 
-    @Override
     public boolean deleteDoc(String id) throws IOException {
         return data.deleteDoc(id);
     }
 
-    @Override
     public boolean existsSpec(String id) {
         return data.existsSpec(id);
     }
 
-    @Override
     public void createDoc(String id, String name, String body) throws IOException {
         Doc doc = getDoc(id);
         doc.set(Doc.Field.NAME, name);
@@ -198,7 +194,6 @@ public class ApiManagerImpl implements ApiManager {
         data.saveDoc(id, doc);
     }
 
-    @Override
     public void replaceDoc(String id, String name, String body) throws IOException {
         createDoc(id, name, body);
     }

@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil;
+package uk.ac.open.kmi.basil.rest.core;
 
 import com.wordnik.swagger.annotations.*;
 import org.slf4j.Logger;

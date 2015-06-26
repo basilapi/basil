@@ -1,7 +1,8 @@
-package uk.ac.open.kmi.basil;
+package uk.ac.open.kmi.basil.rest.core;
 
 import uk.ac.open.kmi.basil.core.ApiManager;
 import uk.ac.open.kmi.basil.core.ApiManagerImpl;
+import uk.ac.open.kmi.basil.rest.BasilApplication;
 import uk.ac.open.kmi.basil.store.Store;
 
 import javax.servlet.ServletContext;

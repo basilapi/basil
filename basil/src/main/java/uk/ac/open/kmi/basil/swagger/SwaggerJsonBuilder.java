@@ -3,9 +3,9 @@ package uk.ac.open.kmi.basil.swagger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import uk.ac.open.kmi.basil.MoreMediaType;
 import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.doc.Doc.Field;
+import uk.ac.open.kmi.basil.rest.core.MoreMediaType;
 import uk.ac.open.kmi.basil.sparql.QueryParameter;
 import uk.ac.open.kmi.basil.sparql.Specification;
 

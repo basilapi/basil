@@ -42,12 +42,35 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-	<servlet>
+    <context-param>
+        <param-name>shiroConfigLocations</param-name>
+        <param-value>classpath:WEB-INF/shiro.ini</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+    </listener>
+
+    <filter>
+        <filter-name>ShiroFilter</filter-name>
+        <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>ShiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
+
+    <servlet>
 		<servlet-name>BASIL</servlet-name>
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>javax.ws.rs.Application</param-name>
-			<param-value>uk.ac.open.kmi.basil.BasilApplication</param-value>
+            <param-value>uk.ac.open.kmi.basil.rest.BasilApplication</param-value>
 		</init-param>
         <init-param>
             <param-name>jersey.config.server.wadl.disableWadl</param-name>
@@ -60,8 +83,13 @@
         <param-name>file-store-home</param-name>
         <param-value>./basil-store</param-value>
     </context-param>
-    
-	<servlet-mapping>
+    <context-param>
+        <param-name>jdbc-config</param-name>
+        <param-value>jdbc:mysql://lwkm234549.open.ac.uk/basilshiro?user=basil&amp;password=!basil!</param-value>
+    </context-param>
+
+
+    <servlet-mapping>
 		<servlet-name>BASIL</servlet-name>
 		<url-pattern>/basil/*</url-pattern>
 	</servlet-mapping>
@@ -81,7 +109,7 @@
     </servlet>
 
 	<listener>
-		<listener-class>uk.ac.open.kmi.basil.BasilApplication</listener-class>
+        <listener-class>uk.ac.open.kmi.basil.rest.BasilApplication</listener-class>
 	</listener>
 
     <servlet>

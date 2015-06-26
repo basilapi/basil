@@ -1,14 +1,10 @@
 package uk.ac.open.kmi.basil.sparql;
 
-import java.io.IOException;
-
 import org.apache.commons.io.IOUtils;
-
-import uk.ac.open.kmi.basil.Headers;
-import uk.ac.open.kmi.basil.sparql.QueryParameter;
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
+import uk.ac.open.kmi.basil.rest.core.Headers;
 import uk.ac.open.kmi.basil.sparql.QueryParameter.Type;
+
+import java.io.IOException;
 
 public class TestUtils {
 

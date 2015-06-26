@@ -1,9 +1,8 @@
-package uk.ac.open.kmi.basil;
-
-import java.util.HashMap;
-import java.util.Map;
+package uk.ac.open.kmi.basil.rest.core;
 
 import javax.ws.rs.core.MediaType;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MoreMediaType {
 	public static final MediaType RDFXML_TYPE = new MediaType("application",
@@ -33,7 +32,7 @@ public class MoreMediaType {
 		private static final long serialVersionUID = 1L;
 		public MediaType remove(Object key) {
 			throw new UnsupportedOperationException();
-		};
+		}
 	};
 	static {
 		extensions.put("txt", MediaType.TEXT_PLAIN_TYPE);

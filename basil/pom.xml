@@ -147,26 +147,20 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<!-- Apache Shiro -->
+		<dependency>
+			<groupId>org.secnod.shiro</groupId>
+			<artifactId>shiro-jersey</artifactId>
+			<version>0.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+		</dependency>
 		
 	</dependencies>
 
-	<build>
-	<plugins>
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.3.0.M1</version>
-                <configuration>
-                    <scanIntervalSeconds>5</scanIntervalSeconds>
-                    <systemProperties>
-                        <systemProperty>
-                            <name>log4j.configurationFile</name>
-                            <value>${project.basedir}/src/test/resources/log4j2-jetty.xml</value>
-                        </systemProperty>
-                    </systemProperties>
-                </configuration>
-            </plugin>
-            </plugins>
-	</build>
 </project>
 

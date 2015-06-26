@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil;
+package uk.ac.open.kmi.basil.rest.core;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
