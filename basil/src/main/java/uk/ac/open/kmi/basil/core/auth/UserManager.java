@@ -1,5 +1,6 @@
 package uk.ac.open.kmi.basil.core.auth;
 
+import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
 import uk.ac.open.kmi.basil.core.auth.exceptions.UserCreationException;
 
 /**
@@ -7,4 +8,6 @@ import uk.ac.open.kmi.basil.core.auth.exceptions.UserCreationException;
  */
 public interface UserManager {
     void createUser(User user) throws UserCreationException;
+
+    void mapUserApi(String username, String apiId) throws UserApiMappingException;
 }

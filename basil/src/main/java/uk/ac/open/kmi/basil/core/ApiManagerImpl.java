@@ -3,6 +3,8 @@ package uk.ac.open.kmi.basil.core;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
+import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
+import uk.ac.open.kmi.basil.core.auth.UserManager;
 import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
 import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
 import uk.ac.open.kmi.basil.doc.Doc;
@@ -29,6 +31,7 @@ import java.util.UUID;
  */
 public class ApiManagerImpl implements ApiManager {
     private Store data;
+    private UserManager userManager = new JDBCUserManager();
 
     public ApiManagerImpl(Store store) {
         data = store;
@@ -104,6 +107,8 @@ public class ApiManagerImpl implements ApiManager {
         Specification specification = SpecificationFactory.create(endpoint, body);
         try {
             data.saveSpec(id, specification);
+
+
         } catch (IOException e) {
             //TODO throw a proper exception
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
