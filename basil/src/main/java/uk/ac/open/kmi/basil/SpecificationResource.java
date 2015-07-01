@@ -51,13 +51,16 @@ public class SpecificationResource extends AbstractResource {
     @ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
             @ApiResponse(code = 201, message = "Specification created"),
             @ApiResponse(code = 500, message = "Internal error") })
-	public Response put(@ApiParam(value = "SPARQL endpoint of the data source")
-                            @QueryParam("endpoint") String endpoint,
+	public Response put(
+			@ApiParam(value = "SPARQL Endpoint of the data source", required = false)
+			@QueryParam(value = "endpoint") String endpoint,
                         @ApiParam(value = "SPARQL query that defines the API specification", required = true)
                         String body) {
 		log.trace("Called PUT");
 
 		try {
+			endpoint = getParameterOrHeader("endpoint");
+			
 			String id = getApiManager().createSpecification(endpoint, body);
 			URI api = requestUri.getBaseUriBuilder().path(id).build();
 

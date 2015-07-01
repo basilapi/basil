@@ -7,9 +7,10 @@
         </Console>
     </Appenders>
     <Loggers>
-    <Logger name="org.apache.log4j.xml" level="info"/>
-        <Root level="info">
+        <Logger name="org.apache.log4j.xml" level="ERROR"/>
+        <Root level="ERROR">
             <AppenderRef ref="STDOUT"/>
         </Root>
+        <Logger name="uk.ac.open.kmi.basil" level="TRACE"/>
     </Loggers>
 </Configuration>

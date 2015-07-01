@@ -54,8 +54,7 @@ public class AbstractResource {
 		return builder;
 	}
 
-	protected final String getParameterOrHeader(String parameter,
-			boolean mandatory) {
+	protected final String getParameterOrHeader(String parameter) {
 		String value = requestUri.getQueryParameters().getFirst(parameter);
 		if (value == null) {
 			if (requestHeaders.getHeaderString(Headers.getHeader(parameter)) == null) {

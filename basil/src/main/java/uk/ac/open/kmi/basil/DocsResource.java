@@ -100,13 +100,17 @@ public class DocsResource extends AbstractResource {
 			if (!getApiManager().existsSpec(id)) {
 				return Response.status(409).entity("API does not exists (create the API first).").build();
 			}
+			if(name == null){
+				name = getParameterOrHeader("name");
+			}
 			getApiManager().createDoc(id, name, body);
 			ResponseBuilder builder;
-			builder = Response.created(requestUri.getBaseUriBuilder().path(id).path(name).build());
+			builder = Response.created(requestUri.getBaseUriBuilder().path(id).path("docs").build());
 			addHeaders(builder, id);
 			return builder.build();
 		} catch (Exception e) {
-			return Response.serverError().entity(e).build();
+			log.error("An error occurred",e);
+			return Response.serverError().entity(e.getMessage()).build();
 		}
 	}
 
