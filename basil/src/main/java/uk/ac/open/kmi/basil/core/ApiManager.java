@@ -10,6 +10,7 @@ import uk.ac.open.kmi.basil.view.View;
 import uk.ac.open.kmi.basil.view.Views;
 
 import javax.ws.rs.core.MultivaluedMap;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -23,6 +24,8 @@ public interface ApiManager {
 
     String cloneSpecification(String username, String id) throws IOException, UserApiMappingException;
 
+    void replaceSpecification(String id, String endpoint, String body) throws IOException, SpecificationParsingException;
+    
     void replaceSpecification(String id, String body) throws IOException, SpecificationParsingException;
 
     boolean deleteApi(String id) throws IOException, UserApiMappingException;

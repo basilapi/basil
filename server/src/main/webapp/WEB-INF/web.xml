@@ -21,15 +21,15 @@
         </init-param>
         <init-param>
             <param-name>cors.supportedMethods</param-name>
-            <param-value>GET, POST, HEAD, PUT, DELETE, OPTIONS</param-value>
+            <param-value>GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS</param-value>
         </init-param>
         <init-param>
             <param-name>cors.supportedHeaders</param-name>
-            <param-value>Accept, Origin, X-Requested-With, Content-Type, Last-Modified</param-value>
+            <param-value>Accept, Origin, X-Requested-With, Content-Type, Last-Modified, X-Basil-Endpoint, X-Basil-Name</param-value>
         </init-param>
         <init-param>
             <param-name>cors.exposedHeaders</param-name>
-            <param-value>Set-Cookie</param-value>
+            <param-value>Set-Cookie, X-Basil-Endpoint, X-Basil-Api, X-Basil-Spec, X-Basil-View, X-Basil-Docs, X-Basil-Swagger, X-Basil-Name</param-value>
         </init-param>
         <init-param>
             <param-name>cors.supportsCredentials</param-name>

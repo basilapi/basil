@@ -666,6 +666,7 @@ public class ApiResource extends AbstractResource {
 	 * @return
 	 */
 	@PUT
+	@Path("spec")
 	@Produces("application/json")
 	@ApiOperation(value = "Update existing API specification",
 			response = URI.class)
@@ -675,6 +676,8 @@ public class ApiResource extends AbstractResource {
 	public Response replaceSpec(
 			@ApiParam(value = "ID of the API specification", required = true)
 			@PathParam(value = "id") String id,
+			@ApiParam(value = "SPARQL Endpoint", required = false)
+			@QueryParam(value = "endpoint") String endpoint,
 			@ApiParam(value = "SPARQL query that substitutes the API specification", required = true)
 			String body,
 			@Auth Subject subject) {
@@ -682,6 +685,8 @@ public class ApiResource extends AbstractResource {
 		try {
 			subject.checkRole(id);
 			getApiManager().replaceSpecification(id, body);
+			endpoint = getParameterOrHeader("endpoint");
+			getApiManager().replaceSpecification(id, endpoint, body);
 
 			ResponseBuilder response;
 			URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();

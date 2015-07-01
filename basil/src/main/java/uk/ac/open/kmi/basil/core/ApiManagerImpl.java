@@ -138,11 +138,15 @@ public class ApiManagerImpl implements ApiManager {
     }
 
     public void replaceSpecification(String id, String body) throws IOException, SpecificationParsingException {
+    	Specification oldSpec = data.loadSpec(id);
+    	replaceSpecification(id, oldSpec.getEndpoint(), body);
+    }
+    
+    public void replaceSpecification(String id, String endpoint, String body) throws IOException, SpecificationParsingException {
         if (body.equals("")) {
             throw new SpecificationParsingException("Body cannot be empty");
         }
-        Specification oldSpec = data.loadSpec(id);
-        Specification specification = SpecificationFactory.create(oldSpec.getEndpoint(), body);
+        Specification specification = SpecificationFactory.create(endpoint, body);
         try {
             data.saveSpec(id, specification);
         } catch (IOException e) {
