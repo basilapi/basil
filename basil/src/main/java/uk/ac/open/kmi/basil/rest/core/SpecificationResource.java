@@ -52,6 +52,7 @@ public class SpecificationResource extends AbstractResource {
             response = URI.class)
     @ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
             @ApiResponse(code = 201, message = "Specification created"),
+            @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 500, message = "Internal error") })
 	public Response put(
 			@ApiParam(value = "SPARQL Endpoint of the data source", required = false)

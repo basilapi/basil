@@ -4,10 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.wordnik.swagger.annotations.*;
+
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.ac.open.kmi.basil.view.Engine;
 import uk.ac.open.kmi.basil.view.View;
 import uk.ac.open.kmi.basil.view.Views;
@@ -15,6 +18,8 @@ import uk.ac.open.kmi.basil.view.Views;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -31,6 +36,7 @@ public class ViewResource extends AbstractResource {
             notes = "The operation returns the resource URI of the API view")
     @ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
             @ApiResponse(code = 201, message = "View created"),
+            @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 500, message = "Internal error") })
 	public Response put(
             @ApiParam(value = "ID of the API specification", required = true)
@@ -76,6 +82,9 @@ public class ViewResource extends AbstractResource {
 			} else {
 				return Response.ok().build();
 			}
+		} catch (AuthorizationException e) {
+			log.trace("Not authorized");
+			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
 		} catch (Exception e) {
 			return Response.serverError().entity(e).build();
 		}
@@ -144,6 +153,7 @@ public class ViewResource extends AbstractResource {
 	@ApiOperation(value = "Delete API view")
     @ApiResponses(value = { @ApiResponse(code = 404, message = "API view not found"),
             @ApiResponse(code = 200, message = "API view deleted"),
+            @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 500, message = "Internal error") })
 	public Response delete(
             @ApiParam(value = "ID of the API specification", required = true)
@@ -160,6 +170,9 @@ public class ViewResource extends AbstractResource {
 			m.add("message", new JsonPrimitive("View deleted: " + view.toString()));
 			m.add("location", new JsonPrimitive(view.toString()));
 			return Response.ok().entity(m.toString()).build();
+		} catch (AuthorizationException e) {
+			log.trace("Not authorized");
+			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
 		} catch (IOException e) {
 			log.error("", e);
 			return Response.serverError().build();

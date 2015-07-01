@@ -19,6 +19,7 @@ import com.hp.hpl.jena.sparql.resultset.JSONOutput;
 import com.hp.hpl.jena.sparql.resultset.XMLOutput;
 import com.hp.hpl.jena.sparql.util.Context;
 import com.wordnik.swagger.annotations.*;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.out.JsonLDWriter;
@@ -26,10 +27,12 @@ import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapNull;
 import org.apache.jena.riot.system.PrefixMapStd;
 import org.apache.jena.riot.writer.*;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.ac.open.kmi.basil.core.InvocationResult;
 import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
 import uk.ac.open.kmi.basil.rest.auth.AuthResource;
@@ -43,7 +46,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Variant;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -672,6 +677,7 @@ public class ApiResource extends AbstractResource {
 			response = URI.class)
 	@ApiResponses(value = {@ApiResponse(code = 400, message = "Body cannot be empty"),
 			@ApiResponse(code = 200, message = "Specification updated"),
+			@ApiResponse(code = 403, message = "Forbidden"),
 			@ApiResponse(code = 500, message = "Internal error")})
 	public Response replaceSpec(
 			@ApiParam(value = "ID of the API specification", required = true)
@@ -699,6 +705,9 @@ public class ApiResource extends AbstractResource {
 			addHeaders(response, id);
 
 			return response.build();
+		} catch (AuthorizationException e) {
+			log.trace("Not authorized");
+			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
 		} catch (SpecificationParsingException e) {
 			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 					.header(Headers.Error, e.getMessage()).build();
@@ -770,6 +779,7 @@ public class ApiResource extends AbstractResource {
 	@ApiOperation(value = "Delete API specification")
 	@ApiResponses(value = {@ApiResponse(code = 404, message = "Specification not found"),
 			@ApiResponse(code = 200, message = "Specification deleted"),
+			@ApiResponse(code = 403, message = "Forbidden"),
 			@ApiResponse(code = 500, message = "Internal error")})
 	public Response deleteSpec(
 			@ApiParam(value = "ID of the API specification", required = true)
@@ -788,6 +798,9 @@ public class ApiResource extends AbstractResource {
 			addHeaders(response, id);
 
 			return response.build();
+		} catch (AuthorizationException e) {
+			log.trace("Not authorized");
+			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
 		} catch (Exception e) {
 			throw new WebApplicationException(Response
 					.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
@@ -808,6 +821,7 @@ public class ApiResource extends AbstractResource {
 	@ApiOperation(value = "Get a clone of an API")
 	@ApiResponses(value = {@ApiResponse(code = 404, message = "Specification not found"),
 			@ApiResponse(code = 200, message = "API clones"),
+			@ApiResponse(code = 403, message = "Forbidden"),
 			@ApiResponse(code = 500, message = "Internal error")})
 	public Response getClone(
 			@ApiParam(value = "ID of the API specification", required = true)

@@ -1,17 +1,33 @@
 package uk.ac.open.kmi.basil.rest.core;
 
-import com.wordnik.swagger.annotations.*;
+import java.io.IOException;
+
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
+
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.doc.Doc.Field;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import java.io.IOException;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 
 /**
  * 
@@ -56,6 +72,7 @@ public class DocsResource extends AbstractResource {
 	@ApiOperation(value = "Delete API documentation")
     @ApiResponses(value = {
     		@ApiResponse(code = 500, message = "Internal error") ,
+    		@ApiResponse(code = 403, message = "Forbidden") ,
     		@ApiResponse(code = 204, message = "Deleted. No content")
     })
 	public Response delete(@PathParam("id") String id, @Auth Subject subject) {
@@ -75,6 +92,9 @@ public class DocsResource extends AbstractResource {
 			}
 			addHeaders(builder, id);
 			return builder.build();
+		} catch (AuthorizationException e) {
+			log.trace("Not authorized");
+			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
 		} catch (IOException e) {
 			throw new WebApplicationException(e);
 		}
@@ -86,6 +106,7 @@ public class DocsResource extends AbstractResource {
             notes = "The operation returns the resource URI of the doc file")
     @ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
             @ApiResponse(code = 201, message = "Doc file created"),
+            @ApiResponse(code = 403, message = "Forbidden") ,
             @ApiResponse(code = 409, message = "API does not exists (create the API first).") ,
             @ApiResponse(code = 500, message = "Internal error") })
 	public Response put(
@@ -112,6 +133,9 @@ public class DocsResource extends AbstractResource {
 			builder = Response.created(requestUri.getBaseUriBuilder().path(id).path("docs").build());
 			addHeaders(builder, id);
 			return builder.build();
+		} catch (AuthorizationException e) {
+			log.trace("Not authorized");
+			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
 		} catch (Exception e) {
 			log.error("An error occurred",e);
 			return Response.serverError().entity(e.getMessage()).build();
