@@ -6,35 +6,16 @@ import com.google.gson.JsonPrimitive;
 import com.wordnik.swagger.annotations.*;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.List;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.basil.rest.auth.AuthResource;
 
-import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
-import uk.ac.open.kmi.basil.doc.Doc;
-import uk.ac.open.kmi.basil.doc.Doc.Field;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.util.List;
 
 @Path("/")
 @Api(value = "/basil", description = "BASIL operations")
@@ -68,12 +49,9 @@ public class SpecificationResource extends AbstractResource {
 		try {
 			if (subject.isAuthenticated()) {
 				String username = (String) subject.getSession().getAttribute(AuthResource.CURRENT_USER_KEY);
+				endpoint = getParameterOrHeader("endpoint");
 				String id = getApiManager().createSpecification(username, endpoint, body);
 				URI api = requestUri.getBaseUriBuilder().path(id).build();
-			endpoint = getParameterOrHeader("endpoint");
-			
-			String id = getApiManager().createSpecification(endpoint, body);
-			URI api = requestUri.getBaseUriBuilder().path(id).build();
 
 				ResponseBuilder response;
 
@@ -102,7 +80,6 @@ public class SpecificationResource extends AbstractResource {
 	 * List APIs
 	 *
 	 * @return
-	 * @throws IOException 
 	 */
 	@GET
 	@Produces("application/json")
@@ -111,18 +88,11 @@ public class SpecificationResource extends AbstractResource {
 			@ApiResponse(code = 200, message = "OK"),
 			@ApiResponse(code = 500, message = "Internal error")}
 	)
-	public String list() throws IOException {
+	public String list() {
 		log.trace("Called GET");
 		JsonArray r = new JsonArray();
 		for (String api : getApiManager().listApis()) {
-			JsonObject object = new JsonObject();
-			Doc doc = getApiManager().getDoc(api);
-			object.add("id", new JsonPrimitive(api));
-			object.add("name", new JsonPrimitive(String.valueOf(doc.get(Field.NAME))));
-			object.add("createdby", new JsonPrimitive("")); // TODO
-			//object.add("description", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
-			object.add("location", new JsonPrimitive(String.valueOf(requestUri.getBaseUriBuilder().path(api))));
-			r.add(object);
+			r.add(new JsonPrimitive(String.valueOf(requestUri.getBaseUriBuilder().path(api))));
 		}
 		return r.toString();
 	}
