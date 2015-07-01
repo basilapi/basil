@@ -26,10 +26,13 @@ import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapNull;
 import org.apache.jena.riot.system.PrefixMapStd;
 import org.apache.jena.riot.writer.*;
+import org.apache.shiro.subject.Subject;
+import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.basil.core.InvocationResult;
 import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
+import uk.ac.open.kmi.basil.rest.auth.AuthResource;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.view.Items;
 import uk.ac.open.kmi.basil.view.View;
@@ -673,9 +676,11 @@ public class ApiResource extends AbstractResource {
 			@ApiParam(value = "ID of the API specification", required = true)
 			@PathParam(value = "id") String id,
 			@ApiParam(value = "SPARQL query that substitutes the API specification", required = true)
-			String body) {
+			String body,
+			@Auth Subject subject) {
 		log.trace("Called PUT with id: {}", id);
 		try {
+			subject.checkRole(id);
 			getApiManager().replaceSpecification(id, body);
 
 			ResponseBuilder response;
@@ -763,9 +768,11 @@ public class ApiResource extends AbstractResource {
 			@ApiResponse(code = 500, message = "Internal error")})
 	public Response deleteSpec(
 			@ApiParam(value = "ID of the API specification", required = true)
-			@PathParam(value = "id") String id) {
+			@PathParam(value = "id") String id,
+			@Auth Subject subject) {
 		log.trace("Called DELETE spec with id: {}", id);
 		try {
+			subject.checkRole(id);
 			getApiManager().deleteApi(id);
 			URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
 			ResponseBuilder response;
@@ -799,29 +806,34 @@ public class ApiResource extends AbstractResource {
 			@ApiResponse(code = 500, message = "Internal error")})
 	public Response getClone(
 			@ApiParam(value = "ID of the API specification", required = true)
-			@PathParam(value = "id") String id) {
+			@PathParam(value = "id") String id,
+			@Auth Subject subject) {
 		log.trace("Called GET clone with id: {}", id);
 		try {
+			if (subject.isAuthenticated()) {
+				String username = (String) subject.getSession().getAttribute(AuthResource.CURRENT_USER_KEY);
+				String newId = getApiManager().cloneSpecification(username, id);
+				if (newId == null) {
+					return Response.status(Response.Status.NOT_FOUND).build();
+				}
+				ResponseBuilder response;
+				URI spec = requestUri.getBaseUriBuilder().path(newId).path("spec").build();
+				log.info("Cloned spec at: {}", spec);
+				JsonObject m = new JsonObject();
+				m.add("message", new JsonPrimitive("Cloned at: " + spec.toString()));
+				m.add("location", new JsonPrimitive(spec.toString()));
+				response = Response.ok(spec).entity(m.toString());
+				addHeaders(response, newId);
 
-			String newId = getApiManager().cloneSpecification(id);
-			if (newId == null) {
-				return Response.status(Response.Status.NOT_FOUND).build();
+				return response.build();
 			}
-			ResponseBuilder response;
-			URI spec = requestUri.getBaseUriBuilder().path(newId).path("spec").build();
-			log.info("Cloned spec at: {}", spec);
-			JsonObject m = new JsonObject();
-			m.add("message", new JsonPrimitive("Cloned at: " + spec.toString()));
-			m.add("location", new JsonPrimitive(spec.toString()));
-			response = Response.ok(spec).entity(m.toString());
-			addHeaders(response, newId);
-
-			return response.build();
 		} catch (Exception e) {
 			log.error("An error occurred", e);
 			throw new WebApplicationException(Response
 					.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 					.entity(e.getMessage()).build());
 		}
+		return Response.status(HttpURLConnection.HTTP_FORBIDDEN)
+				.header(Headers.Error, "User must be authenticated").build();
 	}
 }

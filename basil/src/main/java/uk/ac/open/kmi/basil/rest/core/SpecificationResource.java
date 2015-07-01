@@ -4,9 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.wordnik.swagger.annotations.*;
+import org.apache.shiro.subject.Subject;
+import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
+import uk.ac.open.kmi.basil.rest.auth.AuthResource;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -40,31 +42,35 @@ public class SpecificationResource extends AbstractResource {
 	public Response put(@ApiParam(value = "SPARQL endpoint of the data source")
                             @QueryParam("endpoint") String endpoint,
                         @ApiParam(value = "SPARQL query that defines the API specification", required = true)
-                        String body) {
+						String body,
+						@Auth Subject subject) {
 		log.trace("Called PUT");
-
 		try {
-			String id = getApiManager().createSpecification(endpoint, body);
-			URI api = requestUri.getBaseUriBuilder().path(id).build();
+			if (subject.isAuthenticated()) {
+				String username = (String) subject.getSession().getAttribute(AuthResource.CURRENT_USER_KEY);
+				String id = getApiManager().createSpecification(username, endpoint, body);
+				URI api = requestUri.getBaseUriBuilder().path(id).build();
 
-			ResponseBuilder response;
+				ResponseBuilder response;
 
-			URI spec = requestUri.getBaseUriBuilder().path(id).path("spec")
+				URI spec = requestUri.getBaseUriBuilder().path(id).path("spec")
 						.build();
-			log.info("Created  spec at: {}", spec);
-			JsonObject m = new JsonObject();
-			m.add("message", new JsonPrimitive("Created: " + api.toString()));
-			m.add("location", new JsonPrimitive(api.toString()));
-			response = Response.created(api).entity(m.toString());
+				log.info("Created  spec at: {}", spec);
+				JsonObject m = new JsonObject();
+				m.add("message", new JsonPrimitive("Created: " + api.toString()));
+				m.add("location", new JsonPrimitive(api.toString()));
+				response = Response.created(api).entity(m.toString());
 
-			addHeaders(response, id);
+				addHeaders(response, id);
 
-			return response.build();
-		} catch (SpecificationParsingException e) {
+				return response.build();
+			}
+		} catch (Exception e) {
 			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
 					.header(Headers.Error, e.getMessage()).build();
 		}
-
+		return Response.status(HttpURLConnection.HTTP_FORBIDDEN)
+				.header(Headers.Error, "User must be authenticated").build();
 	}
 
 

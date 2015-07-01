@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.wordnik.swagger.annotations.*;
+import org.apache.shiro.subject.Subject;
+import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.basil.view.Engine;
@@ -40,8 +42,10 @@ public class ViewResource extends AbstractResource {
             @ApiParam(value = "Media type of the view", required = true)
             @HeaderParam("Content-Type") String contentType,
             @ApiParam(value = "Template of the view", required = true)
-            String body) {
+			String body,
+			@Auth Subject subject) {
 		try {
+			subject.checkRole(id);
 			Engine engine;
 			// Content-type
 			if (requestHeaders.getMediaType() == null) {
@@ -136,8 +140,10 @@ public class ViewResource extends AbstractResource {
             @ApiParam(value = "ID of the API specification", required = true)
             @PathParam("id") String id,
             @ApiParam(value = "Name of the view", required = true)
-			@PathParam("name") String name) {
+			@PathParam("name") String name,
+			@Auth Subject subject) {
 		try {
+			subject.checkRole(id);
 			getApiManager().deleteView(id, name);
 			log.debug("View deleted: {}:{} ", id, name);
 			URI view = requestUri.getBaseUriBuilder().path(id).path("view").path("name").build();

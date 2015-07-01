@@ -1,5 +1,6 @@
 package uk.ac.open.kmi.basil.core;
 
+import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
 import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
 import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
 import uk.ac.open.kmi.basil.doc.Doc;
@@ -18,9 +19,9 @@ import java.util.List;
 public interface ApiManager {
     InvocationResult invokeApi(String id, MultivaluedMap<String, String> parameters) throws IOException, ApiInvocationException;
 
-    String createSpecification(String endpoint, String body) throws SpecificationParsingException;
+    String createSpecification(String username, String endpoint, String body) throws SpecificationParsingException, UserApiMappingException;
 
-    String cloneSpecification(String id) throws IOException;
+    String cloneSpecification(String username, String id) throws IOException, UserApiMappingException;
 
     void replaceSpecification(String id, String body) throws IOException, SpecificationParsingException;
 

@@ -25,7 +25,7 @@ public class JDBCUserManager implements UserManager {
                 Class.forName("com.mysql.jdbc.Driver");
                 // Setup the connection with the DB
                 connect = DriverManager.getConnection(jdbcUri);
-                PreparedStatement preparedStatement = connect.prepareStatement("insert into USERS values (?, ?, ?)");
+                PreparedStatement preparedStatement = connect.prepareStatement("insert into users values (?, ?, ?)");
                 preparedStatement.setString(1, user.getUsername());
                 preparedStatement.setString(2, user.getEmail());
 
@@ -34,7 +34,7 @@ public class JDBCUserManager implements UserManager {
 
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
-                preparedStatement = connect.prepareStatement("insert into USERS_ROLES values (?, ?)");
+                preparedStatement = connect.prepareStatement("insert into users_roles values (?, ?)");
                 preparedStatement.setString(1, user.getUsername());
                 preparedStatement.setString(2, "default");
                 preparedStatement.executeUpdate();
@@ -66,9 +66,18 @@ public class JDBCUserManager implements UserManager {
                 Class.forName("com.mysql.jdbc.Driver");
                 // Setup the connection with the DB
                 connect = DriverManager.getConnection(jdbcUri);
-                PreparedStatement preparedStatement = connect.prepareStatement("insert into user_roles values (DEFAULT , ?, ?)");
+                PreparedStatement preparedStatement = connect.prepareStatement("insert into users_roles values (?, ?)");
                 preparedStatement.setString(1, username);
                 preparedStatement.setString(2, apiId);
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+                preparedStatement = connect.prepareStatement("insert into roles values (?)");
+                preparedStatement.setString(1, apiId);
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+                preparedStatement = connect.prepareStatement("insert into roles_permissions values (?, ?)");
+                preparedStatement.setString(1, apiId);
+                preparedStatement.setString(2, "write");
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
             }

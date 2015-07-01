@@ -1,6 +1,8 @@
 package uk.ac.open.kmi.basil.rest.core;
 
 import com.wordnik.swagger.annotations.*;
+import org.apache.shiro.subject.Subject;
+import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.basil.doc.Doc;
@@ -56,10 +58,10 @@ public class DocsResource extends AbstractResource {
     		@ApiResponse(code = 500, message = "Internal error") ,
     		@ApiResponse(code = 204, message = "Deleted. No content")
     })
-	public Response delete(@PathParam("id") String id) {
+	public Response delete(@PathParam("id") String id, @Auth Subject subject) {
 		log.trace("Calling DELETE. id={}",id);
 		try {
-
+			subject.checkPermission(id + ":write");
 
 			if (getApiManager().getSpecification(id) == null) {
 				return Response.status(404).build();
@@ -92,11 +94,13 @@ public class DocsResource extends AbstractResource {
             @ApiParam(value = "Name of the API", required = false)
             @QueryParam("name") String name,
             @ApiParam(value = "Description of the API", required = false)
-            String body) {
+			String body,
+			@Auth Subject subject
+	) {
 		log.trace("Calling PUT. id={} name={}",id, name);
 		try {
 			log.trace("Body is: {}",body);
-
+			subject.checkRole(id);
 			if (!getApiManager().existsSpec(id)) {
 				return Response.status(409).entity("API does not exists (create the API first).").build();
 			}

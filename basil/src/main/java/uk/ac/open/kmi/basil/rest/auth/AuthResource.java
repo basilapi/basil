@@ -5,8 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authc.credential.DefaultPasswordService;
-import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
@@ -58,9 +56,6 @@ public class AuthResource {
         Gson gson = new Gson();
         User user = gson.fromJson(body, User.class);
         try {
-            PasswordService passwordService = new DefaultPasswordService();
-            System.out.println(passwordService.encryptPassword("pippo"));
-            System.out.println(passwordService.passwordsMatch("pippo", "$shiro1$SHA-256$500000$z6EuzXlyC1o/ZBO68LqcOg==$0XIO5YJtBXnaP3CHIQjw+OSnPzNW50UBklqoLptHOsk="));
             UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
             token.setRememberMe(true);
             Subject currentUser = SecurityUtils.getSubject();
@@ -93,7 +88,7 @@ public class AuthResource {
             JsonObject m = new JsonObject();
             m.add("message", new JsonPrimitive("Logout successful: " + username));
             m.add("location", new JsonPrimitive(userUri.toASCIIString()));
-            return Response.created(userUri).entity(m.toString()).build();
+            return Response.ok().entity(m.toString()).build();
         } catch (Exception e) {
             JsonObject m = new JsonObject();
             m.add("message", new JsonPrimitive(e.getMessage()));

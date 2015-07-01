@@ -5,6 +5,7 @@ import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
 import uk.ac.open.kmi.basil.core.auth.UserManager;
+import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
 import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
 import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
 import uk.ac.open.kmi.basil.doc.Doc;
@@ -99,7 +100,7 @@ public class ApiManagerImpl implements ApiManager {
 
     }
 
-    public String createSpecification(String endpoint, String body) throws SpecificationParsingException {
+    public String createSpecification(String username, String endpoint, String body) throws SpecificationParsingException, UserApiMappingException {
         String id = shortUUID();
         if (body.equals("")) {
             throw new SpecificationParsingException("Body cannot be empty");
@@ -107,8 +108,7 @@ public class ApiManagerImpl implements ApiManager {
         Specification specification = SpecificationFactory.create(endpoint, body);
         try {
             data.saveSpec(id, specification);
-
-
+            userManager.mapUserApi(username, id);
         } catch (IOException e) {
             //TODO throw a proper exception
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -116,13 +116,14 @@ public class ApiManagerImpl implements ApiManager {
         return id;
     }
 
-    public String cloneSpecification(String id) throws IOException {
+    public String cloneSpecification(String username, String id) throws IOException, UserApiMappingException {
         String newId = shortUUID();
         Specification specification = data.loadSpec(id);
         Doc doc = data.loadDoc(id);
         Views views = listViews(id);
         try {
             data.saveSpec(newId, specification);
+            userManager.mapUserApi(username, newId);
             if (!doc.isEmpty()) {
                 data.saveDoc(newId, doc);
             }
