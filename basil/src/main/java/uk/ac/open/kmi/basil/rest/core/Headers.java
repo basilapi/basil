@@ -12,6 +12,7 @@ public final class Headers {
 	public static final String Docs = PREFIX + "Docs";
 	public static final String Name = PREFIX + "Name";
 	public static final String Swagger = PREFIX + "Swagger";
+	public static final String Creator = PREFIX + "Creator";
 
 	private Headers() {
 	}

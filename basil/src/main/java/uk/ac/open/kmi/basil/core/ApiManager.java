@@ -25,7 +25,7 @@ public interface ApiManager {
 
     void replaceSpecification(String id, String body) throws IOException, SpecificationParsingException;
 
-    boolean deleteApi(String id) throws IOException;
+    boolean deleteApi(String id) throws IOException, UserApiMappingException;
 
     List<String> listApis();
 
@@ -48,4 +48,6 @@ public interface ApiManager {
     void createDoc(String id, String name, String body) throws IOException;
 
     void replaceDoc(String id, String name, String body) throws IOException;
+
+    String getCreatorOfApi(String id);
 }

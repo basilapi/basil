@@ -52,6 +52,7 @@ public class AbstractResource {
 		builder.header(Headers.View, views);
 		builder.header(Headers.Docs, docs);
 		builder.header(Headers.Swagger, swagger);
+		builder.header(Headers.Creator, apiManager.getCreatorOfApi(id));
 		return builder;
 	}
 

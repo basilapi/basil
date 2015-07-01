@@ -5,10 +5,9 @@ import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
 import uk.ac.open.kmi.basil.core.auth.exceptions.UserCreationException;
 import uk.ac.open.kmi.basil.rest.BasilApplication;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Luca Panziera on 26/06/15.
@@ -98,6 +97,149 @@ public class JDBCUserManager implements UserManager {
             }
         }
 
+    }
+
+    public User getUser(String username) {
+        Connection connect = null;
+        try {
+            if (username != null) {
+                Class.forName("com.mysql.jdbc.Driver");
+                // Setup the connection with the DB
+                connect = DriverManager.getConnection(jdbcUri);
+                PreparedStatement preparedStatement = connect.prepareStatement("SELECT * FROM users WHERE username = ?");
+                preparedStatement.setString(1, username);
+                ResultSet rs = preparedStatement.executeQuery();
+                User user = null;
+                if (rs.next()) {
+                    user = new User();
+                    user.setUsername(rs.getString("username"));
+                    user.setEmail(rs.getString("email"));
+                }
+                preparedStatement.close();
+                return user;
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (connect != null) {
+                    connect.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public Set<String> getUserApis(String username) {
+        Connection connect = null;
+        try {
+            if (username != null) {
+                Class.forName("com.mysql.jdbc.Driver");
+                // Setup the connection with the DB
+                connect = DriverManager.getConnection(jdbcUri);
+                PreparedStatement preparedStatement = connect.prepareStatement("SELECT role_name FROM users_roles WHERE username = ? AND role_name != \"default\"");
+                preparedStatement.setString(1, username);
+                ResultSet rs = preparedStatement.executeQuery();
+                Set<String> r = new HashSet<String>();
+                while (rs.next()) {
+                    r.add(rs.getString("role_name"));
+                }
+                preparedStatement.close();
+                return r;
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (connect != null) {
+                    connect.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public void deleteUserApiMap(String apiId) throws UserApiMappingException {
+        Connection connect = null;
+        try {
+            if (apiId != null) {
+                Class.forName("com.mysql.jdbc.Driver");
+                // Setup the connection with the DB
+                connect = DriverManager.getConnection(jdbcUri);
+                PreparedStatement preparedStatement = connect.prepareStatement("DELETE FROM users_roles WHERE role_name = ? ");
+                preparedStatement.setString(1, apiId);
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+                preparedStatement = connect.prepareStatement("DELETE FROM roles WHERE role_name = ? ");
+                preparedStatement.setString(1, apiId);
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+                preparedStatement = connect.prepareStatement("DELETE FROM roles_permissions WHERE role_name = ? ");
+                preparedStatement.setString(1, apiId);
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new UserApiMappingException(e.getMessage());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new UserApiMappingException(e.getMessage());
+        } finally {
+            try {
+                if (connect != null) {
+                    connect.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public String getCreatorOfApi(String id) {
+        Connection connect = null;
+        try {
+            if (id != null) {
+                Class.forName("com.mysql.jdbc.Driver");
+                // Setup the connection with the DB
+                connect = DriverManager.getConnection(jdbcUri);
+                PreparedStatement preparedStatement = connect.prepareStatement("SELECT username FROM users_roles WHERE role_name = ?");
+                preparedStatement.setString(1, id);
+                ResultSet rs = preparedStatement.executeQuery();
+                String r = null;
+                if (rs.next()) {
+                    r = rs.getString("username");
+                }
+                preparedStatement.close();
+                return r;
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (connect != null) {
+                    connect.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
 }

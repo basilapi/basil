@@ -151,7 +151,8 @@ public class ApiManagerImpl implements ApiManager {
         }
     }
 
-    public boolean deleteApi(String id) throws IOException {
+    public boolean deleteApi(String id) throws IOException, UserApiMappingException {
+        userManager.deleteUserApiMap(id);
         return data.deleteSpec(id);
     }
 
@@ -202,6 +203,10 @@ public class ApiManagerImpl implements ApiManager {
 
     public void replaceDoc(String id, String name, String body) throws IOException {
         createDoc(id, name, body);
+    }
+
+    public String getCreatorOfApi(String id) {
+        return userManager.getCreatorOfApi(id);
     }
 
 }

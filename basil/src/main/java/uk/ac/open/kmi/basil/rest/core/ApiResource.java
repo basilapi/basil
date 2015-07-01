@@ -783,7 +783,7 @@ public class ApiResource extends AbstractResource {
 			addHeaders(response, id);
 
 			return response.build();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new WebApplicationException(Response
 					.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
 					.entity(e.getMessage()).build());
