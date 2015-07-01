@@ -4,14 +4,19 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+
 import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
 import uk.ac.open.kmi.basil.core.auth.User;
 import uk.ac.open.kmi.basil.core.auth.UserManager;
+import uk.ac.open.kmi.basil.doc.Doc;
+import uk.ac.open.kmi.basil.doc.Doc.Field;
+import uk.ac.open.kmi.basil.rest.core.AbstractResource;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
 import java.net.URI;
 import java.util.Set;
 
@@ -20,7 +25,7 @@ import java.util.Set;
  */
 
 @Path("users")
-public class UsersResource {
+public class UsersResource extends AbstractResource{
 
     @Context
     protected UriInfo requestUri;
@@ -69,7 +74,14 @@ public class UsersResource {
             Set<String> apiIds = userManager.getUserApis(username);
             JsonArray r = new JsonArray();
             for (String api : apiIds) {
-                r.add(new JsonPrimitive(String.valueOf(requestUri.getBaseUriBuilder().path(api))));
+            	JsonObject object = new JsonObject();
+    			Doc doc = getApiManager().getDoc(api);
+    			object.add("id", new JsonPrimitive(api));
+    			object.add("name", new JsonPrimitive(String.valueOf(doc.get(Field.NAME))));
+    			object.add("createdby", new JsonPrimitive(username));
+    			//object.add("description", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
+    			object.add("location", new JsonPrimitive(String.valueOf(requestUri.getBaseUriBuilder().path(api))));
+                r.add(object);
             }
             return Response.ok().entity(r.toString()).build();
         } catch (Exception e) {
