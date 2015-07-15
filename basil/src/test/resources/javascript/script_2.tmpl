@@ -1,0 +1,15 @@
+function (){
+    this.print("this is a test for ");
+    this.print(this.items);
+    this.print("\n");
+    while(this.items.hasNext()){
+        var i = this.items.next();
+        this.print(i.p1);
+        this.print(",");
+        this.print(i.p2);
+        this.print(",");
+        this.print(i.p3);
+        this.print("\n");
+    }
+    return this;
+}
