@@ -182,7 +182,7 @@ public class ApiManagerImpl implements ApiManager {
 
     public void createView(String id, String mimeType, String name, String template, Engine engine) throws IOException {
         Views views = data.loadViews(id);
-        views.put(name, name, template, engine);
+        views.put(mimeType, name, template, engine);
         data.saveViews(id, views);
     }
 
