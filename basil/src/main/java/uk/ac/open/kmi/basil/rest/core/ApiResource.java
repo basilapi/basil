@@ -66,6 +66,7 @@ public class ApiResource extends AbstractResource {
 	private static Logger log = LoggerFactory
 			.getLogger(ApiResource.class);
 
+	@SuppressWarnings("unchecked")
 	private Response performQuery(String id,
 			MultivaluedMap<String, String> parameters, String extension) {
 		try {
@@ -137,7 +138,9 @@ public class ApiResource extends AbstractResource {
 			rb.header("Content-Type", type.withCharset("UTF-8").toString());
 			return rb.build();
 		} catch (Exception e) {
-			throw new WebApplicationException(e);
+			//Response r = Response.serverError().entity(e.getMessage()).build();
+			log.error("ERROR while query execution",e);
+			return Response.serverError().entity(e.getMessage()).build();
 		}
 	}
 
@@ -147,7 +150,6 @@ public class ApiResource extends AbstractResource {
 				.build();
 	}
 
-	@SuppressWarnings("unchecked")
 	private Object prepareEntity(MediaType type, boolean b) {
 
 		// text/plain
@@ -231,7 +233,6 @@ public class ApiResource extends AbstractResource {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private Object prepareEntity(MediaType type, Model model,
 			Map<String, String> prefixes) {
 
@@ -434,7 +435,6 @@ public class ApiResource extends AbstractResource {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private Object prepareEntity(MediaType type, ResultSet rs) {
 		// text/plain
 		if (MediaType.TEXT_PLAIN_TYPE.equals(type)) {
@@ -595,6 +595,7 @@ public class ApiResource extends AbstractResource {
 		// This list is sorted by the client preference
 		List<MediaType> acceptHeaders = requestHeaders
 				.getAcceptableMediaTypes();
+		log.debug("Acceptable media types: {}",acceptHeaders);
 		if (acceptHeaders == null || acceptHeaders.size() == 0) {
 			// Default type is text/plain
 			return MediaType.TEXT_PLAIN_TYPE;
@@ -662,7 +663,7 @@ public class ApiResource extends AbstractResource {
 	) {
 		return performQuery(id, requestUri.getQueryParameters(), "");
 	}
-
+	
 	/**
 	 * Replace the spec of an API with a new version.
 	 *
@@ -726,8 +727,13 @@ public class ApiResource extends AbstractResource {
 	@GET
 	public Response redirectToSpec(
 			@PathParam(value = "id") String id) {
+		// If requests HTML, go to API Docs instead
 		ResponseBuilder builder = Response.status(303);
 		addHeaders(builder, id);
+		if(requestHeaders
+				.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)){
+			return builder.location(requestUri.getBaseUriBuilder().path(id).path("api-docs").build()).build();
+		}
 		return builder.location(requestUri.getBaseUriBuilder().path(id).path("spec").build()).build();
 	}
 
