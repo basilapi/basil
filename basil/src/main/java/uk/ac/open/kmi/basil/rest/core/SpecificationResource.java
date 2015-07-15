@@ -112,7 +112,9 @@ public class SpecificationResource extends AbstractResource {
 			Doc doc = getApiManager().getDoc(api);
 			object.add("id", new JsonPrimitive(api));
 			object.add("name", new JsonPrimitive(String.valueOf(doc.get(Field.NAME))));
-			object.add("createdby", new JsonPrimitive("")); // TODO
+			String c = getApiManager().getCreatorOfApi(api);
+			if(c == null) c = "";
+			object.add("createdBy", new JsonPrimitive(c)); // TODO
 			//object.add("description", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
 			object.add("location", new JsonPrimitive(String.valueOf(requestUri.getBaseUriBuilder().path(api))));
 			r.add(object);
