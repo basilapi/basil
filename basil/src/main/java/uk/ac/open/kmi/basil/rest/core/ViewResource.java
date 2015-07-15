@@ -89,9 +89,9 @@ public class ViewResource extends AbstractResource {
 		} catch (AuthorizationException e) {
 			log.trace("Not authorized");
 			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			return Response.serverError().entity(e).build();
-		}
+		} 
 	}
 
 	@GET
@@ -116,8 +116,8 @@ public class ViewResource extends AbstractResource {
 					JsonObject o = new JsonObject();
 					o.add("id", new JsonPrimitive(n));
 					o.add("extension", new JsonPrimitive(n));
-					o.add("engine", new JsonPrimitive(v.getEngine().getContentType()));
-					o.add("Content-Type", new JsonPrimitive(v.getMimeType()));
+					o.add("content-type", new JsonPrimitive(v.getEngine().getContentType()));
+					o.add("type", new JsonPrimitive(v.getMimeType()));
 					o.add("template", new JsonPrimitive(v.getTemplate()));
 					arr.add(o);
 				}
