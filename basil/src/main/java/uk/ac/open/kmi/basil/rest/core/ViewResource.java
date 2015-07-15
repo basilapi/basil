@@ -57,7 +57,8 @@ public class ViewResource extends AbstractResource {
 			if (requestHeaders.getMediaType() == null) {
 				engine = Engine.MUSTACHE;
 			} else {
-				String mediaType = requestHeaders.getMediaType().getType();
+				String mediaType = requestHeaders.getMediaType().getType() + "/" + requestHeaders.getMediaType().getSubtype();
+				log.debug("Content-Type is {}", mediaType);
 				engine = Engine.byContentType(mediaType);
 				if (engine == null) {
 					JsonObject m = new JsonObject();
@@ -75,13 +76,16 @@ public class ViewResource extends AbstractResource {
 				created = false;
 			}
 			getApiManager().createView(id, type, name, body, engine);
+			ResponseBuilder r;
 			if (created) {
-				return Response.created(
-						requestUri.getBaseUriBuilder().path(id).path(name).build())
-						.build();
+				 r = Response.created(
+						requestUri.getBaseUriBuilder().path(id).path(name).build());
 			} else {
-				return Response.ok().build();
+				r = Response.ok();
 			}
+			addHeaders(r, id);
+			return r
+					.build();
 		} catch (AuthorizationException e) {
 			log.trace("Not authorized");
 			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
@@ -102,20 +106,25 @@ public class ViewResource extends AbstractResource {
             @PathParam("id") String id) {
 		try {
 			Views views = getApiManager().listViews(id);
+			ResponseBuilder r;
 			if (views.numberOf() == 0) {
-				return Response.noContent().build();
+				r = Response.noContent();
+			}else{
+				JsonArray arr = new JsonArray();
+				for(String n : views.getNames()){
+					View v = views.byName(n);
+					JsonObject o = new JsonObject();
+					o.add("id", new JsonPrimitive(n));
+					o.add("extension", new JsonPrimitive(n));
+					o.add("engine", new JsonPrimitive(v.getEngine().getContentType()));
+					o.add("Content-Type", new JsonPrimitive(v.getMimeType()));
+					o.add("template", new JsonPrimitive(v.getTemplate()));
+					arr.add(o);
+				}
+				r = Response.ok(arr.toString());
 			}
-			JsonArray arr = new JsonArray();
-			for(String n : views.getNames()){
-				View v = views.byName(n);
-				JsonObject o = new JsonObject();
-				o.add("id", new JsonPrimitive(n));
-				o.add("extension", new JsonPrimitive(n));
-				o.add("engine", new JsonPrimitive(v.getEngine().name()));
-				o.add("Content-Type", new JsonPrimitive(v.getMimeType()));
-				arr.add(o);
-			}
-			return Response.ok(arr.toString()).build();
+			addHeaders(r, id);
+			return r.build();
 		} catch (Exception e) {
 			return Response.serverError().entity(e.getMessage()).build();
 		}
@@ -169,7 +178,10 @@ public class ViewResource extends AbstractResource {
 			JsonObject m = new JsonObject();
 			m.add("message", new JsonPrimitive("View deleted: " + view.toString()));
 			m.add("location", new JsonPrimitive(view.toString()));
-			return Response.ok().entity(m.toString()).build();
+			ResponseBuilder r = Response.ok().entity(m.toString());
+			addHeaders(r, id);
+			return r
+					.build();
 		} catch (AuthorizationException e) {
 			log.trace("Not authorized");
 			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
