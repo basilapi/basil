@@ -6,6 +6,7 @@ import java.io.Writer;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 import uk.ac.open.kmi.basil.view.rhino.RhinoMediator;
 
@@ -15,8 +16,9 @@ import com.github.mustachejava.MustacheFactory;
 
 public enum Engine {
 	MUSTACHE("template/mustache"), RHINO("application/javascript");
+	
 	private String contentType;
-
+	
 	Engine(String contentType) {
 		this.contentType = contentType;
 	}
@@ -33,26 +35,35 @@ public enum Engine {
 					.compile(new StringReader(template), template);
 			mustache.execute(writer, data);
 		} else if (this.equals(RHINO)) {
-			Context cx = Context.enter();
+			final Context cx = Context.enter();
 			try {
-				Scriptable scope = cx.initStandardObjects();
+				final ScriptableObject scope = cx.initStandardObjects();
+				//ScriptableObject.defineClass(scope, RhinoMediator.class, false, true);
 				cx.evaluateString(scope, "var rhinofunc = " + template,
-						"<cmd>", 1, null);
+						template, 1, null);
 				Object fObj = scope.get("rhinofunc", scope);
 				if (fObj == Scriptable.NOT_FOUND || !(fObj instanceof Function)) {
 					throw new EngineExecutionException(
-							"Broken input: script should declare a single anonym function. Eg: function(){ /*your code here*/ }");
+							"Broken input: script should declare a single anonym function. "
+							+ "Eg: "
+							+ "function(){ "
+							+ " var items = this.items;"
+							+ "	while(items.hasNext()){ "
+							+ "		var i = items.next(); "
+							+ "		this.print(i); "
+							+ "	} "
+							+ "");
 				} else {
 					Function f = (Function) fObj;
-					RhinoMediator sb = new RhinoMediator(scope, writer);
-					try {
-						sb.bindItems(data);
-						f.call(cx, scope, sb, new Object[] { sb });
-					} catch (Exception e) {
-						throw new EngineExecutionException(e);
-					}
+					RhinoMediator sb = new RhinoMediator();
+					sb.init(writer);
+					sb.bindItems(data);
+					f.call(cx, scope, sb, new Object[] { sb });
 				}
-				;
+			} catch(EngineExecutionException e){
+				throw e;
+			} catch(Exception e){
+				throw new EngineExecutionException(e);
 			} finally {
 				Context.exit();
 			}

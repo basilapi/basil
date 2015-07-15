@@ -21,15 +21,12 @@ public class RhinoMediator extends ScriptableObject {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	// FIXME REMOVE
-	private Scriptable scope;
 
-	public RhinoMediator(Scriptable scope, final Writer writer) {
-		this.scope = scope;
+	public void init(final Writer writer){
 		try {
 			// Initialize string builder
 			final Writer bridge = writer;
-			BaseFunction mf = new BaseFunction(scope, this) {
+			BaseFunction mf = new BaseFunction() {
 				private static final long serialVersionUID = 1L;
 
 				@Override
@@ -40,11 +37,11 @@ public class RhinoMediator extends ScriptableObject {
 						try {
 							bridge.append(o.toString());
 						} catch (IOException e) {
-							// How to handle this?
-							e.printStackTrace();
+							cx.getErrorReporter().runtimeError(e.getMessage(), "", 0, "", 0);
+							log.error(this.getClassName(), e);
 						}
 					}
-					return this;
+					return thisObj;
 				}
 			};
 			put("print", this, mf);
@@ -52,10 +49,10 @@ public class RhinoMediator extends ScriptableObject {
 			log.error("", e);
 		}
 	}
-
+	
 	@Override
 	public String getClassName() {
-		return this.getClassName();
+		return RhinoMediator.class.getName();
 	}
 
 	public void bindItems(Items items) throws Exception {
@@ -66,6 +63,7 @@ public class RhinoMediator extends ScriptableObject {
 		private static final long serialVersionUID = 1L;
 
 		public ItemsWrapper(final Iterator<Map<String, String>> iterator) {
+			
 			put("hasNext", this, new BaseFunction() {
 				private static final long serialVersionUID = 1L;
 
