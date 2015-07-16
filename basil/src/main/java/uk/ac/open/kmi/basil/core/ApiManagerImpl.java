@@ -177,7 +177,9 @@ public class ApiManagerImpl implements ApiManager {
     }
 
     public void deleteView(String id, String name) throws IOException {
-        data.loadViews(id).remove(data.loadViews(id).byName(name));
+        Views views = data.loadViews(id);
+        views.remove(data.loadViews(id).byName(name));
+        data.saveViews(id, views);
     }
 
     public void createView(String id, String mimeType, String name, String template, Engine engine) throws IOException {
