@@ -171,6 +171,7 @@ public class ViewResource extends AbstractResource {
 			@PathParam("name") String name,
 			@Auth Subject subject) {
 		try {
+			log.trace("Deleting view id: {} name: {}", id, name);
 			subject.checkRole(id);
 			getApiManager().deleteView(id, name);
 			log.debug("View deleted: {}:{} ", id, name);
