@@ -69,6 +69,7 @@ public class ApiResource extends AbstractResource {
 	@SuppressWarnings("unchecked")
 	private Response performQuery(String id,
 			MultivaluedMap<String, String> parameters, String extension) {
+		log.trace("API execution.");
 		try {
 			InvocationResult r = getApiManager().invokeApi(id, parameters);
 
@@ -78,12 +79,14 @@ public class ApiResource extends AbstractResource {
 				// remove dot
 				extension = extension.substring(1);
 				type = getFromExtension(extension);
-
+				log.trace("API execution. Ext: {} Type: {}", extension, type);
 				// No extension, check if the extension is the name of a view
 				if (type == null) {
 					Views views = getApiManager().listViews(id);
 					if (views.exists(extension)) {
+						
 						View view = views.byName(extension);
+						log.trace("API execution. View: {}", view);
 						StringWriter writer = new StringWriter();
 						Items data = null;
 						if (r.getResult() instanceof ResultSet) {
@@ -96,16 +99,19 @@ public class ApiResource extends AbstractResource {
 							data = Items.create((List<Map<String, String>>) r.getResult());
 						}
 						view.getEngine().exec(writer, view.getTemplate(), data);
+						
 						// Yeah!
 						ResponseBuilder rb = Response.ok(writer.toString());
 						addHeaders(rb, id);
 						rb.header("Content-Type", view.getMimeType()
 								+ "; charset=utf-8");
+						log.trace("API execution. View executed. Returning response.");
 						return rb.build();
 					}
 				}
 				// Still found nothing?
 				if (type == null) {
+					log.trace("API execution. View not found.");
 					return Response.status(404).entity("Not found\n").build();
 				}
 			}
@@ -115,9 +121,11 @@ public class ApiResource extends AbstractResource {
 			}
 			// No best acceptable
 			if (type == null) {
+				log.trace("API execution. Not acceptable.");
 				return buildNotAcceptable();
 			}
 
+			log.trace("API execution. Prepare response.");
 			Object entity = null;
 			if (r.getResult() instanceof ResultSet) {
 				entity = prepareEntity(type, (ResultSet) r.getResult());
@@ -130,12 +138,14 @@ public class ApiResource extends AbstractResource {
 			// If entity is null then format is not acceptable
 			// ie we don't have an implementation of that object/type map
 			if (entity == null) {
+				log.trace("API execution. Cannot prepare response (not acceptable).");
 				return buildNotAcceptable();
 			}
 			ResponseBuilder rb;
 			rb = Response.ok().entity(entity);
 			addHeaders(rb, id);
 			rb.header("Content-Type", type.withCharset("UTF-8").toString());
+			log.trace("API execution. Return response.");
 			return rb.build();
 		} catch (Exception e) {
 			//Response r = Response.serverError().entity(e.getMessage()).build();
@@ -632,6 +642,7 @@ public class ApiResource extends AbstractResource {
             @PathParam("ext") String extension,
             @ApiParam(value = "Input parameters")
             MultivaluedMap<String, String> form) {
+		log.trace("Called POST with extension.");
 		return performQuery(id, form, extension);
 	}
 
@@ -647,6 +658,7 @@ public class ApiResource extends AbstractResource {
             @PathParam("id") String id,
 			@ApiParam(value = "Extension of the output data format (e.g., .json, .xml)", required = false)
 			@PathParam("ext") String extension) {
+		log.trace("Called GET with extension.");
 		return performQuery(id, requestUri.getQueryParameters(), extension);
 	}
 
@@ -661,6 +673,7 @@ public class ApiResource extends AbstractResource {
 			@ApiParam(value = "ID of the API specification", required = true)
 			@PathParam("id") String id
 	) {
+		log.trace("Called GET.");
 		return performQuery(id, requestUri.getQueryParameters(), "");
 	}
 	
@@ -694,7 +707,6 @@ public class ApiResource extends AbstractResource {
 			getApiManager().replaceSpecification(id, body);
 			endpoint = getParameterOrHeader("endpoint");
 			getApiManager().replaceSpecification(id, endpoint, body);
-
 			ResponseBuilder response;
 			URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
 			log.info("Replaced spec at: {}", spec);
@@ -702,9 +714,7 @@ public class ApiResource extends AbstractResource {
 			m.add("message", new JsonPrimitive("Replaced: " + spec.toString()));
 			m.add("location", new JsonPrimitive(spec.toString()));
 			response = Response.ok(spec).entity(m.toString());
-
 			addHeaders(response, id);
-
 			return response.build();
 		} catch (AuthorizationException e) {
 			log.trace("Not authorized");
