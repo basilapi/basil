@@ -19,7 +19,8 @@
 		<!-- current log4j 2 release -->
 		<log4j.version>2.1</log4j.version>
 		<!-- jetty -->
-		<org.eclipse.jetty.version>9.2.3.v20140905</org.eclipse.jetty.version>
+		<!-- org.eclipse.jetty.version>9.2.3.v20140905</org.eclipse.jetty.version -->
+		<org.eclipse.jetty.version>9.3.0.v20150612</org.eclipse.jetty.version>
 		
 		<!-- basil version -->
 		<basil.version>0.2.0-SNAPSHOT</basil.version>
@@ -182,6 +183,21 @@
 		
 	</dependencies>
 </dependencyManagement>
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+    </plugin>
+ </plugins>
+</build>
+
 	<issueManagement>
 		<system>GitHub Issues</system>
 		<url>https://github.com/the-open-university/basil/issues</url>
