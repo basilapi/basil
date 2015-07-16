@@ -48,11 +48,12 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 		log.info("Preparing file store: {}", home);
 		home.mkdirs();
 		ctx.setAttribute(Registry.Store, new FileStore(home));
-		ctx.setAttribute(Registry.UserManager, 	new JDBCUserManager());
 
 		// JDBC setup
 		String jdbc_url = ctx.getInitParameter("jdbc-config");
 		Registry.JdbcUri = jdbc_url;
+
+		ctx.setAttribute(Registry.UserManager, 	new JDBCUserManager());
 
 	}
 
