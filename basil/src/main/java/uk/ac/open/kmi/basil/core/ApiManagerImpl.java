@@ -32,10 +32,11 @@ import java.util.UUID;
  */
 public class ApiManagerImpl implements ApiManager {
     private Store data;
-    private UserManager userManager = new JDBCUserManager();
+    private UserManager userManager;
 
-    public ApiManagerImpl(Store store) {
+    public ApiManagerImpl(Store store, UserManager um) {
         data = store;
+        userManager = um;
     }
 
     /**

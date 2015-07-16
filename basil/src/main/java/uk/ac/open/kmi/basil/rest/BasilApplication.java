@@ -1,20 +1,24 @@
 package uk.ac.open.kmi.basil.rest;
 
-import com.wordnik.swagger.jersey.listing.ApiListingResourceJSON;
-import com.wordnik.swagger.jersey.listing.JerseyApiDeclarationProvider;
-import com.wordnik.swagger.jersey.listing.JerseyResourceListingProvider;
+import java.io.File;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
 import org.glassfish.jersey.server.ResourceConfig;
 import org.secnod.shiro.jersey.AuthInjectionBinder;
 import org.secnod.shiro.jersey.AuthorizationFilterFeature;
 import org.secnod.shiro.jersey.SubjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
 import uk.ac.open.kmi.basil.store.FileStore;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import java.io.File;
+import com.wordnik.swagger.jersey.listing.ApiListingResourceJSON;
+import com.wordnik.swagger.jersey.listing.JerseyApiDeclarationProvider;
+import com.wordnik.swagger.jersey.listing.JerseyResourceListingProvider;
 
 /**
  * Created by Luca Panziera on 09/01/15.
@@ -44,6 +48,7 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 		log.info("Preparing file store: {}", home);
 		home.mkdirs();
 		ctx.setAttribute(Registry.Store, new FileStore(home));
+		ctx.setAttribute(Registry.UserManager, 	new JDBCUserManager());
 
 		// JDBC setup
 		String jdbc_url = ctx.getInitParameter("jdbc-config");
@@ -53,6 +58,7 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 
 	public final static class Registry {
 		public final static String Store = "_Store";
+		public final static String UserManager = "_UserManager";
 		public static String JdbcUri = "_JdbcUri";
 	}
 }

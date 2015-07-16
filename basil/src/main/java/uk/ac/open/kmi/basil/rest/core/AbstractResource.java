@@ -2,6 +2,7 @@ package uk.ac.open.kmi.basil.rest.core;
 
 import uk.ac.open.kmi.basil.core.ApiManager;
 import uk.ac.open.kmi.basil.core.ApiManagerImpl;
+import uk.ac.open.kmi.basil.core.auth.UserManager;
 import uk.ac.open.kmi.basil.rest.BasilApplication;
 import uk.ac.open.kmi.basil.store.Store;
 
@@ -12,6 +13,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
+
 import java.net.HttpURLConnection;
 import java.net.URI;
 
@@ -29,7 +31,7 @@ public class AbstractResource {
 
 	protected ApiManager getApiManager() {
 		if (apiManager == null) {
-			apiManager = new ApiManagerImpl(getDataStore());
+			apiManager = new ApiManagerImpl(getDataStore(), getUserManager());
 		}
 		return apiManager;
 	}
@@ -76,5 +78,9 @@ public class AbstractResource {
 
 	private Store getDataStore() {
 		return (Store) context.getAttribute(BasilApplication.Registry.Store);
+	}
+	
+	private UserManager getUserManager(){
+		return (UserManager) context.getAttribute(BasilApplication.Registry.UserManager);
 	}
 }
