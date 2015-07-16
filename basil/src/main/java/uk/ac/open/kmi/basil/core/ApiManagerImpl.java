@@ -3,7 +3,6 @@ package uk.ac.open.kmi.basil.core;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
 import uk.ac.open.kmi.basil.core.auth.UserManager;
 import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
 import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
