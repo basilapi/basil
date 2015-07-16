@@ -20,7 +20,7 @@ import java.util.List;
 public interface ApiManager {
     InvocationResult invokeApi(String id, MultivaluedMap<String, String> parameters) throws IOException, ApiInvocationException;
 
-    String createSpecification(String username, String endpoint, String body) throws SpecificationParsingException, UserApiMappingException;
+    String createSpecification(String username, String endpoint, String body) throws SpecificationParsingException, UserApiMappingException, IOException;
 
     String cloneSpecification(String username, String id) throws IOException, UserApiMappingException;
 
@@ -30,7 +30,7 @@ public interface ApiManager {
 
     boolean deleteApi(String id) throws IOException, UserApiMappingException;
 
-    List<String> listApis();
+    List<String> listApis() throws IOException;
 
     Specification getSpecification(String id) throws IOException;
 
@@ -46,7 +46,7 @@ public interface ApiManager {
 
     boolean deleteDoc(String id) throws IOException;
 
-    boolean existsSpec(String id);
+    boolean existsSpec(String id) throws IOException;
 
     void createDoc(String id, String name, String body) throws IOException;
 

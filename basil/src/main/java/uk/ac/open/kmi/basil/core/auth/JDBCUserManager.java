@@ -1,20 +1,28 @@
 package uk.ac.open.kmi.basil.core.auth;
 
-import org.apache.shiro.authc.credential.DefaultPasswordService;
-import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
-import uk.ac.open.kmi.basil.core.auth.exceptions.UserCreationException;
-import uk.ac.open.kmi.basil.rest.BasilApplication;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.shiro.authc.credential.DefaultPasswordService;
+
+import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
+import uk.ac.open.kmi.basil.core.auth.exceptions.UserCreationException;
 
 /**
  * Created by Luca Panziera on 26/06/15.
  */
 public class JDBCUserManager implements UserManager {
 
-    private String jdbcUri = BasilApplication.Registry.JdbcUri;
+    private String jdbcUri;
+    
+    public JDBCUserManager(String jdbcUri) {
+    	this.jdbcUri = jdbcUri;
+	}
 
     public void createUser(User user) throws UserCreationException {
 

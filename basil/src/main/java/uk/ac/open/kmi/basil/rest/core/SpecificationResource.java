@@ -65,11 +65,12 @@ public class SpecificationResource extends AbstractResource {
 			if (subject.isAuthenticated()) {
 				String username = (String) subject.getSession().getAttribute(AuthResource.CURRENT_USER_KEY);
 				endpoint = getParameterOrHeader("endpoint");
+				
 				String id = getApiManager().createSpecification(username, endpoint, body);
+				log.trace("Spec created: {}", id);
 				URI api = requestUri.getBaseUriBuilder().path(id).build();
 
 				ResponseBuilder response;
-
 				URI spec = requestUri.getBaseUriBuilder().path(id).path("spec")
 						.build();
 				log.info("Created  spec at: {}", spec);
@@ -79,11 +80,11 @@ public class SpecificationResource extends AbstractResource {
 				response = Response.created(api).entity(m.toString());
 
 				addHeaders(response, id);
-
 				return response.build();
 			}
 		} catch (Exception e) {
-			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+			log.error("An error occurred", e);
+			return Response.serverError()
 					.header(Headers.Error, e.getMessage()).build();
 		}
 		return Response.status(HttpURLConnection.HTTP_FORBIDDEN)
@@ -104,21 +105,26 @@ public class SpecificationResource extends AbstractResource {
 			@ApiResponse(code = 200, message = "OK"),
 			@ApiResponse(code = 500, message = "Internal error")}
 	)
-	public String list() throws IOException {
+	public Response list() {
 		log.trace("Called GET");
 		JsonArray r = new JsonArray();
-		for (String api : getApiManager().listApis()) {
-			JsonObject object = new JsonObject();
-			Doc doc = getApiManager().getDoc(api);
-			object.add("id", new JsonPrimitive(api));
-			object.add("name", new JsonPrimitive(String.valueOf(doc.get(Field.NAME))));
-			String c = getApiManager().getCreatorOfApi(api);
-			if(c == null) c = "";
-			object.add("createdBy", new JsonPrimitive(c)); // TODO
-			//object.add("description", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
-			object.add("location", new JsonPrimitive(String.valueOf(requestUri.getBaseUriBuilder().path(api))));
-			r.add(object);
+		try {
+			for (String api : getApiManager().listApis()) {
+				JsonObject object = new JsonObject();
+				Doc doc = getApiManager().getDoc(api);
+				object.add("id", new JsonPrimitive(api));
+				object.add("name", new JsonPrimitive(String.valueOf(doc.get(Field.NAME))));
+				String c = getApiManager().getCreatorOfApi(api);
+				if(c == null) c = "";
+				object.add("createdBy", new JsonPrimitive(c)); // TODO
+				//object.add("description", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
+				object.add("location", new JsonPrimitive(String.valueOf(requestUri.getBaseUriBuilder().path(api))));
+				r.add(object);
+			}
+		} catch (IOException e) {
+			log.error("", e);
+			return Response.serverError().entity(e).build();
 		}
-		return r.toString();
+		return Response.ok(r.toString()).build();
 	}
 }

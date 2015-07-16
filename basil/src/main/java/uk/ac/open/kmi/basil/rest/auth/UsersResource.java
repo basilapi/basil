@@ -1,24 +1,27 @@
 package uk.ac.open.kmi.basil.rest.auth;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import java.net.URI;
+import java.util.Set;
 
-import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
-import uk.ac.open.kmi.basil.core.auth.User;
-import uk.ac.open.kmi.basil.core.auth.UserManager;
-import uk.ac.open.kmi.basil.doc.Doc;
-import uk.ac.open.kmi.basil.doc.Doc.Field;
-import uk.ac.open.kmi.basil.rest.core.AbstractResource;
-
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import java.net.URI;
-import java.util.Set;
+import uk.ac.open.kmi.basil.core.auth.User;
+import uk.ac.open.kmi.basil.doc.Doc;
+import uk.ac.open.kmi.basil.doc.Doc.Field;
+import uk.ac.open.kmi.basil.rest.core.AbstractResource;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * Created by Luca Panziera on 01/07/15.
@@ -29,7 +32,6 @@ public class UsersResource extends AbstractResource{
 
     @Context
     protected UriInfo requestUri;
-    UserManager userManager = new JDBCUserManager();
 
     @POST
     @Consumes("application/json")
@@ -38,7 +40,7 @@ public class UsersResource extends AbstractResource{
         Gson gson = new Gson();
         User user = gson.fromJson(body, User.class);
         try {
-            userManager.createUser(user);
+            getUserManager().createUser(user);
             URI userUri = requestUri.getBaseUriBuilder().path("users").path(user.getUsername()).build();
             JsonObject m = new JsonObject();
             m.add("message", new JsonPrimitive("Created user: " + user.getUsername()));
@@ -71,7 +73,7 @@ public class UsersResource extends AbstractResource{
     @Produces("application/json")
     public Response getUserApis(@PathParam("username") String username) {
         try {
-            Set<String> apiIds = userManager.getUserApis(username);
+            Set<String> apiIds = getUserManager().getUserApis(username);
             JsonArray r = new JsonArray();
             for (String api : apiIds) {
             	JsonObject object = new JsonObject();

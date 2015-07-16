@@ -50,6 +50,7 @@ public class ViewResource extends AbstractResource {
             @ApiParam(value = "Template of the view", required = true)
 			String body,
 			@Auth Subject subject) {
+		log.trace("Calling PUT view with id: {} name: ", id, name);
 		try {
 			subject.checkRole(id);
 			Engine engine;
@@ -78,6 +79,7 @@ public class ViewResource extends AbstractResource {
 			getApiManager().createView(id, type, name, body, engine);
 			ResponseBuilder r;
 			if (created) {
+				log.debug("View created.");
 				 r = Response.created(
 						requestUri.getBaseUriBuilder().path(id).path(name).build());
 			} else {
@@ -90,6 +92,7 @@ public class ViewResource extends AbstractResource {
 			log.trace("Not authorized");
 			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
 		} catch (IOException e) {
+			log.error("",e);
 			return Response.serverError().entity(e).build();
 		} 
 	}
@@ -126,7 +129,8 @@ public class ViewResource extends AbstractResource {
 			addHeaders(r, id);
 			return r.build();
 		} catch (Exception e) {
-			return Response.serverError().entity(e.getMessage()).build();
+			log.error("", e);
+			return Response.serverError().entity("An error occurred").build();
 		}
 	}
 
@@ -141,6 +145,7 @@ public class ViewResource extends AbstractResource {
             @PathParam("id") String id,
             @ApiParam(value = "Name of the view", required = true)
 			@PathParam("name") String name) {
+		log.trace("Calling GET view with id: {} and name: {}", id, name);
 		try {
 			View view = getApiManager().getView(id, name);
 			if (view == null) {

@@ -48,7 +48,7 @@ public class DocsResource extends AbstractResource {
     		@ApiResponse(code = 204, message = "No content")
     })
 	public Response get(@PathParam("id") String id) {
-		log.trace("Calling GET. id={}",id);
+		log.trace("Calling GET docs with id: {}",id);
 		try {
 			if (getApiManager().getSpecification(id) == null) {
 				return Response.status(404).build();
@@ -76,7 +76,7 @@ public class DocsResource extends AbstractResource {
     		@ApiResponse(code = 204, message = "Deleted. No content")
     })
 	public Response delete(@PathParam("id") String id, @Auth Subject subject) {
-		log.trace("Calling DELETE. id={}",id);
+		log.trace("Calling DELETE docs with id: {}",id);
 		try {
 			subject.checkPermission(id + ":write");
 
@@ -118,7 +118,7 @@ public class DocsResource extends AbstractResource {
 			String body,
 			@Auth Subject subject
 	) {
-		log.trace("Calling PUT. id={} name={}",id, name);
+		log.trace("Calling PUT docs with id: {} name: {}",id, name);
 		try {
 			log.trace("Body is: {}",body);
 			subject.checkRole(id);

@@ -1,36 +1,45 @@
 package uk.ac.open.kmi.basil.rest.auth;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import java.net.HttpURLConnection;
+import java.net.URI;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
-import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.ac.open.kmi.basil.core.auth.User;
-import uk.ac.open.kmi.basil.core.auth.UserManager;
+import uk.ac.open.kmi.basil.rest.core.AbstractResource;
 import uk.ac.open.kmi.basil.rest.core.Headers;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import java.net.HttpURLConnection;
-import java.net.URI;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * Created by Luca Panziera on 26/06/15.
  */
 @Path("auth")
-public class AuthResource {
+public class AuthResource extends AbstractResource {
     public static final String CURRENT_USER_KEY = "currentUser";
     @Context
     protected UriInfo requestUri;
-    UserManager userManager = new JDBCUserManager();
 
-
+	private static Logger log = LoggerFactory
+			.getLogger(AuthResource.class);
+	
     @POST
     @Path("login")
     @Consumes("application/json")
@@ -51,7 +60,7 @@ public class AuthResource {
             m.add("user", new JsonPrimitive(userUri.toASCIIString()));
             return Response.created(userUri).entity(m.toString()).build();
         } catch (Exception e) {
-            e.printStackTrace();
+        	log.error("An error occurred", e);
             JsonObject m = new JsonObject();
             m.add("message", new JsonPrimitive(e.getMessage()));
             return Response.serverError().entity(m.toString()).build();
@@ -72,6 +81,7 @@ public class AuthResource {
             m.add("location", new JsonPrimitive(userUri.toASCIIString()));
             return Response.ok().entity(m.toString()).build();
         } catch (Exception e) {
+        	log.error("An error occurred", e);
             JsonObject m = new JsonObject();
             m.add("message", new JsonPrimitive(e.getMessage()));
             return Response.serverError().entity(m.toString()).build();
@@ -86,10 +96,11 @@ public class AuthResource {
             if (subject.isAuthenticated()) {
                 String username = (String) subject.getSession().getAttribute(CURRENT_USER_KEY);
                 Gson gson = new Gson();
-                return Response.ok().entity(gson.toJson(userManager.getUser(username))).build();
+                return Response.ok().entity(gson.toJson(getUserManager().getUser(username))).build();
             }
 
         } catch (Exception e) {
+        	log.error("An error occurred", e);
             JsonObject m = new JsonObject();
             m.add("message", new JsonPrimitive(e.getMessage()));
             return Response.serverError().entity(m.toString()).build();

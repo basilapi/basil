@@ -17,9 +17,7 @@ import uk.ac.open.kmi.basil.view.Engine;
 import uk.ac.open.kmi.basil.view.View;
 import uk.ac.open.kmi.basil.view.Views;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -100,19 +98,14 @@ public class ApiManagerImpl implements ApiManager {
 
     }
 
-    public String createSpecification(String username, String endpoint, String body) throws SpecificationParsingException, UserApiMappingException {
+    public String createSpecification(String username, String endpoint, String body) throws IOException, SpecificationParsingException, UserApiMappingException {
         String id = shortUUID();
         if (body.equals("")) {
             throw new SpecificationParsingException("Body cannot be empty");
         }
         Specification specification = SpecificationFactory.create(endpoint, body);
-        try {
-            data.saveSpec(id, specification);
-            userManager.mapUserApi(username, id);
-        } catch (IOException e) {
-            //TODO throw a proper exception
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        data.saveSpec(id, specification);
+        userManager.mapUserApi(username, id);
         return id;
     }
 
@@ -121,20 +114,15 @@ public class ApiManagerImpl implements ApiManager {
         Specification specification = data.loadSpec(id);
         Doc doc = data.loadDoc(id);
         Views views = listViews(id);
-        try {
-            data.saveSpec(newId, specification);
-            userManager.mapUserApi(username, newId);
-            if (!doc.isEmpty()) {
-                data.saveDoc(newId, doc);
-            }
-            if (views.numberOf() > 0) {
-                data.saveViews(newId, views);
-            }
-            return newId;
-        } catch (IOException e) {
-            //TODO throw a proper exception
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        data.saveSpec(newId, specification);
+        userManager.mapUserApi(username, newId);
+        if (!doc.isEmpty()) {
+            data.saveDoc(newId, doc);
         }
+        if (views.numberOf() > 0) {
+            data.saveViews(newId, views);
+        }
+        return newId;
     }
 
     public void replaceSpecification(String id, String body) throws IOException, SpecificationParsingException {
@@ -147,12 +135,7 @@ public class ApiManagerImpl implements ApiManager {
             throw new SpecificationParsingException("Body cannot be empty");
         }
         Specification specification = SpecificationFactory.create(endpoint, body);
-        try {
-            data.saveSpec(id, specification);
-        } catch (IOException e) {
-            //TODO throw a proper exception
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        data.saveSpec(id, specification);
     }
 
     public boolean deleteApi(String id) throws IOException, UserApiMappingException {
@@ -160,7 +143,7 @@ public class ApiManagerImpl implements ApiManager {
         return data.deleteSpec(id);
     }
 
-    public List<String> listApis() {
+    public List<String> listApis() throws IOException {
         return data.listSpecs();
     }
 
@@ -196,8 +179,8 @@ public class ApiManagerImpl implements ApiManager {
         return data.deleteDoc(id);
     }
 
-    public boolean existsSpec(String id) {
-        return data.existsSpec(id);
+    public boolean existsSpec(String id) throws IOException{
+    	return data.existsSpec(id);
     }
 
     public void createDoc(String id, String name, String body) throws IOException {

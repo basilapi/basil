@@ -1,7 +1,5 @@
 package uk.ac.open.kmi.basil.rest;
 
-import java.io.File;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -14,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
-import uk.ac.open.kmi.basil.store.FileStore;
+import uk.ac.open.kmi.basil.store.JdbcStore;
 
 import com.wordnik.swagger.jersey.listing.ApiListingResourceJSON;
 import com.wordnik.swagger.jersey.listing.JerseyApiDeclarationProvider;
@@ -42,24 +40,21 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 	}
 
 	public void contextInitialized(ServletContextEvent arg0) {
+		log.info("Initializing context.");
 		ServletContext ctx = arg0.getServletContext();
-		String h = ctx.getInitParameter("file-store-home");
-		File home = new File(h);
-		log.info("Preparing file store: {}", home);
-		home.mkdirs();
-		ctx.setAttribute(Registry.Store, new FileStore(home));
 
 		// JDBC setup
 		String jdbc_url = ctx.getInitParameter("jdbc-config");
-		Registry.JdbcUri = jdbc_url;
-
-		ctx.setAttribute(Registry.UserManager, 	new JDBCUserManager());
+		ctx.setAttribute(Registry.JdbcUri, jdbc_url);
+		ctx.setAttribute(Registry.UserManager, 	new JDBCUserManager(jdbc_url));
+		ctx.setAttribute(Registry.Store, new JdbcStore(jdbc_url));
+		
 
 	}
 
 	public final static class Registry {
 		public final static String Store = "_Store";
 		public final static String UserManager = "_UserManager";
-		public static String JdbcUri = "_JdbcUri";
+		public final static String JdbcUri = "_JdbcUri";
 	}
 }

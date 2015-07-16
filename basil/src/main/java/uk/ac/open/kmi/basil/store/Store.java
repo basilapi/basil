@@ -13,9 +13,9 @@ public interface Store {
 
 	Specification loadSpec(String id) throws IOException;
 
-	boolean existsSpec(String id);
+	boolean existsSpec(String id) throws IOException;
 
-	List<String> listSpecs();
+	List<String> listSpecs() throws IOException;
 
 	Views loadViews(String id) throws IOException;
 

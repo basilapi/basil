@@ -80,7 +80,7 @@ public class AbstractResource {
 		return (Store) context.getAttribute(BasilApplication.Registry.Store);
 	}
 	
-	private UserManager getUserManager(){
+	protected UserManager getUserManager(){
 		return (UserManager) context.getAttribute(BasilApplication.Registry.UserManager);
 	}
 }
