@@ -2,13 +2,10 @@ package uk.ac.open.kmi.basil.server;
 
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.web.env.IniWebEnvironment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BasilServerEnvironment extends IniWebEnvironment implements BasilEnvironment {
 	
 	private String jdbcConnectionUrl;
-	private Logger log = LoggerFactory.getLogger(BasilServerEnvironment.class);
 	
 	public BasilServerEnvironment() {
 		String iniPath = System.getProperty("basil.configurationFile");
@@ -26,7 +23,6 @@ public class BasilServerEnvironment extends IniWebEnvironment implements BasilEn
 		.append(getIni().get("").get("ds.user"))
 		.append("&password=")
 		.append(getIni().get("").get("ds.password")).toString();
-		//log.trace("jdbc connection url is: {}", jdbcConnectionUrl);
 	}
 	
 	@Override

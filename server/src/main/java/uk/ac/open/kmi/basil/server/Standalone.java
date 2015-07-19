@@ -1,6 +1,5 @@
 package uk.ac.open.kmi.basil.server;
 
-import java.io.File;
 import java.io.PrintStream;
 
 import org.apache.commons.cli.BasicParser;
