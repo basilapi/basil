@@ -12,7 +12,7 @@ import uk.ac.open.kmi.basil.sparql.Specification;
 import javax.ws.rs.core.MediaType;
 
 public class SwaggerJsonBuilder {
-	@SuppressWarnings("unchecked")
+
 	public static JsonObject build(String id, Specification spec, Doc doc,
 								   String basilRoot) {
 		JsonObject root = new JsonObject();

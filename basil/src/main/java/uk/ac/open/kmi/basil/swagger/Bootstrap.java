@@ -1,16 +1,21 @@
 package uk.ac.open.kmi.basil.swagger;
 
+import javax.servlet.http.HttpServlet;
+
 import com.wordnik.swagger.config.ConfigFactory;
 import com.wordnik.swagger.config.FilterFactory;
 import com.wordnik.swagger.model.ApiInfo;
-
-import javax.servlet.http.HttpServlet;
 
 /**
  * Created by Luca Panziera on 14/03/15.
  */
 public class Bootstrap extends HttpServlet {
-    static {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	static {
         // do any additional initialization here, such as set your base path programmatically as such:
         // ConfigFactory.config().setBasePath("http://www.foo.com/");
 
