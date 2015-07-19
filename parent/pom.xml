@@ -131,7 +131,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
+        
 		<!-- Server -->
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
@@ -181,6 +181,23 @@
 			</exclusions>
 		</dependency>
 		
+		<!-- Security -->
+		<dependency>
+		    <groupId>org.apache.shiro</groupId>
+		    <artifactId>shiro-core</artifactId>
+		    <version>1.2.3</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.shiro</groupId>
+		    <artifactId>shiro-web</artifactId>
+		    <version>1.2.3</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.secnod.shiro</groupId>
+		    <artifactId>shiro-jersey</artifactId>
+		    <version>0.2.0</version>
+		</dependency>
+				
 	</dependencies>
 </dependencyManagement>
 

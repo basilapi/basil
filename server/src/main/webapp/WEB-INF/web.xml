@@ -29,7 +29,7 @@
         </init-param>
         <init-param>
             <param-name>cors.exposedHeaders</param-name>
-            <param-value>Set-Cookie, X-Basil-Endpoint, X-Basil-Api, X-Basil-Spec, X-Basil-View, X-Basil-Docs, X-Basil-Swagger, X-Basil-Name</param-value>
+            <param-value>Set-Cookie, X-Basil-Endpoint, X-Basil-Api, X-Basil-Spec, X-Basil-View, X-Basil-Docs, X-Basil-Swagger, X-Basil-Name, X-Basil-Creator</param-value>
         </init-param>
         <init-param>
             <param-name>cors.supportsCredentials</param-name>
@@ -43,8 +43,13 @@
     </filter-mapping>
 
     <context-param>
-        <param-name>shiroConfigLocations</param-name>
-        <param-value>classpath:WEB-INF/shiro.ini</param-value>
+        <param-name>shiroEnvironmentClass</param-name>
+        <param-value>uk.ac.open.kmi.basil.server.BasilServerEnvironment</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>basilEnvironmentClass</param-name>
+        <param-value>uk.ac.open.kmi.basil.server.BasilServerEnvironment</param-value>
     </context-param>
 
     <listener>
@@ -83,11 +88,6 @@
         <param-name>file-store-home</param-name>
         <param-value>./basil-store</param-value>
     </context-param>
-    <context-param>
-        <param-name>jdbc-config</param-name>
-        <param-value>jdbc:mysql://lwkm234549.open.ac.uk/basilshiro?user=basil&amp;password=!basil!</param-value>
-    </context-param>
-
 
     <servlet-mapping>
 		<servlet-name>BASIL</servlet-name>

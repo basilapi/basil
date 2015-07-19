@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
+import uk.ac.open.kmi.basil.server.BasilEnvironment;
 import uk.ac.open.kmi.basil.store.JdbcStore;
 
 import com.wordnik.swagger.jersey.listing.ApiListingResourceJSON;
@@ -43,17 +44,25 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 		log.info("Initializing context.");
 		ServletContext ctx = arg0.getServletContext();
 
+		String envClass = ctx.getInitParameter("basilEnvironmentClass");
+		BasilEnvironment environment;
+		try {
+			environment = (BasilEnvironment) Class.forName(envClass).newInstance();
+		} catch (InstantiationException | IllegalAccessException
+				| ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 		// JDBC setup
-		String jdbc_url = ctx.getInitParameter("jdbc-config");
-		ctx.setAttribute(Registry.JdbcUri, jdbc_url);
-		ctx.setAttribute(Registry.UserManager, 	new JDBCUserManager(jdbc_url));
-		ctx.setAttribute(Registry.Store, new JdbcStore(jdbc_url));
+		ctx.setAttribute(Registry.Environment, environment);
+		ctx.setAttribute(Registry.UserManager, 	new JDBCUserManager(environment.getJdbcConnectionUrl()));
+		ctx.setAttribute(Registry.Store, new JdbcStore(environment.getJdbcConnectionUrl()));
 		
 
 	}
 
 	public final static class Registry {
 		public final static String Store = "_Store";
+		public final static String Environment ="_Environment";
 		public final static String UserManager = "_UserManager";
 		public final static String JdbcUri = "_JdbcUri";
 	}
