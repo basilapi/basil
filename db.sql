@@ -12,10 +12,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `apis`
+-- Table structure for table `APIS`
 --
 
-CREATE TABLE `apis` (
+CREATE TABLE `APIS` (
 `id` int(11) NOT NULL,
   `nickname` varchar(255) NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -26,10 +26,10 @@ CREATE TABLE `apis` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `data`
+-- Table structure for table `DATA`
 --
 
-CREATE TABLE `data` (
+CREATE TABLE `DATA` (
 `id` int(11) NOT NULL,
   `api` int(11) NOT NULL,
   `property` varchar(255) NOT NULL,
@@ -103,10 +103,10 @@ CREATE TABLE `users_roles` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `views`
+-- Table structure for table `VIEWS`
 --
 
-CREATE TABLE `views` (
+CREATE TABLE `VIEWS` (
 `id` int(11) NOT NULL,
   `api` int(11) NOT NULL,
   `view` varchar(255) NOT NULL,
@@ -122,15 +122,15 @@ CREATE TABLE `views` (
 --
 
 --
--- Indexes for table `apis`
+-- Indexes for table `APIS`
 --
-ALTER TABLE `apis`
+ALTER TABLE `APIS`
  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `nickname` (`nickname`);
 
 --
--- Indexes for table `data`
+-- Indexes for table `DATA`
 --
-ALTER TABLE `data`
+ALTER TABLE `DATA`
  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `api_property` (`api`,`property`);
 
 --
@@ -152,9 +152,9 @@ ALTER TABLE `users`
  ADD PRIMARY KEY (`username`);
 
 --
--- Indexes for table `views`
+-- Indexes for table `VIEWS`
 --
-ALTER TABLE `views`
+ALTER TABLE `VIEWS`
  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `api_view` (`api`,`view`);
 
 --
@@ -162,32 +162,32 @@ ALTER TABLE `views`
 --
 
 --
--- AUTO_INCREMENT for table `apis`
+-- AUTO_INCREMENT for table `APIS`
 --
-ALTER TABLE `apis`
+ALTER TABLE `APIS`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
 --
--- AUTO_INCREMENT for table `data`
+-- AUTO_INCREMENT for table `DATA`
 --
-ALTER TABLE `data`
+ALTER TABLE `DATA`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=13;
 --
--- AUTO_INCREMENT for table `views`
+-- AUTO_INCREMENT for table `VIEWS`
 --
-ALTER TABLE `views`
+ALTER TABLE `VIEWS`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=14;
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `data`
+-- Constraints for table `DATA`
 --
-ALTER TABLE `data`
-ADD CONSTRAINT `data_ibfk_1` FOREIGN KEY (`api`) REFERENCES `apis` (`id`) ON DELETE CASCADE;
+ALTER TABLE `DATA`
+ADD CONSTRAINT `data_ibfk_1` FOREIGN KEY (`api`) REFERENCES `APIS` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `views`
+-- Constraints for table `VIEWS`
 --
-ALTER TABLE `views`
-ADD CONSTRAINT `views_ibfk_1` FOREIGN KEY (`api`) REFERENCES `apis` (`id`) ON DELETE CASCADE;
+ALTER TABLE `VIEWS`
+ADD CONSTRAINT `views_ibfk_1` FOREIGN KEY (`api`) REFERENCES `APIS` (`id`) ON DELETE CASCADE;

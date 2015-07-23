@@ -1,0 +1,8 @@
+/target/
+/target/
+/bin
+.DS_Store
+.settings
+.project
+.classpath
+basil-store
