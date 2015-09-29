@@ -30,7 +30,7 @@ public class SwaggerJsonBuilder {
 		op.add("method", new JsonPrimitive("GET"));
 		op.add("nickname", new JsonPrimitive("API"));
 		op.add("summary", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
-		op.add("type", new JsonPrimitive(Types.List.toString()));
+		op.add("type", new JsonPrimitive("void"));
 		JsonArray produces = new JsonArray();
 		for (MediaType kt : MoreMediaType.extensions.values()) {
 			produces.add(new JsonPrimitive(kt.toString()));
@@ -67,7 +67,7 @@ public class SwaggerJsonBuilder {
 		op2.add("method", new JsonPrimitive("GET"));
 		op2.add("nickname", new JsonPrimitive("APIext"));
 		op2.add("summary", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
-		op2.add("type", new JsonPrimitive(Types.List.toString()));
+		op2.add("type", new JsonPrimitive("void"));
 		op2.add("produces", produces);
 
 		par = new JsonObject();
@@ -87,6 +87,10 @@ public class SwaggerJsonBuilder {
 		apis.add(api);
 		apis.add(api2);
 		root.add("apis", apis);
+
+		// create model section
+		// TODO create proper model according to the data model from the SPARQL endpoint
+
 		return root;
 	}
 
