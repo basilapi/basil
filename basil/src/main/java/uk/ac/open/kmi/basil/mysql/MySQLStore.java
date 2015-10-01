@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.store;
+package uk.ac.open.kmi.basil.mysql;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -8,20 +8,31 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.ac.open.kmi.basil.doc.Doc;
+import uk.ac.open.kmi.basil.search.Query;
+import uk.ac.open.kmi.basil.search.Result;
+import uk.ac.open.kmi.basil.search.SearchProvider;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
+import uk.ac.open.kmi.basil.store.Store;
 import uk.ac.open.kmi.basil.view.Engine;
 import uk.ac.open.kmi.basil.view.View;
 import uk.ac.open.kmi.basil.view.Views;
 
-public class JdbcStore implements Store {
+public class MySQLStore implements Store, SearchProvider {
 
+	private static final Logger log = LoggerFactory.getLogger(MySQLStore.class);
 	private String jdbcUri;
 
 	static final String SPEC_ENDPOINT = "spec:endpoint";
@@ -29,10 +40,10 @@ public class JdbcStore implements Store {
 	static final String DOC_NAME = "doc:name";
 	static final String DOC_DESCRIPTION = "doc:description";
 
-	public JdbcStore(String jdbcUri) {
+	public MySQLStore(String jdbcUri) {
 		this.jdbcUri = jdbcUri;
 	}
-	
+
 	/**
 	 * Gets a API Db identifier from a nickname
 	 * 
@@ -114,7 +125,7 @@ public class JdbcStore implements Store {
 						}
 					}
 					connect.commit();
-				} catch(IOException e){
+				} catch (IOException e) {
 					connect.rollback();
 				} finally {
 					connect.setAutoCommit(true);
@@ -276,8 +287,8 @@ public class JdbcStore implements Store {
 	@Override
 	public void saveViews(String id, Views views) throws IOException {
 		/**
-		 * FIXME This method is very inefficient...
-		 * It does not harm for the moment but we should change it. - enridaga
+		 * FIXME This method is very inefficient... It does not harm for the
+		 * moment but we should change it. - enridaga
 		 */
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -293,7 +304,7 @@ public class JdbcStore implements Store {
 					// delete views not in
 					String d = "DELETE FROM VIEWS WHERE API = " + dbId;
 					try (PreparedStatement stmt = connect.prepareStatement(d)) {
-						//stmt.setInt(1, dbId);
+						// stmt.setInt(1, dbId);
 						stmt.executeUpdate();
 					}
 					String q = "INSERT INTO VIEWS (API, VIEW, LANGUAGE, TYPE, TEMPLATE ) VALUES (?,?,?,?,?) ON DUPLICATE "
@@ -310,7 +321,7 @@ public class JdbcStore implements Store {
 						}
 					}
 					connect.commit();
-				}  catch(IOException e){
+				} catch (IOException e) {
 					connect.rollback();
 				} finally {
 					connect.setAutoCommit(true);
@@ -342,4 +353,112 @@ public class JdbcStore implements Store {
 		return true;
 	}
 
+	private String _buildSearchQuery(Query query, boolean onlyIds) {
+		StringBuilder qb = new StringBuilder();
+		qb.append("SELECT APIS.NICKNAME");
+		if (!onlyIds)
+			qb.append(", DATA.PROPERTY, DATA.VALUE ");
+
+		qb.append(" FROM APIS INNER JOIN DATA ON APIS.ID=DATA.API");
+		String txt = query.getText();
+		String[] txts = txt.split(" ");
+		for (int i = 0; i < txts.length; i++) {
+			qb.append(" AND DATA.VALUE LIKE ? ");
+		}
+		return qb.toString();
+	}
+
+	private void _mapSearchParameters(PreparedStatement stmt, Query query) throws SQLException {
+		String[] txts = query.getText().split(" ");
+		int pos = 1;
+		for (String t : txts) {
+			stmt.setString(pos, new StringBuilder().append("%").append(t).append("%").toString());
+			pos++;
+		}
+	}
+
+	@Override
+	public List<String> search(Query query) throws IOException {
+		List<String> results = new ArrayList<String>();
+		String q = this._buildSearchQuery(query, true);
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
+				try (PreparedStatement stmt = connect.prepareStatement(q)) {
+					this._mapSearchParameters(stmt, query);
+					ResultSet r = stmt.executeQuery();
+					while (r.next()) {
+						String id = r.getString(1);
+						if (!results.contains(id))
+							results.add(id);
+					}
+				}
+			}
+		} catch (ClassNotFoundException e) {
+			throw new IOException(e);
+		} catch (SQLException e) {
+			log.error("SQL State: {}", e.getSQLState());
+			throw new IOException(e);
+		}
+		return results;
+	}
+
+	@Override
+	public Collection<Result> contextSearch(Query query) throws IOException {
+		Map<String, Result> results = new HashMap<String, Result>();
+		String q = this._buildSearchQuery(query, false);
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
+				try (PreparedStatement stmt = connect.prepareStatement(q)) {
+					this._mapSearchParameters(stmt, query);
+					ResultSet r = stmt.executeQuery();
+					while (r.next()) {
+						if (!results.containsKey(r.getString(1))) {
+							results.put(r.getString(1), new ResultSetResult(r.getString(1)));
+						}
+						((ResultSetResult) results.get(r.getString(1))).put(r.getString(2), r.getString(3));
+					}
+				}
+			}
+		} catch (ClassNotFoundException e) {
+			throw new IOException(e);
+		} catch (SQLException e) {
+			log.error("SQL State: {}", e.getSQLState());
+			throw new IOException(e);
+		}
+		return results.values();
+	}
+
+	class ResultSetResult implements Result {
+
+		private String id;
+		private Map<String, String> context;
+		private int hashCode;
+
+		public ResultSetResult(String id) {
+			this.id = id;
+			this.context = new HashMap<String, String>();
+			this.hashCode = new HashCodeBuilder().append(this.id).hashCode();
+		}
+
+		public int hashCode() {
+			return hashCode;
+		};
+
+		@Override
+		public String id() {
+			return id;
+		}
+
+		public void put(String property, String value) {
+			context.put(property, value);
+		}
+
+		@Override
+		public Map<String, String> context() {
+			return Collections.unmodifiableMap(context);
+		}
+
+	}
 }

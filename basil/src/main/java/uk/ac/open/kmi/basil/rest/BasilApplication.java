@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
+import uk.ac.open.kmi.basil.mysql.MySQLStore;
 import uk.ac.open.kmi.basil.server.BasilEnvironment;
-import uk.ac.open.kmi.basil.store.JdbcStore;
 
 import com.wordnik.swagger.jersey.listing.ApiListingResourceJSON;
 import com.wordnik.swagger.jersey.listing.JerseyApiDeclarationProvider;
@@ -55,9 +55,9 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 		// JDBC setup
 		ctx.setAttribute(Registry.Environment, environment);
 		ctx.setAttribute(Registry.UserManager, 	new JDBCUserManager(environment.getJdbcConnectionUrl()));
-		ctx.setAttribute(Registry.Store, new JdbcStore(environment.getJdbcConnectionUrl()));
-		
-
+		MySQLStore store = new MySQLStore(environment.getJdbcConnectionUrl());
+		ctx.setAttribute(Registry.Store, store);
+		ctx.setAttribute(Registry.SearchProvider, store);
 	}
 
 	public final static class Registry {
@@ -65,5 +65,6 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 		public final static String Environment ="_Environment";
 		public final static String UserManager = "_UserManager";
 		public final static String JdbcUri = "_JdbcUri";
+		public final static String SearchProvider = "_SearchProvider";
 	}
 }
