@@ -1,11 +1,13 @@
 package uk.ac.open.kmi.basil.store;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+
+import uk.ac.open.kmi.basil.core.ApiInfo;
 import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.view.Views;
-
-import java.io.IOException;
-import java.util.List;
 
 public interface Store {
 
@@ -16,6 +18,8 @@ public interface Store {
 	boolean existsSpec(String id) throws IOException;
 
 	List<String> listSpecs() throws IOException;
+
+	List<ApiInfo> list() throws IOException;
 
 	Views loadViews(String id) throws IOException;
 
@@ -28,4 +32,10 @@ public interface Store {
 	boolean deleteDoc(String id) throws IOException;
 
 	boolean deleteSpec(String id) throws IOException;
+	
+	Date created(String id) throws IOException;
+	
+	Date modified(String id) throws IOException;
+	
+	ApiInfo info(String id) throws IOException;
 }

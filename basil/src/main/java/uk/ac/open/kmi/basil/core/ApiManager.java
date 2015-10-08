@@ -1,5 +1,10 @@
 package uk.ac.open.kmi.basil.core;
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.ws.rs.core.MultivaluedMap;
+
 import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
 import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
 import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
@@ -8,11 +13,6 @@ import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.view.Engine;
 import uk.ac.open.kmi.basil.view.View;
 import uk.ac.open.kmi.basil.view.Views;
-
-import javax.ws.rs.core.MultivaluedMap;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by Luca Panziera on 15/06/15.
@@ -52,5 +52,7 @@ public interface ApiManager {
 
     void replaceDoc(String id, String name, String body) throws IOException;
 
-    String getCreatorOfApi(String id);
+    String getCreatorOfApi(String id) throws IOException;
+
+	ApiInfo getInfo(String api) throws IOException;
 }

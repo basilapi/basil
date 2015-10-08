@@ -13,6 +13,8 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.open.kmi.basil.core.ApiInfo;
+import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.search.Result;
 import uk.ac.open.kmi.basil.search.SimpleQuery;
 
@@ -52,14 +54,23 @@ public class SearchResource extends AbstractResource {
 			m.add("count", new JsonPrimitive(results.size()));
 			JsonArray r = new JsonArray();
 			for (Result i : results) {
+				
+				String name = getApiManager().getDoc(i.id()).get(Doc.Field.NAME);
+				String createdBy = getApiManager().getCreatorOfApi(i.id());
+				ApiInfo info = getApiManager().getInfo(i.id());
 				JsonObject j = new JsonObject();
 				j.add("id", new JsonPrimitive(i.id()));
+				j.add("name", new JsonPrimitive(name));
+				j.add("modified", new JsonPrimitive(info.modified().getTime()));
 				JsonArray a = new JsonArray();
 				for(Entry<String,String> e: i.context().entrySet()){
 					JsonObject o = new JsonObject();
 					o.add(e.getKey(), new JsonPrimitive(e.getValue()));
 					a.add(o);
 				}
+				j.add("createdBy", new JsonPrimitive(createdBy)); // TODO
+				//object.add("description", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
+				j.add("location", new JsonPrimitive(String.valueOf(requestUri.getBaseUriBuilder().path(i.id()))));
 				j.add("context", a);
 				r.add(j);
 			}

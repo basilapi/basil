@@ -18,8 +18,7 @@ import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.basil.doc.Doc;
-import uk.ac.open.kmi.basil.doc.Doc.Field;
+import uk.ac.open.kmi.basil.core.ApiInfo;
 import uk.ac.open.kmi.basil.rest.auth.AuthResource;
 
 import com.google.gson.JsonArray;
@@ -111,9 +110,10 @@ public class SpecificationResource extends AbstractResource {
 		try {
 			for (String api : getApiManager().listApis()) {
 				JsonObject object = new JsonObject();
-				Doc doc = getApiManager().getDoc(api);
+				ApiInfo info = getApiManager().getInfo(api);
 				object.add("id", new JsonPrimitive(api));
-				object.add("name", new JsonPrimitive(String.valueOf(doc.get(Field.NAME))));
+				object.add("modified", new JsonPrimitive(info.modified().getTime()));
+				object.add("name", new JsonPrimitive(String.valueOf(info.getName())));
 				String c = getApiManager().getCreatorOfApi(api);
 				if(c == null) c = "";
 				object.add("createdBy", new JsonPrimitive(c)); // TODO

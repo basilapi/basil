@@ -7,9 +7,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.open.kmi.basil.core.ApiInfo;
 import uk.ac.open.kmi.basil.doc.Doc;
 import uk.ac.open.kmi.basil.search.Query;
 import uk.ac.open.kmi.basil.search.Result;
@@ -123,6 +126,12 @@ public class MySQLStore implements Store, SearchProvider {
 							stmt.setString(3, entry.getValue());
 							stmt.executeUpdate();
 						}
+					}
+					q = "UPDATE APIS SET MODIFIED = NOW() WHERE ID = ?";
+					try (PreparedStatement stmt = connect
+							.prepareStatement(q)) {
+						stmt.setInt(1, dbId);
+						stmt.executeUpdate();
 					}
 					connect.commit();
 				} catch (IOException e) {
@@ -430,6 +439,134 @@ public class MySQLStore implements Store, SearchProvider {
 		return results.values();
 	}
 
+	@Override
+	public Date created(String id) throws IOException {
+		long created = -1;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
+				String q = "SELECT CREATED FROM APIS WHERE NICKNAME = ?";
+				try (PreparedStatement stmt = connect.prepareStatement(q)) {
+					stmt.setString(1, id);
+					ResultSet s = stmt.executeQuery();
+					while (s.next()) {
+						created = s.getLong(1);
+					}
+				}
+			}
+			return new Date(created);
+		} catch (ClassNotFoundException | SQLException e) {
+			throw new IOException(e);
+		}
+	}
+
+	@Override
+	public Date modified(String id) throws IOException {
+		long created = -1;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
+				String q = "SELECT MODIFIED FROM APIS WHERE NICKNAME = ?";
+				try (PreparedStatement stmt = connect.prepareStatement(q)) {
+					stmt.setString(1, id);
+					ResultSet s = stmt.executeQuery();
+					while (s.next()) {
+						created = s.getLong(1);
+					}
+				}
+			}
+			return new Date(created);
+		} catch (ClassNotFoundException | SQLException e) {
+			throw new IOException(e);
+		}
+	}
+
+	@Override
+	public ApiInfo info(String id) throws IOException {
+		try {
+			ApiInfo apiInfo = null;
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
+				String q = "SELECT DATA.VALUE, APIS.CREATED, APIS.MODIFIED FROM APIS INNER JOIN DATA ON DATA.API = APIS.ID AND DATA.PROPERTY='doc:name' WHERE APIS.NICKNAME = ?";
+				try (PreparedStatement stmt = connect.prepareStatement(q)) {
+					stmt.setString(1, id);
+					ResultSet s = stmt.executeQuery();
+					while (s.next()) {
+						final String name = s.getString(1);
+						final Timestamp created = s.getTimestamp(2);
+						final Timestamp modified = s.getTimestamp(3);
+						apiInfo = new ApiInfo() {
+							@Override
+							public Date created() {
+								return new Date(created.getTime());
+							}
+
+							@Override
+							public String getId() {
+								return id;
+							}
+
+							@Override
+							public String getName() {
+								return name;
+							}
+
+							public Date modified() {
+								return new Date(modified.getTime());
+							};
+						};
+					}
+				}
+			}
+			return apiInfo;
+		} catch (ClassNotFoundException | SQLException e) {
+			throw new IOException(e);
+		}
+
+	}
+
+	public List<ApiInfo> list() throws IOException {
+		try {
+			List<ApiInfo> apiInfo = new ArrayList<ApiInfo>();
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
+				String q = "SELECT DATA.VALUE, APIS.CREATED, APIS.MODIFIED, APIS.NICKNAME FROM APIS INNER JOIN DATA ON DATA.API = APIS.ID AND DATA.PROPERTY='doc:name' ORDER BY APIS.MODIFIED DESC,APIS.CREATED DESC;";
+				try (PreparedStatement stmt = connect.prepareStatement(q)) {
+					ResultSet s = stmt.executeQuery();
+					while (s.next()) {
+						final String name = s.getString(1);
+						final Timestamp created = s.getTimestamp(2);
+						final Timestamp modified = s.getTimestamp(3);
+						final String nickname = s.getString(4);
+						apiInfo.add(new ApiInfo() {
+							@Override
+							public Date created() {
+								return new Date(created.getTime());
+							}
+
+							@Override
+							public String getId() {
+								return nickname;
+							}
+
+							@Override
+							public String getName() {
+								return name;
+							}
+
+							public Date modified() {
+								return new Date(modified.getTime());
+							};
+						});
+					}
+				}
+			}
+			return apiInfo;
+		} catch (ClassNotFoundException | SQLException e) {
+			throw new IOException(e);
+		}
+	};
+
 	class ResultSetResult implements Result {
 
 		private String id;
@@ -459,6 +596,5 @@ public class MySQLStore implements Store, SearchProvider {
 		public Map<String, String> context() {
 			return Collections.unmodifiableMap(context);
 		}
-
 	}
 }

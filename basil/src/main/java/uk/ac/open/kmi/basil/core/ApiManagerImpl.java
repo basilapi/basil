@@ -3,6 +3,7 @@ package uk.ac.open.kmi.basil.core;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
+
 import uk.ac.open.kmi.basil.core.auth.UserManager;
 import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
 import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
@@ -18,6 +19,7 @@ import uk.ac.open.kmi.basil.view.View;
 import uk.ac.open.kmi.basil.view.Views;
 
 import javax.ws.rs.core.MultivaluedMap;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -198,4 +200,8 @@ public class ApiManagerImpl implements ApiManager {
         return userManager.getCreatorOfApi(id);
     }
 
+    @Override
+    public ApiInfo getInfo(String api) throws IOException {
+    	return data.info(api);
+    }
 }

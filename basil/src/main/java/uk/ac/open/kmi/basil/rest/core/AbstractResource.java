@@ -1,5 +1,6 @@
 package uk.ac.open.kmi.basil.rest.core;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 
@@ -11,6 +12,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.ac.open.kmi.basil.core.ApiManager;
 import uk.ac.open.kmi.basil.core.ApiManagerImpl;
 import uk.ac.open.kmi.basil.core.auth.UserManager;
@@ -20,6 +24,8 @@ import uk.ac.open.kmi.basil.store.Store;
 
 public class AbstractResource {
 
+	private static Logger log = LoggerFactory.getLogger(AbstractResource.class);
+	
 	@Context
 	protected HttpHeaders requestHeaders;
 
@@ -29,8 +35,6 @@ public class AbstractResource {
 	@Context
 	protected ServletContext context;
 	private ApiManager apiManager;
-	private SearchProvider searchProvider;
-
 	protected ApiManager getApiManager() {
 		if (apiManager == null) {
 			apiManager = new ApiManagerImpl(getDataStore(), getUserManager());
@@ -60,7 +64,11 @@ public class AbstractResource {
 		builder.header(Headers.View, views);
 		builder.header(Headers.Docs, docs);
 		builder.header(Headers.Swagger, swagger);
-		builder.header(Headers.Creator, getApiManager().getCreatorOfApi(id));
+		try {
+			builder.header(Headers.Creator, getApiManager().getCreatorOfApi(id));
+		} catch (IOException e) {
+			log.error("",e);
+		}
 		return builder;
 	}
 
