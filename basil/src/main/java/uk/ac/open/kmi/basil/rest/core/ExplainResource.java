@@ -58,7 +58,7 @@ public class ExplainResource extends AbstractResource {
 			builder.header(Headers.Endpoint, specification.getEndpoint());
 			return builder.build();
 		} catch (IOException e) {
-			throw new WebApplicationException(e);
+			return packError(Response.serverError(), e).build();
 		}
 	}
 }

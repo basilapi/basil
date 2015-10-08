@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.jena.atlas.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,16 @@ public class AbstractResource {
 		return (SearchProvider) context.getAttribute(BasilApplication.Registry.SearchProvider);
 	}
 
+	protected final ResponseBuilder packError(ResponseBuilder builder, String message){
+		JsonObject j = new JsonObject();
+		j.put("error", message);
+		return builder.header(Headers.Error, message).entity(j.toString());
+	}
+	
+	protected final ResponseBuilder packError(ResponseBuilder builder, Exception e){
+		return packError(builder, e.getMessage());
+	}
+	
 	protected final ResponseBuilder addHeaders(ResponseBuilder builder,
 			String id) {
 		URI api = requestUri.getBaseUriBuilder().path(id).path("api").build();

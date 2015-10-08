@@ -79,7 +79,7 @@ public class SearchResource extends AbstractResource {
 			return response.build();
 		} catch (Exception e) {
 			log.error("", e);
-			return Response.serverError().build();
+			return packError(Response.serverError(),e).build();
 		}
 	}
 }

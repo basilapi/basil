@@ -11,6 +11,7 @@ import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.open.kmi.basil.doc.Doc.Field;
 import uk.ac.open.kmi.basil.view.Engine;
 import uk.ac.open.kmi.basil.view.View;
 import uk.ac.open.kmi.basil.view.Views;
@@ -21,6 +22,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.List;
 
@@ -90,10 +92,11 @@ public class ViewResource extends AbstractResource {
 					.build();
 		} catch (AuthorizationException e) {
 			log.trace("Not authorized");
-			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
+			return packError(Response.status(Status.FORBIDDEN), e).build();
 		} catch (IOException e) {
 			log.error("",e);
-			return Response.serverError().entity(e).build();
+			return packError(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					, e).build();
 		} 
 	}
 
@@ -127,10 +130,11 @@ public class ViewResource extends AbstractResource {
 				r = Response.ok(arr.toString());
 			}
 			addHeaders(r, id);
+			r.header(Headers.Name, getApiManager().getDoc(id).get(Field.NAME));
 			return r.build();
 		} catch (Exception e) {
 			log.error("", e);
-			return Response.serverError().entity("An error occurred").build();
+			return packError(Response.serverError(), e).build();
 		}
 	}
 
@@ -149,7 +153,7 @@ public class ViewResource extends AbstractResource {
 		try {
 			View view = getApiManager().getView(id, name);
 			if (view == null) {
-				return Response.status(404).entity("Not found").build();
+				return packError(Response.status(404),"Not found").build();
 			}
 			ResponseBuilder builder = Response.ok(view.getTemplate());
 			addHeaders(builder, id);
@@ -157,7 +161,7 @@ public class ViewResource extends AbstractResource {
 			builder.header(Headers.Type, view.getMimeType());
 			return builder.build();
 		} catch (Exception e) {
-			return Response.serverError().entity(e).build();
+			return packError(Response.serverError(),e).build();
 		}
 	}
 
@@ -190,10 +194,10 @@ public class ViewResource extends AbstractResource {
 					.build();
 		} catch (AuthorizationException e) {
 			log.trace("Not authorized");
-			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
+			return packError(Response.status(Status.FORBIDDEN),e).build();
 		} catch (IOException e) {
 			log.error("", e);
-			return Response.serverError().build();
+			return packError(Response.serverError(), e).build();
 		}
 	}
 }

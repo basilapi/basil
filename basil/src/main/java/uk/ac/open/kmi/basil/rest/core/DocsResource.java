@@ -1,6 +1,7 @@
 package uk.ac.open.kmi.basil.rest.core;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -9,7 +10,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -37,46 +37,48 @@ import com.wordnik.swagger.annotations.ApiResponses;
 @Path("{id}/docs")
 @Api(value = "/basil", description = "BASIL operations")
 public class DocsResource extends AbstractResource {
-    private Logger log = LoggerFactory.getLogger(DocsResource.class);
+	private Logger log = LoggerFactory.getLogger(DocsResource.class);
 
 	@GET
 	@Produces("text/plain")
 	@ApiOperation(value = "API documentation")
-    @ApiResponses(value = {
-    		@ApiResponse(code = 200, message = "OK"),
-    		@ApiResponse(code = 500, message = "Internal error") ,
-    		@ApiResponse(code = 204, message = "No content")
-    })
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 500, message = "Internal error"),
+			@ApiResponse(code = 204, message = "No content")
+	})
 	public Response get(@PathParam("id") String id) {
-		log.trace("Calling GET docs with id: {}",id);
+		log.trace("Calling GET docs with id: {}", id);
 		try {
 			if (getApiManager().getSpecification(id) == null) {
-				return Response.status(404).build();
+				return Response.status(404).entity("API not found").build();
 			}
 			Doc doc = getApiManager().getDoc(id);
 			ResponseBuilder builder;
-			if(doc.isEmpty()){
+			if (doc.isEmpty()) {
 				builder = Response.noContent();
-			}else{
+			} else {
 				builder = Response.ok(doc.get(Field.DESCRIPTION));
 				builder.header(Headers.Name, doc.get(Doc.Field.NAME));
 			}
 			addHeaders(builder, id);
 			return builder.build();
 		} catch (IOException e) {
-			throw new WebApplicationException(e);
+			log.error("", e);
+			return packError(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					, e).build();
 		}
 	}
 
 	@DELETE
 	@ApiOperation(value = "Delete API documentation")
-    @ApiResponses(value = {
-    		@ApiResponse(code = 500, message = "Internal error") ,
-    		@ApiResponse(code = 403, message = "Forbidden") ,
-    		@ApiResponse(code = 204, message = "Deleted. No content")
-    })
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Internal error"),
+			@ApiResponse(code = 403, message = "Forbidden"),
+			@ApiResponse(code = 204, message = "Deleted. No content")
+	})
 	public Response delete(@PathParam("id") String id, @Auth Subject subject) {
-		log.trace("Calling DELETE docs with id: {}",id);
+		log.trace("Calling DELETE docs with id: {}", id);
 		try {
 			subject.checkPermission(id + ":write");
 
@@ -85,47 +87,46 @@ public class DocsResource extends AbstractResource {
 			}
 			boolean success = getApiManager().deleteDoc(id);
 			ResponseBuilder builder;
-			if(success){
+			if (success) {
 				builder = Response.noContent();
-			}else{
+			} else {
 				builder = Response.serverError();
 			}
 			addHeaders(builder, id);
 			return builder.build();
 		} catch (AuthorizationException e) {
 			log.trace("Not authorized");
-			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
+			return packError(Response.status(Status.FORBIDDEN), e).build();
 		} catch (IOException e) {
-			throw new WebApplicationException(e);
+			log.error("", e);
+			return packError(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					, e).build();
 		}
 	}
-	
+
 	@PUT
 	@Produces("text/plain")
-    @ApiOperation(value = "To create a new doc file (plain text) and/or set a name for the API",
-            notes = "The operation returns the resource URI of the doc file")
-    @ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
-            @ApiResponse(code = 201, message = "Doc file created"),
-            @ApiResponse(code = 403, message = "Forbidden") ,
-            @ApiResponse(code = 409, message = "API does not exists (create the API first).") ,
-            @ApiResponse(code = 500, message = "Internal error") })
+	@ApiOperation(value = "To create a new doc file (plain text) and/or set a name for the API",
+			notes = "The operation returns the resource URI of the doc file")
+	@ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
+			@ApiResponse(code = 201, message = "Doc file created"),
+			@ApiResponse(code = 403, message = "Forbidden"),
+			@ApiResponse(code = 409, message = "API does not exists (create the API first)."),
+			@ApiResponse(code = 500, message = "Internal error") })
 	public Response put(
-            @ApiParam(value = "ID of the API specification", required = true)
-            @PathParam("id") String id,
-            @ApiParam(value = "Name of the API", required = false)
-            @QueryParam("name") String name,
-            @ApiParam(value = "Description of the API", required = false)
-			String body,
+			@ApiParam(value = "ID of the API specification", required = true) @PathParam("id") String id,
+			@ApiParam(value = "Name of the API", required = false) @QueryParam("name") String name,
+			@ApiParam(value = "Description of the API", required = false) String body,
 			@Auth Subject subject
-	) {
-		log.trace("Calling PUT docs with id: {} name: {}",id, name);
+			) {
+		log.trace("Calling PUT docs with id: {} name: {}", id, name);
 		try {
-			log.trace("Body is: {}",body);
+			log.trace("Body is: {}", body);
 			subject.checkRole(id);
 			if (!getApiManager().existsSpec(id)) {
 				return Response.status(409).entity("API does not exists (create the API first).").build();
 			}
-			if(name == null){
+			if (name == null) {
 				name = getParameterOrHeader("name");
 			}
 			getApiManager().createDoc(id, name, body);
@@ -135,10 +136,10 @@ public class DocsResource extends AbstractResource {
 			return builder.build();
 		} catch (AuthorizationException e) {
 			log.trace("Not authorized");
-			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
+			return packError(Response.status(Status.FORBIDDEN), e).build();
 		} catch (Exception e) {
-			log.error("An error occurred",e);
-			return Response.serverError().entity(e.getMessage()).build();
+			log.error("An error occurred", e);
+			return packError(Response.serverError(), e).build();
 		}
 	}
 

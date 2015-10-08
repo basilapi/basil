@@ -1,11 +1,64 @@
 package uk.ac.open.kmi.basil.rest.core;
 
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Variant;
+
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.out.JsonLDWriter;
+import org.apache.jena.riot.system.PrefixMap;
+import org.apache.jena.riot.system.PrefixMapNull;
+import org.apache.jena.riot.system.PrefixMapStd;
+import org.apache.jena.riot.writer.NQuadsWriter;
+import org.apache.jena.riot.writer.NTriplesWriter;
+import org.apache.jena.riot.writer.RDFJSONWriter;
+import org.apache.jena.riot.writer.RDFXMLPlainWriter;
+import org.apache.jena.riot.writer.TurtleWriter;
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.subject.Subject;
+import org.secnod.shiro.jaxrs.Auth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.ac.open.kmi.basil.core.InvocationResult;
+import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
+import uk.ac.open.kmi.basil.doc.Doc.Field;
+import uk.ac.open.kmi.basil.rest.auth.AuthResource;
+import uk.ac.open.kmi.basil.sparql.Specification;
+import uk.ac.open.kmi.basil.view.Items;
+import uk.ac.open.kmi.basil.view.View;
+import uk.ac.open.kmi.basil.view.Views;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
@@ -18,46 +71,11 @@ import com.hp.hpl.jena.sparql.resultset.CSVOutput;
 import com.hp.hpl.jena.sparql.resultset.JSONOutput;
 import com.hp.hpl.jena.sparql.resultset.XMLOutput;
 import com.hp.hpl.jena.sparql.util.Context;
-import com.wordnik.swagger.annotations.*;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.riot.out.JsonLDWriter;
-import org.apache.jena.riot.system.PrefixMap;
-import org.apache.jena.riot.system.PrefixMapNull;
-import org.apache.jena.riot.system.PrefixMapStd;
-import org.apache.jena.riot.writer.*;
-import org.apache.shiro.authz.AuthorizationException;
-import org.apache.shiro.subject.Subject;
-import org.secnod.shiro.jaxrs.Auth;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import uk.ac.open.kmi.basil.core.InvocationResult;
-import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
-import uk.ac.open.kmi.basil.rest.auth.AuthResource;
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.view.Items;
-import uk.ac.open.kmi.basil.view.View;
-import uk.ac.open.kmi.basil.view.Views;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.Variant;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 
 @Path("{id}")
 @Api(value = "/basil", description = "BASIL operations")
@@ -112,7 +130,7 @@ public class ApiResource extends AbstractResource {
 				// Still found nothing?
 				if (type == null) {
 					log.trace("API execution. View not found.");
-					return Response.status(404).entity("Not found\n").build();
+					return packError(Response.status(404),"Not found\n").build();
 				}
 			}
 			// No extension, look for best acceptable
@@ -150,7 +168,7 @@ public class ApiResource extends AbstractResource {
 		} catch (Exception e) {
 			//Response r = Response.serverError().entity(e.getMessage()).build();
 			log.error("ERROR while query execution",e);
-			return Response.serverError().entity(e.getMessage()).build();
+			return packError(Response.serverError(),e).build();
 		}
 	}
 
@@ -718,13 +736,13 @@ public class ApiResource extends AbstractResource {
 			return response.build();
 		} catch (AuthorizationException e) {
 			log.trace("Not authorized");
-			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
-		} catch (SpecificationParsingException e) {
-			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-					.header(Headers.Error, e.getMessage()).build();
-		} catch (IOException e) {
-			return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-					.header(Headers.Error, e.getMessage()).build();
+			return packError(Response.status(Status.FORBIDDEN),e).build();
+		} catch (QueryParseException|SpecificationParsingException e) {
+			return packError(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+					, e).build();
+		} catch (Exception e) {
+			return packError(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+					, e).build();
 		}
 	}
 
@@ -771,6 +789,7 @@ public class ApiResource extends AbstractResource {
 				return Response.status(Response.Status.NOT_FOUND).build();
 			}
 			ResponseBuilder response = Response.ok();
+			response.header(Headers.Name, getApiManager().getDoc(id).get(Field.NAME));
 			response.header(Headers.Endpoint, spec.getEndpoint());
 			addHeaders(response, id);
 			response.entity(spec.getQuery());
@@ -778,9 +797,9 @@ public class ApiResource extends AbstractResource {
 			return response.build();
 		} catch (Exception e) {
 			log.error("An error occurred", e);
-			throw new WebApplicationException(Response
+			return packError(Response
 					.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-					.entity(e.getMessage()).build());
+					,e).build();
 		}
 	}
 
@@ -816,11 +835,10 @@ public class ApiResource extends AbstractResource {
 			return response.build();
 		} catch (AuthorizationException e) {
 			log.trace("Not authorized");
-			return Response.status(Status.FORBIDDEN).entity(e.getMessage()).build();
+			return packError(Response.status(Status.FORBIDDEN),e).build();
 		} catch (Exception e) {
-			throw new WebApplicationException(Response
-					.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-					.entity(e.getMessage()).build());
+			return packError(Response
+					.status(HttpURLConnection.HTTP_INTERNAL_ERROR),e).build();
 		}
 
 	}
@@ -864,11 +882,11 @@ public class ApiResource extends AbstractResource {
 			}
 		} catch (Exception e) {
 			log.error("An error occurred", e);
-			throw new WebApplicationException(Response
+			return packError(Response
 					.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-					.entity(e.getMessage()).build());
+					,e).build();
 		}
-		return Response.status(HttpURLConnection.HTTP_FORBIDDEN)
-				.header(Headers.Error, "User must be authenticated").build();
+		return packError(Response.status(HttpURLConnection.HTTP_FORBIDDEN)
+				, "User must be authenticated").build();
 	}
 }
