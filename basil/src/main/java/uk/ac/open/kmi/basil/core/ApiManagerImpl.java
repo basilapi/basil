@@ -141,8 +141,11 @@ public class ApiManagerImpl implements ApiManager {
     }
 
     public boolean deleteApi(String id) throws IOException, UserApiMappingException {
-        userManager.deleteUserApiMap(id);
-        return data.deleteSpec(id);
+        if(data.deleteSpec(id)){
+        	userManager.deleteUserApiMap(id);
+        	return true;
+        }
+        return false;
     }
 
     public List<String> listApis() throws IOException {

@@ -184,20 +184,25 @@ public class JDBCUserManager implements UserManager {
                 Class.forName("com.mysql.jdbc.Driver");
                 // Setup the connection with the DB
                 connect = DriverManager.getConnection(jdbcUri);
-                PreparedStatement preparedStatement = connect.prepareStatement("DELETE FROM users_roles WHERE role_name = ? ");
-                preparedStatement.setString(1, apiId);
-                preparedStatement.executeUpdate();
-                preparedStatement.close();
-                preparedStatement = connect.prepareStatement("DELETE FROM roles WHERE role_name = ? ");
-                preparedStatement.setString(1, apiId);
-                preparedStatement.executeUpdate();
-                preparedStatement.close();
-                preparedStatement = connect.prepareStatement("DELETE FROM roles_permissions WHERE role_name = ? ");
-                preparedStatement.setString(1, apiId);
-                preparedStatement.executeUpdate();
-                preparedStatement.close();
+                connect.setAutoCommit(false);
+                try{
+	                PreparedStatement preparedStatement = connect.prepareStatement("DELETE FROM users_roles WHERE role_name = ? ");
+	                preparedStatement.setString(1, apiId);
+	                preparedStatement.executeUpdate();
+	                preparedStatement.close();
+	                preparedStatement = connect.prepareStatement("DELETE FROM roles WHERE name = ? ");
+	                preparedStatement.setString(1, apiId);
+	                preparedStatement.executeUpdate();
+	                preparedStatement.close();
+	                preparedStatement = connect.prepareStatement("DELETE FROM roles_permissions WHERE role_name = ? ");
+	                preparedStatement.setString(1, apiId);
+	                preparedStatement.executeUpdate();
+	                preparedStatement.close();
+	                connect.commit();
+                }finally{
+                	connect.setAutoCommit(true);
+                }
             }
-
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             throw new UserApiMappingException(e.getMessage());
