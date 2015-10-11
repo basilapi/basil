@@ -512,6 +512,9 @@ public class MySQLStore implements Store, SearchProvider {
 							}
 
 							public Date modified() {
+								if(modified == null) {
+									return new Date(created.getTime());
+								}
 								return new Date(modified.getTime());
 							};
 						};
