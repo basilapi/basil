@@ -208,6 +208,9 @@ public class ApiResource extends AbstractResource {
 			p.append("</vars>");
 
 			p.append("\n\t");
+			p.append("<items>");
+
+			p.append("\n\t");
 			p.append("<item>");
 
 			p.append("\n\t\t");
@@ -230,6 +233,9 @@ public class ApiResource extends AbstractResource {
 
 			p.append("\n\t");
 			p.append("</item>");
+
+			p.append("\n\t");
+			p.append("</items>");
 
 			p.append("\n");
 			p.append("</data>");
@@ -486,38 +492,30 @@ public class ApiResource extends AbstractResource {
 			}
 			p.append("\n\t");
 			p.append("</vars>");
+			p.append("\n\t");
+			p.append("<items>");
 			while (rs.hasNext()) {
 				QuerySolution r = rs.next();
-				p.append("\n\t");
+				p.append("\n\t\t");
 				p.append("<item>");
 				Iterator<String> vn = r.varNames();
 				while (vn.hasNext()) {
-					p.append("\n\t\t");
+					p.append("\n\t\t\t");
 					String v = vn.next();
 					RDFNode n = r.get(v);
 					p.append("<");
 					p.append(v);
-//					p.append(" ");
-//					p.append("type=\"");
-//					if (n.isAnon()) {
-//						p.append("anon");
-//					} else if (n.isLiteral()) {
-//						p.append("literal");
-//					} else if (n.isURIResource()) {
-//						p.append("uri");
-//					} else if (n.isResource()) {
-//						p.append("resource");
-//					}
-//					p.append("\"");
 					p.append(">");
 					p.append(n.toString());
 					p.append("</");
 					p.append(v);
 					p.append(">");
 				}
-				p.append("\n\t");
+				p.append("\n\t\t");
 				p.append("</item>");
 			}
+			p.append("\n\t");
+			p.append("</items>");
 			p.append("\n");
 			p.append("</data>");
 			p.append("\n");
