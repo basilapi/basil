@@ -83,6 +83,13 @@ public class ApiManagerImpl implements ApiManager {
         }
 
         Query q = binder.toQuery();
+        if(parameters.containsKey("limit")){
+        	q.setLimit(Long.parseLong(parameters.getFirst("limit")));
+        }
+        if(parameters.containsKey("offset")){
+        	q.setOffset(Long.parseLong(parameters.getFirst("offset")));
+        }
+        
         QueryExecution qe = QueryExecutionFactory.sparqlService(
                 specification.getEndpoint(), q);
 
