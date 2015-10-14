@@ -264,6 +264,7 @@ public class ApiResource extends AbstractResource {
 			xOut.format(baos, b);
 			return new String(baos.toByteArray());
 		}
+		
 		return null;
 	}
 
@@ -317,16 +318,6 @@ public class ApiResource extends AbstractResource {
 				Node n = t.getSubject();
 				p.append("<");
 				p.append(v);
-//				p.append(" ");
-//				p.append("type=\"");
-//				if (n.isBlank()) {
-//					p.append("anon");
-//				} else if (n.isLiteral()) {
-//					p.append("literal");
-//				} else if (n.isURI()) {
-//					p.append("uri");
-//				}
-//				p.append("\"");
 				p.append(">");
 				p.append(n.toString());
 				p.append("</");
@@ -339,16 +330,6 @@ public class ApiResource extends AbstractResource {
 				n = t.getSubject();
 				p.append("<");
 				p.append(v);
-				// p.append(" ");
-				// p.append("type=\"");
-				// if (n.isBlank()) {
-				// p.append("anon");
-				// } else if (n.isLiteral()) {
-				// p.append("literal");
-				// } else if (n.isURI()) {
-				// p.append("uri");
-				// }
-				// p.append("\"");
 				p.append(">");
 				p.append(n.toString());
 				p.append("</");
@@ -361,16 +342,6 @@ public class ApiResource extends AbstractResource {
 				n = t.getSubject();
 				p.append("<");
 				p.append(v);
-//				p.append(" ");
-//				p.append("type=\"");
-//				if (n.isBlank()) {
-//					p.append("anon");
-//				} else if (n.isLiteral()) {
-//					p.append("literal");
-//				} else if (n.isURI()) {
-//					p.append("uri");
-//				}
-//				p.append("\"");
 				p.append(">");
 				p.append(n.toString());
 				p.append("</");
