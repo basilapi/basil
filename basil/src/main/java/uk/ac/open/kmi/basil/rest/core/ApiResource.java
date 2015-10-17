@@ -1,5 +1,6 @@
 package uk.ac.open.kmi.basil.rest.core;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -45,6 +46,8 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.basil.core.InvocationResult;
 import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
+import uk.ac.open.kmi.basil.rendering.SimpleTripleAdapter;
+import uk.ac.open.kmi.basil.rendering.RDFStreamer;
 import uk.ac.open.kmi.basil.doc.Doc.Field;
 import uk.ac.open.kmi.basil.rest.auth.AuthResource;
 import uk.ac.open.kmi.basil.sparql.Specification;
@@ -145,13 +148,17 @@ public class ApiResource extends AbstractResource {
 
 			log.trace("API execution. Prepare response.");
 			Object entity = null;
+			Map<String,String> prefixMap = r.getQuery().getPrefixMapping().getNsPrefixMap();
 			if (r.getResult() instanceof ResultSet) {
 				entity = prepareEntity(type, (ResultSet) r.getResult());
 			} else if (r.getResult() instanceof Model) {
-				entity = prepareEntity(type, (Model) r.getResult(), r.getQuery()
-						.getPrefixMapping().getNsPrefixMap());
+				entity = prepareEntity(type, (Model) r.getResult(), prefixMap);
 			} else if (r.getResult() instanceof Boolean) {
-				entity = prepareEntity(type, (Boolean) r.getResult());
+				if (MoreMediaType.isRDF(type)) {
+					entity = prepareEntity(type, ResultSetFormatter.toModel((Boolean) r.getResult()), prefixMap);
+				}else{
+					entity = prepareEntity(type, (Boolean) r.getResult());
+				}
 			}
 			// If entity is null then format is not acceptable
 			// ie we don't have an implementation of that object/type map
@@ -441,6 +448,21 @@ public class ApiResource extends AbstractResource {
 	}
 
 	private Object prepareEntity(MediaType type, ResultSet rs) {
+		
+		// rdf formats
+		if(MoreMediaType.isRDF(type)){
+			// XXX Only RDF/XML, for the moment. See Issue #5
+			if(MoreMediaType.RDFXML_TYPE.equals(type)){
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				String uri = requestUri.getRequestUri().toString();
+				if(uri.indexOf('#')>-1){
+					uri = uri.substring(0,uri.lastIndexOf('#'));
+				}
+				RDFStreamer.stream(baos, rs, RDFFormat.RDFXML, new SimpleTripleAdapter(uri + "#"));
+				return new ByteArrayInputStream(baos.toByteArray());
+			}
+		}
+		
 		// text/plain
 		if (MediaType.TEXT_PLAIN_TYPE.equals(type)) {
 			return ResultSetFormatter.asText(rs);
@@ -507,18 +529,8 @@ public class ApiResource extends AbstractResource {
 				JsonObject item = new JsonObject();
 				Iterator<String> vi = t.varNames();
 				while (vi.hasNext()) {
-//					JsonObject cell = new JsonObject();
 					String vn = vi.next();
 					RDFNode n = t.get(vn);
-//					if (n.isAnon()) {
-//						cell.add("type", "anon");
-//					} else if (n.isLiteral()) {
-//						cell.add("type", "literal");
-//					} else if (n.isURIResource()) {
-//						cell.add("type", "uri");
-//					}
-//					cell.add("value", n.toString());
-//					item.add(vn, cell);
 					item.add(vn, new JsonPrimitive(n.toString()));
 				}
 				items.add(item);
