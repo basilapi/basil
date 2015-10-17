@@ -1,6 +1,7 @@
 package uk.ac.open.kmi.basil.rest.core;
 
 import javax.ws.rs.core.MediaType;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,9 +35,18 @@ public class MoreMediaType {
 			throw new UnsupportedOperationException();
 		}
 	};
+	
+	public final static boolean isRDF(MediaType type){
+		return (MoreMediaType.RDFJSON_TYPE.equals(type) || MoreMediaType.JSONLD_TYPE.equals(type) ||
+		MoreMediaType.RDFXML_TYPE.equals(type) || MoreMediaType.TEXT_TURTLE_TYPE.equals(type)
+		|| MoreMediaType.APPLICATION_TURTLE_TYPE.equals(type) ||
+		MoreMediaType.TEXT_X_NQUADS_TYPE.equals(type));
+	}
+	
 	static {
 		extensions.put("txt", MediaType.TEXT_PLAIN_TYPE);
 		extensions.put("xml", MediaType.APPLICATION_XML_TYPE);
+		extensions.put("rdf", MoreMediaType.RDFXML_TYPE);
 		extensions.put("json", MediaType.APPLICATION_JSON_TYPE);
 		extensions.put("sparql-json", MoreMediaType.SPARQL_RESULTS_JSON_TYPE);
 		extensions.put("sparql-xml", MoreMediaType.SPARQL_RESULTS_XML_TYPE);
