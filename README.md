@@ -5,12 +5,17 @@ With BASIL you can build Web APIs on top of SPARQL endpoints.
 
 BASIL stores SPARQL queries and builds APIs with standard and customizable formats.
 
-## Build with Maven ##
+## Build ##
+The basil project is managed and built with Maven.
 
 ```
-#!shell
+mvn clean install
+```
+Note: to also run tests, you need an active internet connection (as they use public SPARQL endpoints).
+If you want to skip tests, you can:
 
-$ mvn install
+```
+mvn install -DskipTests
 ```
 
 ## Run ##
