@@ -22,7 +22,7 @@ mvn install -DskipTests
 You need to:
 
  - Have a MySQL server.
- - Prepare a database running the db.sql queries (at the root of the codebase).
+ - Prepare a database running the [db.sql](db.sql) queries (at the root of the codebase).
  - Prepare the configuration file (the connection parameters), see [this file](basil.ini) as an example.
  - Prepare a log4j2 configuration file (if you want logging). See [this file](server/src/test/resources/log4j2.xml) as an example.
  
