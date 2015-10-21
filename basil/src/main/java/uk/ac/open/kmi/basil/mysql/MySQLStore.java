@@ -487,7 +487,7 @@ public class MySQLStore implements Store, SearchProvider {
 			ApiInfo apiInfo = null;
 			Class.forName("com.mysql.jdbc.Driver");
 			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
-				String q = "SELECT DATA.VALUE, APIS.CREATED, APIS.MODIFIED FROM APIS INNER JOIN DATA ON DATA.API = APIS.ID AND DATA.PROPERTY='doc:name' WHERE APIS.NICKNAME = ?";
+				String q = "SELECT DATA.VALUE, APIS.CREATED, APIS.MODIFIED FROM APIS LEFT JOIN DATA ON DATA.API = APIS.ID AND DATA.PROPERTY='doc:name' WHERE APIS.NICKNAME = ?";
 				try (PreparedStatement stmt = connect.prepareStatement(q)) {
 					stmt.setString(1, id);
 					ResultSet s = stmt.executeQuery();
@@ -508,7 +508,7 @@ public class MySQLStore implements Store, SearchProvider {
 
 							@Override
 							public String getName() {
-								return name;
+								return name == null ? "" : name;
 							}
 
 							public Date modified() {
