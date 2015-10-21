@@ -5,7 +5,7 @@
 
 	<groupId>basil</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.3.1</version>
+	<version>0.3.2</version>
 	<packaging>pom</packaging>
 
 	<name>BASIL :: Parent</name>
@@ -23,7 +23,7 @@
 		<org.eclipse.jetty.version>9.3.0.v20150612</org.eclipse.jetty.version>
 		
 		<!-- basil version -->
-		<basil.version>0.3.1</basil.version>
+		<basil.version>0.3.2</basil.version>
 	</properties>
 	
 	<dependencyManagement>
