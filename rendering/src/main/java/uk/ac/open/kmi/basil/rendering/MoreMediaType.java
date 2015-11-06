@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rest.core;
+package uk.ac.open.kmi.basil.rendering;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -60,7 +60,7 @@ public class MoreMediaType {
 		extensions.put("csv", MoreMediaType.TEXT_CSV_TYPE);
 	}
 
-	 final static List<MediaType> mediaTypes = Arrays.asList(MediaType.TEXT_PLAIN_TYPE,
+	 public final static List<MediaType> MediaTypes = Arrays.asList(MediaType.TEXT_PLAIN_TYPE,
 				MoreMediaType.NTRIPLES_TYPE, MediaType.TEXT_XML_TYPE,
 				MediaType.APPLICATION_XML_TYPE,
 				MediaType.APPLICATION_JSON_TYPE, MoreMediaType.RDFJSON_TYPE,

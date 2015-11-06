@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.basil.core.InvocationResult;
 import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
 import uk.ac.open.kmi.basil.rendering.SimpleTripleAdapter;
+import uk.ac.open.kmi.basil.rendering.MoreMediaType;
 import uk.ac.open.kmi.basil.rendering.RDFStreamer;
 import uk.ac.open.kmi.basil.doc.Doc.Field;
 import uk.ac.open.kmi.basil.rest.auth.AuthResource;
@@ -601,7 +602,7 @@ public class ApiResource extends AbstractResource {
 				break;
 			}
 
-			for (MediaType variant : MoreMediaType.mediaTypes) {
+			for (MediaType variant : MoreMediaType.MediaTypes) {
 				if (variant.isCompatible(mt)) {
 					return variant;
 				}
