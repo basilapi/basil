@@ -1,12 +1,22 @@
 package uk.ac.open.kmi.basil.rendering;
 
 import java.io.InputStream;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
-public interface Renderer<T> {
+public abstract class Renderer<T> {
+	private T input;
 
-	public InputStream stream(T o, MediaType type) throws CannotRenderException;
+	public Renderer(T input) {
+		this.input = input;
+	}
 	
-	public String render(T o, MediaType type) throws CannotRenderException;
+	protected T getInput(){
+		return this.input;
+	}
+
+	public abstract InputStream stream(MediaType type, String g, Map<String, String> pref) throws CannotRenderException;
+
+	public abstract String render(MediaType type, String g, Map<String, String> pref) throws CannotRenderException;
 }

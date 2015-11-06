@@ -3,6 +3,7 @@ package uk.ac.open.kmi.basil.rendering;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
@@ -10,22 +11,32 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.sparql.resultset.JSONOutput;
 import com.hp.hpl.jena.sparql.resultset.XMLOutput;
 
-public class BooleanRenderer implements Renderer<Boolean> {
+public class BooleanRenderer extends Renderer<Boolean> {
 
-	@Override
-	public InputStream stream(Boolean o, MediaType type) throws CannotRenderException {
-		return new ByteArrayInputStream(render(o, type).getBytes(StandardCharsets.UTF_8));
+	public BooleanRenderer(Boolean input) {
+		super(input);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public String render(Boolean b, MediaType type) throws CannotRenderException {
+	public InputStream stream(MediaType type, String graphName, Map<String, String> pref) throws CannotRenderException {
+		return new ByteArrayInputStream(render(type, graphName, pref).getBytes(StandardCharsets.UTF_8));
+	}
+
+	@Override
+	public String render(MediaType type, String graphName, Map<String, String> pref) throws CannotRenderException {
+
+		if (MoreMediaType.isRDF(type)) {
+			return new ModelRenderer(ResultSetFormatter.toModel(getInput())).render(type, graphName, pref);
+		}
 
 		// text/plain
 		if (MediaType.TEXT_PLAIN_TYPE.equals(type)) {
-			if (b) {
+			if (getInput()) {
 				return "True\n";
 			} else {
 				return "False\n";
@@ -65,7 +76,7 @@ public class BooleanRenderer implements Renderer<Boolean> {
 			p.append("boolean");
 			p.append("\"");
 			p.append(">");
-			if (b)
+			if (getInput())
 				p.append("true");
 			else
 				p.append("false");
@@ -87,7 +98,7 @@ public class BooleanRenderer implements Renderer<Boolean> {
 
 		if (MediaType.APPLICATION_JSON_TYPE.equals(type)) {
 			JsonObject o = new JsonObject();
-			o.add("bool", new JsonPrimitive(b));
+			o.add("bool", new JsonPrimitive(getInput()));
 			return o.toString() + "\n";
 		}
 
@@ -95,7 +106,7 @@ public class BooleanRenderer implements Renderer<Boolean> {
 		if (MoreMediaType.SPARQL_RESULTS_XML_TYPE.equals(type)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			XMLOutput xOut = new XMLOutput(null);
-			xOut.format(baos, b);
+			xOut.format(baos, getInput());
 			return new String(baos.toByteArray());
 		}
 
@@ -103,7 +114,7 @@ public class BooleanRenderer implements Renderer<Boolean> {
 		if (MoreMediaType.SPARQL_RESULTS_JSON_TYPE.equals(type)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			JSONOutput xOut = new JSONOutput();
-			xOut.format(baos, b);
+			xOut.format(baos, getInput());
 			return new String(baos.toByteArray());
 		}
 
