@@ -1,9 +1,11 @@
 package uk.ac.open.kmi.basil.rest.core;
 
-import javax.ws.rs.core.MediaType;
-
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
 
 public class MoreMediaType {
 	public static final MediaType RDFXML_TYPE = new MediaType("application",
@@ -58,4 +60,15 @@ public class MoreMediaType {
 		extensions.put("csv", MoreMediaType.TEXT_CSV_TYPE);
 	}
 
+	 final static List<MediaType> mediaTypes = Arrays.asList(MediaType.TEXT_PLAIN_TYPE,
+				MoreMediaType.NTRIPLES_TYPE, MediaType.TEXT_XML_TYPE,
+				MediaType.APPLICATION_XML_TYPE,
+				MediaType.APPLICATION_JSON_TYPE, MoreMediaType.RDFJSON_TYPE,
+				MoreMediaType.RDFXML_TYPE,
+				MoreMediaType.APPLICATION_TURTLE_TYPE,
+				MoreMediaType.TEXT_TURTLE_TYPE,
+				MoreMediaType.TEXT_X_NQUADS_TYPE,
+				MoreMediaType.SPARQL_RESULTS_JSON_TYPE,
+				MoreMediaType.SPARQL_RESULTS_XML_TYPE,
+				MoreMediaType.TEXT_CSV_TYPE, MoreMediaType.TEXT_TSV_TYPE);
 }

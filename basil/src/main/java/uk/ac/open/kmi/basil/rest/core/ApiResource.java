@@ -5,7 +5,6 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -574,20 +573,6 @@ public class ApiResource extends AbstractResource {
 		return null;
 	}
 
-	private List<MediaType> getAvailableVariants() {
-		return Arrays.asList(MediaType.TEXT_PLAIN_TYPE,
-				MoreMediaType.NTRIPLES_TYPE, MediaType.TEXT_XML_TYPE,
-				MediaType.APPLICATION_XML_TYPE,
-				MediaType.APPLICATION_JSON_TYPE, MoreMediaType.RDFJSON_TYPE,
-				MoreMediaType.RDFXML_TYPE,
-				MoreMediaType.APPLICATION_TURTLE_TYPE,
-				MoreMediaType.TEXT_TURTLE_TYPE,
-				MoreMediaType.TEXT_X_NQUADS_TYPE,
-				MoreMediaType.SPARQL_RESULTS_JSON_TYPE,
-				MoreMediaType.SPARQL_RESULTS_XML_TYPE,
-				MoreMediaType.TEXT_CSV_TYPE, MoreMediaType.TEXT_TSV_TYPE);
-	}
-
 	public MediaType getFromExtension(String ext) {
 		if (MoreMediaType.extensions.containsKey(ext)) {
 			return MoreMediaType.extensions.get(ext);
@@ -616,7 +601,7 @@ public class ApiResource extends AbstractResource {
 				break;
 			}
 
-			for (MediaType variant : getAvailableVariants()) {
+			for (MediaType variant : MoreMediaType.mediaTypes) {
 				if (variant.isCompatible(mt)) {
 					return variant;
 				}
