@@ -18,6 +18,8 @@ import uk.ac.open.kmi.basil.view.Views;
  * Created by Luca Panziera on 15/06/15.
  */
 public interface ApiManager {
+	String redirectUrl(String id, MultivaluedMap<String, String> parameters) throws IOException, ApiInvocationException;
+	
     InvocationResult invokeApi(String id, MultivaluedMap<String, String> parameters) throws IOException, ApiInvocationException;
 
     String createSpecification(String username, String endpoint, String body) throws SpecificationParsingException, UserApiMappingException, IOException;

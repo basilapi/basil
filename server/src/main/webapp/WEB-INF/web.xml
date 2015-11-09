@@ -29,7 +29,7 @@
         </init-param>
         <init-param>
             <param-name>cors.exposedHeaders</param-name>
-            <param-value>Set-Cookie, X-Basil-Endpoint, X-Basil-Api, X-Basil-Spec, X-Basil-View, X-Basil-Docs, X-Basil-Swagger, X-Basil-Name, X-Basil-Creator</param-value>
+            <param-value>Set-Cookie, X-Basil-Endpoint, X-Basil-Api, X-Basil-Spec, X-Basil-View, X-Basil-Docs, X-Basil-Swagger, X-Basil-Name, X-Basil-Creator, X-Basil-Direct</param-value>
         </init-param>
         <init-param>
             <param-name>cors.supportsCredentials</param-name>

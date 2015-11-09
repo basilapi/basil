@@ -1,5 +1,6 @@
 package uk.ac.open.kmi.basil.rest.core;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -40,6 +41,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
 import uk.ac.open.kmi.basil.core.InvocationResult;
+import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
 import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
 import uk.ac.open.kmi.basil.doc.Doc.Field;
 import uk.ac.open.kmi.basil.rendering.CannotRenderException;
@@ -63,7 +65,6 @@ public class ApiResource extends AbstractResource {
 		log.trace("API execution.");
 		try {
 			InvocationResult r = getApiManager().invokeApi(id, parameters);
-
 			MediaType type = null;
 			// If we have an extension
 			if (!extension.equals("")) {
@@ -206,8 +207,28 @@ public class ApiResource extends AbstractResource {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
 			@ApiResponse(code = 500, message = "Internal error") })
 	public Response get(@ApiParam(value = "ID of the API specification", required = true) @PathParam("id") String id) {
-		log.trace("Called GET.");
+		log.trace("Called GET /api");
 		return performQuery(id, requestUri.getQueryParameters(), "");
+	}
+
+
+	@Path("direct")
+	@GET
+	@ApiOperation(value = "Returns a 303 redirect, querying the endpoint")
+	@ApiResponses(value = { @ApiResponse(code = 303, message = "See other"),
+			@ApiResponse(code = 500, message = "Internal error") })
+	public Response direct(@ApiParam(value = "ID of the API specification", required = true) @PathParam("id") String id) {
+		log.trace("Called GET /direct");
+		try {
+			String s = getApiManager().redirectUrl(id, requestUri.getQueryParameters());
+			ResponseBuilder response;
+			response = Response.seeOther(URI.create(s));
+			addHeaders(response, id);
+			return response.build();
+		} catch (IOException | ApiInvocationException e) {
+			log.error("Error", e);
+			return packError(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR), e).build();
+		}
 	}
 
 	/**

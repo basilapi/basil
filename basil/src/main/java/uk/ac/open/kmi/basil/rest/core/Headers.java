@@ -5,6 +5,7 @@ public final class Headers {
 	public static final String Error = PREFIX + "Error";
 	public static final String Endpoint = PREFIX + "Endpoint";
 	public static final String Api = PREFIX + "Api";
+	public static final String Direct = PREFIX + "Direct";
 	public static final String Spec = PREFIX + "Spec";
 	public static final String View = PREFIX + "View";
 	public static final String Store = PREFIX + "Store";

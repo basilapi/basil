@@ -60,9 +60,8 @@ public class AbstractResource {
 	protected final ResponseBuilder addHeaders(ResponseBuilder builder,
 			String id) {
 		URI api = requestUri.getBaseUriBuilder().path(id).path("api").build();
+		URI direct = requestUri.getBaseUriBuilder().path(id).path("direct").build();
 		URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
-//		URI store = requestUri.getBaseUriBuilder().path(id).path("store")
-//				.build();
 		URI views = requestUri.getBaseUriBuilder().path(id).path("view")
 				.build();
 		URI swagger = requestUri.getBaseUriBuilder().path(id).path("api-docs")
@@ -71,7 +70,7 @@ public class AbstractResource {
 				.build();
 		builder.header(Headers.Api, api);
 		builder.header(Headers.Spec, spec);
-		// builder.header(Headers.Store, store); XXX Not implemented Yet
+		builder.header(Headers.Direct, direct);
 		builder.header(Headers.View, views);
 		builder.header(Headers.Docs, docs);
 		builder.header(Headers.Swagger, swagger);
