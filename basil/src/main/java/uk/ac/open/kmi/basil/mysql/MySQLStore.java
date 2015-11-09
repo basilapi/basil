@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,6 +21,8 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.hp.hpl.jena.query.QueryFactory;
 
 import uk.ac.open.kmi.basil.core.ApiInfo;
 import uk.ac.open.kmi.basil.doc.Doc;
@@ -42,9 +45,67 @@ public class MySQLStore implements Store, SearchProvider {
 	static final String SPEC_QUERY = "spec:query";
 	static final String DOC_NAME = "doc:name";
 	static final String DOC_DESCRIPTION = "doc:description";
+	static final String SPEC_EXPANDED_QUERY = "spec:expanded-query";
 
 	public MySQLStore(String jdbcUri) {
 		this.jdbcUri = jdbcUri;
+		try {
+			this._migrate_0_3__0_4_0();
+		} catch (IOException e) {
+			log.error("FATAL: Upgrade 0.3 -> 0.4.0 failed", e);
+		}
+	}
+
+	private void _migrate_0_3__0_4_0() throws IOException {
+		// XXX
+		// Add expanded queries when not already there
+		String q = "SELECT API, VALUE FROM DATA WHERE PROPERTY = 'spec:query' AND NOT EXISTS (SELECT * FROM DATA WHERE PROPERTY = 'spec:expanded-query')";
+		Map<Integer, String> toUpgrade = new HashMap<Integer,String>();
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection connect = DriverManager.getConnection(jdbcUri);
+					PreparedStatement stmt = connect.prepareStatement(q)) {
+				ResultSet rs = stmt.executeQuery();
+				while (rs.next()) {
+					toUpgrade.put(rs.getInt(1),rs.getString(2));
+				}
+			} catch (Exception e) {
+				throw new IOException(e);
+			}
+		} catch (ClassNotFoundException e) {
+			throw new IOException(e);
+		}
+		log.warn("To Upgrade: {}", toUpgrade.size());
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
+				try (PreparedStatement stmt = connect.prepareStatement(
+						"INSERT INTO DATA (API, PROPERTY, VALUE) VALUES (?,?,?) ON DUPLICATE KEY UPDATE VALUE = VALUES(VALUE);")) {
+					connect.setAutoCommit(false);
+					Iterator<Entry<Integer, String>> it = toUpgrade.entrySet().iterator();
+					while (it.hasNext()) {
+						Entry<Integer, String> api = it.next();
+						stmt.setInt(1, api.getKey());
+						stmt.setString(2, SPEC_EXPANDED_QUERY);
+						com.hp.hpl.jena.query.Query qq = QueryFactory.create(api.getValue());
+						qq.setPrefixMapping(null);
+						stmt.setString(3, qq.toString());
+						stmt.execute();
+					}
+					connect.commit();
+				} catch (Exception e) {
+					throw new IOException(e);
+				} finally {
+					connect.setAutoCommit(true);
+				}
+			} catch (Exception e) {
+				throw new IOException(e);
+			}
+			log.warn("Upgrade completed.");
+		} catch (ClassNotFoundException e) {
+			throw new IOException(e);
+		}
+		
 	}
 
 	/**
@@ -79,21 +140,18 @@ public class MySQLStore implements Store, SearchProvider {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			try (Connection connect = DriverManager.getConnection(jdbcUri);
-					PreparedStatement stmt = connect.prepareStatement(q,
-							Statement.RETURN_GENERATED_KEYS)) {
+					PreparedStatement stmt = connect.prepareStatement(q, Statement.RETURN_GENERATED_KEYS)) {
 				stmt.setString(1, nickname);
 				int affectedRows = stmt.executeUpdate();
 
 				if (affectedRows == 0) {
-					throw new SQLException(
-							"Creating user failed, no affected rows.");
+					throw new SQLException("Creating user failed, no affected rows.");
 				}
 				try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
 					if (generatedKeys.next()) {
 						dbId = generatedKeys.getInt(1);
 					} else {
-						throw new SQLException(
-								"Creating user failed, no ID obtained.");
+						throw new SQLException("Creating user failed, no ID obtained.");
 					}
 				}
 			} catch (Exception e) {
@@ -105,8 +163,7 @@ public class MySQLStore implements Store, SearchProvider {
 		return (int) dbId;
 	}
 
-	private void _saveData(String id, Map<String, String> data)
-			throws IOException {
+	private void _saveData(String id, Map<String, String> data) throws IOException {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
@@ -119,8 +176,7 @@ public class MySQLStore implements Store, SearchProvider {
 					}
 					String q = "INSERT INTO DATA (API, PROPERTY, VALUE) VALUES (?,?,?) ON DUPLICATE KEY UPDATE VALUE = VALUES(VALUE);";
 					for (Entry<String, String> entry : data.entrySet()) {
-						try (PreparedStatement stmt = connect
-								.prepareStatement(q)) {
+						try (PreparedStatement stmt = connect.prepareStatement(q)) {
 							stmt.setInt(1, dbId);
 							stmt.setString(2, entry.getKey());
 							stmt.setString(3, entry.getValue());
@@ -128,8 +184,7 @@ public class MySQLStore implements Store, SearchProvider {
 						}
 					}
 					q = "UPDATE APIS SET MODIFIED = NOW() WHERE ID = ?";
-					try (PreparedStatement stmt = connect
-							.prepareStatement(q)) {
+					try (PreparedStatement stmt = connect.prepareStatement(q)) {
 						stmt.setInt(1, dbId);
 						stmt.executeUpdate();
 					}
@@ -167,8 +222,7 @@ public class MySQLStore implements Store, SearchProvider {
 		return data;
 	}
 
-	private void _deleteData(String id, String... properties)
-			throws IOException {
+	private void _deleteData(String id, String... properties) throws IOException {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
@@ -181,8 +235,7 @@ public class MySQLStore implements Store, SearchProvider {
 					}
 					String q = "DELETE FROM DATA WHERE PROPERTY = ? AND API = ?";
 					for (String property : properties) {
-						try (PreparedStatement stmt = connect
-								.prepareStatement(q)) {
+						try (PreparedStatement stmt = connect.prepareStatement(q)) {
 							stmt.setString(1, property);
 							stmt.setInt(1, dbId);
 							stmt.executeUpdate();
@@ -220,14 +273,17 @@ public class MySQLStore implements Store, SearchProvider {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put(SPEC_ENDPOINT, spec.getEndpoint());
 		data.put(SPEC_QUERY, spec.getQuery());
+		// Add a copy as expanded query
+		com.hp.hpl.jena.query.Query q = QueryFactory.create(spec.getQuery());
+		q.setPrefixMapping(null);
+		data.put(SPEC_EXPANDED_QUERY, q.toString());
 		_saveData(id, data);
 	}
 
 	@Override
 	public Specification loadSpec(String id) throws IOException {
 		Map<String, String> data = _loadData(id);
-		return SpecificationFactory.create(data.get(SPEC_ENDPOINT),
-				data.get(SPEC_QUERY));
+		return SpecificationFactory.create(data.get(SPEC_ENDPOINT), data.get(SPEC_QUERY));
 	}
 
 	@Override
@@ -272,8 +328,7 @@ public class MySQLStore implements Store, SearchProvider {
 					stmt.setString(1, id);
 					ResultSet rs = stmt.executeQuery();
 					while (rs.next()) {
-						views.put(rs.getString("TYPE"), rs.getString("VIEW"),
-								rs.getString("TEMPLATE"),
+						views.put(rs.getString("TYPE"), rs.getString("VIEW"), rs.getString("TEMPLATE"),
 								Engine.byContentType(rs.getString("LANGUAGE")));
 					}
 				}
@@ -368,7 +423,35 @@ public class MySQLStore implements Store, SearchProvider {
 		if (!onlyIds)
 			qb.append(", DATA.PROPERTY, DATA.VALUE ");
 
-		qb.append(" FROM APIS INNER JOIN DATA ON APIS.ID=DATA.API");
+		qb.append(" FROM APIS ");
+
+		// Endpoint
+		if (query.getEndpoint() != null) {
+			qb.append(" INNER JOIN DATA AS E ON APIS.ID=E.API AND E.PROPERTY = ");
+			qb.append("'");
+			qb.append(SPEC_ENDPOINT);
+			qb.append("' AND E.VALUE = ? ");
+		}
+
+		// Namespaces
+		if (query.getNamespaces() != null || query.getResources() != null) {
+			qb.append(" INNER JOIN DATA AS E ON APIS.ID=E.API AND E.PROPERTY = ");
+			qb.append("'");
+			qb.append(SPEC_EXPANDED_QUERY);
+			qb.append("'");
+			if (query.getNamespaces() != null) {
+				for (int i = 0; i < query.getNamespaces().length; i++) {
+					qb.append(" AND E.VALUE LIKE ? ");
+				}
+			}
+			if (query.getResources() != null) {
+				for (int i = 0; i < query.getResources().length; i++) {
+					qb.append(" AND E.VALUE LIKE ? ");
+				}
+			}
+		}
+
+		qb.append(" INNER JOIN DATA ON APIS.ID=DATA.API");
 		String txt = query.getText();
 		String[] txts = txt.split(" ");
 		for (int i = 0; i < txts.length; i++) {
@@ -380,6 +463,27 @@ public class MySQLStore implements Store, SearchProvider {
 	private void _mapSearchParameters(PreparedStatement stmt, Query query) throws SQLException {
 		String[] txts = query.getText().split(" ");
 		int pos = 1;
+
+		// Endpoint
+		if (query.getEndpoint() != null) {
+			stmt.setString(pos, query.getEndpoint());
+		}
+		// Namespaces
+		if (query.getNamespaces() != null) {
+			for (String t : query.getNamespaces()) {
+				stmt.setString(pos, new StringBuilder().append("%<").append(t).append("%").toString());
+				pos++;
+			}
+		}
+		// Resources
+		if (query.getResources() != null) {
+			for (String t : query.getResources()) {
+				stmt.setString(pos, new StringBuilder().append("%<").append(t).append(">%").toString());
+				pos++;
+			}
+		}
+
+		// Text
 		for (String t : txts) {
 			stmt.setString(pos, new StringBuilder().append("%").append(t).append("%").toString());
 			pos++;
@@ -512,7 +616,7 @@ public class MySQLStore implements Store, SearchProvider {
 							}
 
 							public Date modified() {
-								if(modified == null) {
+								if (modified == null) {
 									return new Date(created.getTime());
 								}
 								return new Date(modified.getTime());
