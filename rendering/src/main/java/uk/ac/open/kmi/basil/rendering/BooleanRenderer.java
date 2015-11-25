@@ -118,6 +118,11 @@ public class BooleanRenderer extends Renderer<Boolean> {
 			return new String(baos.toByteArray());
 		}
 
-		throw new CannotRenderException();
+		// text/csv
+		if(MoreMediaType.TEXT_CSV_TYPE.equals(type) || MoreMediaType.TEXT_TSV_TYPE.equals(type)){
+			return Boolean.toString(getInput());
+		}
+		
+		throw new CannotRenderException("Cannot render media type " + type.toString());
 	}
 }

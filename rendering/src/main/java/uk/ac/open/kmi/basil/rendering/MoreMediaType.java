@@ -42,6 +42,7 @@ public class MoreMediaType {
 		return (MoreMediaType.RDFJSON_TYPE.equals(type) || MoreMediaType.JSONLD_TYPE.equals(type) ||
 		MoreMediaType.RDFXML_TYPE.equals(type) || MoreMediaType.TEXT_TURTLE_TYPE.equals(type)
 		|| MoreMediaType.APPLICATION_TURTLE_TYPE.equals(type) ||
+		MoreMediaType.NTRIPLES_TYPE.equals(type) ||
 		MoreMediaType.TEXT_X_NQUADS_TYPE.equals(type));
 	}
 	

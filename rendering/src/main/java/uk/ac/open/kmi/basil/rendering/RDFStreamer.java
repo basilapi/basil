@@ -20,7 +20,9 @@ import com.hp.hpl.jena.util.iterator.WrappedIterator;
 public class RDFStreamer {
 	static {
 		StreamRDFWriter.register(Lang.RDFXML, RDFFormat.RDFXML);
+		StreamRDFWriter.register(Lang.RDFJSON, RDFFormat.RDFXML);
 		StreamRDFWriter.register(RDFFormat.RDFXML, new StreamRDFXMLWriterFactory());
+		StreamRDFWriter.register(RDFFormat.RDFJSON, new StreamRDFJSONWriterFactory());
 	}
 
 	public static void stream(OutputStream os, ResultSet rs, RDFFormat format, Transform<QuerySolution, Iterator<Triple>> adapter) {
@@ -35,6 +37,13 @@ public class RDFStreamer {
 		@Override
 		public StreamRDF create(OutputStream output, RDFFormat format) {
 			return new WriterStreamRDFXML(output);
+		}
+	}
+
+	static class StreamRDFJSONWriterFactory implements StreamRDFWriterFactory{
+		@Override
+		public StreamRDF create(OutputStream output, RDFFormat format) {
+			return new WriterStreamRDFJSON(output);
 		}
 	}
 }

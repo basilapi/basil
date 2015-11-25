@@ -30,18 +30,36 @@ public class ResultSetRenderer extends Renderer<ResultSet> {
 	}
 
 	private InputStream asRdfStream(MediaType type, String g, Map<String, String> pref) throws CannotRenderException {
-		// XXX Only RDF/XML, for the moment. See Issue #5
-		if (MoreMediaType.RDFXML_TYPE.equals(type)) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			String uri = g;
 			if (uri.indexOf('#') > -1) {
 				uri = uri.substring(0, uri.lastIndexOf('#'));
 			}
-			RDFStreamer.stream(baos, getInput(), RDFFormat.RDFXML, new SimpleTripleAdapter(uri + "#"));
-			return new ByteArrayInputStream(baos.toByteArray());
-		}
 
-		throw new CannotRenderException();
+			// See Issue #5
+			RDFFormat f = null;
+			if (MoreMediaType.RDFXML_TYPE.equals(type)) {
+				f = RDFFormat.RDFXML;
+			}else if (MoreMediaType.NTRIPLES_TYPE.equals(type)) {
+				f = RDFFormat.NTRIPLES_UTF8;
+			}else if (MoreMediaType.RDFJSON_TYPE.equals(type)) {
+				f = RDFFormat.RDFJSON;
+			}else if (MoreMediaType.APPLICATION_TURTLE_TYPE.equals(type) ||
+					MoreMediaType.TEXT_TURTLE_TYPE.equals(type)) {
+				f = RDFFormat.TURTLE_FLAT;
+			}else if (MoreMediaType.RDFXML_TYPE.equals(type)) {
+				f = RDFFormat.RDFXML;
+			}else if (MoreMediaType.TEXT_X_NQUADS_TYPE.equals(type)) {
+				f = RDFFormat.NQUADS_UTF8;
+			}
+			if (f != null) {
+				RDFStreamer.stream(baos, getInput(), f, new SimpleTripleAdapter(uri + "#"));
+				return new ByteArrayInputStream(baos.toByteArray());
+			} 
+		} catch (Throwable e) {
+			throw new CannotRenderException("An error occurred: " + e.getMessage(), e);
+		}
+		throw new CannotRenderException(getInput(), type);
 	}
 
 	@Override
@@ -51,8 +69,7 @@ public class ResultSetRenderer extends Renderer<ResultSet> {
 			try {
 				return IOUtils.toString(asRdfStream(type, g, pref));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new CannotRenderException(e);
 			}
 		}
 
@@ -163,7 +180,7 @@ public class ResultSetRenderer extends Renderer<ResultSet> {
 			return new String(baos.toByteArray());
 		}
 
-		throw new CannotRenderException();
+		throw new CannotRenderException(getInput(), type);
 	}
 
 	@Override

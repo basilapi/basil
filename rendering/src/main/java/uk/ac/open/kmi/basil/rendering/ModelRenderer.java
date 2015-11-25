@@ -28,6 +28,7 @@ import com.google.gson.JsonPrimitive;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.hp.hpl.jena.sparql.core.DatasetGraphFactory;
@@ -207,7 +208,18 @@ public class ModelRenderer extends Renderer<Model> {
 			writer.write(w, dg, PrefixMapNull.empty, null, Context.emptyContext);
 			return w.toString();
 		}
+		
+		// application/sparql-results+json
+		// application/sparql-results+xml
+		// text/csv
+		// text/tsv
+		if (MoreMediaType.SPARQL_RESULTS_XML_TYPE.equals(type)||
+				MoreMediaType.SPARQL_RESULTS_JSON_TYPE.equals(type)||
+				MoreMediaType.TEXT_CSV_TYPE.equals(type)||
+				MoreMediaType.TEXT_TSV_TYPE.equals(type)) {
+			return RendererFactory.getRenderer(ResultSetFactory.fromRDF(getInput())).render(type, graphName, pref);
+		}
 
-		throw new CannotRenderException();
+		throw new CannotRenderException(getInput(), type);
 	}
 }
