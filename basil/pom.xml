@@ -12,7 +12,7 @@
 	<artifactId>basil</artifactId>
 	<packaging>jar</packaging>
 
-	<name>BASIL</name>
+	<name>BASIL :: Core</name>
 
 	<description>Tool for Building web Apis SImpLy on top of sparql endpoints</description>
 

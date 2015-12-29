@@ -89,7 +89,7 @@ public class Standalone {
 		root.setResourceBase(resLocation);
 		root.setParentLoaderPriority(true);
 		server.setHandler(root);
-		System.out.println("#3: done");
+		System.out.println("#3: resources setup");
 
 		try {
 			server.start();
