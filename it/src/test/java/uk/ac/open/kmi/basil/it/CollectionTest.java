@@ -24,7 +24,7 @@ public class CollectionTest extends BasilTestBase {
 		log.info("#{}", name.getMethodName());
 		executor.execute(builder.buildGetRequest("/basil").withHeader("Accept", "*/*"));
 		log.debug(" ... returned content: {}", executor.getContent());
-		executor.assertStatus(200).assertContentType("application/json").assertContentRegexp("\\{.*\\}");
+		executor.assertStatus(200).assertContentType("application/json").assertContentRegexp("\\[.*\\]");
 	}
 
 	@Test
@@ -32,7 +32,7 @@ public class CollectionTest extends BasilTestBase {
 		log.info("#{}", name.getMethodName());
 		executor.execute(builder.buildGetRequest("/basil").withHeader("Accept", "application/json"));
 		log.debug(" ... returned content: {}", executor.getContent());
-		executor.assertStatus(200).assertContentType("application/json").assertContentRegexp("\\{.*\\}");
+		executor.assertStatus(200).assertContentType("application/json").assertContentRegexp("\\[.*\\]");
 	}
 
 	@Test

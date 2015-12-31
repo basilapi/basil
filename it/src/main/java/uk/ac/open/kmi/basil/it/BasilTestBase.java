@@ -1,11 +1,22 @@
 package uk.ac.open.kmi.basil.it;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -18,14 +29,19 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.shiro.config.Ini;
 import org.apache.stanbol.commons.testing.http.RequestBuilder;
 import org.apache.stanbol.commons.testing.http.RequestExecutor;
 import org.apache.stanbol.commons.testing.jarexec.JarExecutor;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 
 /**
  * 
@@ -43,8 +59,16 @@ public class BasilTestBase {
 	public static final String SERVER_READY_TIMEOUT_PROP = "server.ready.timeout.seconds";
 	public static final String SERVER_READY_PROP_PREFIX = "server.ready.path";
 	public static final String KEEP_JAR_RUNNING_PROP = "keepJarRunning";
+	public static final String BASIL_CONFIGURATION_FILE = "basil.configurationFile";
+	public static final String TEST_DB_INIT = "test.db.init";
+	public static final String TEST_DB_INIT_SCRIPT = "test.db.init.script";
 
 	protected static String serverBaseUrl;
+	protected static String dbInit = "false";
+	protected static String jdbcConnectionUrl = null;
+	protected static String databaseName = null;
+	protected static String user = null;
+	protected static String password = null;
 
 	private static final Logger log = LoggerFactory.getLogger(BasilTestBase.class);
 
@@ -64,7 +88,89 @@ public class BasilTestBase {
 	}
 
 	@BeforeClass
-	public static synchronized void startRunnableJar() throws Exception {
+	public static void initialize() throws Exception {
+		dbInit = System.getProperty(TEST_DB_INIT);
+		String conf = System.getProperty(BASIL_CONFIGURATION_FILE);
+		log.info("Configuration: {}", conf);
+		log.info("Init a test db: {}", dbInit);
+		if ("true".equals(dbInit)) {
+			log.debug("{} is true", TEST_DB_INIT);
+			conf = createTestDb();
+		}
+		startServer(conf);
+	}
+
+	@AfterClass
+	public static void cleanup() {
+		if(!dbInit.equals("true")){
+			return;
+		}
+		log.info("Cleaning up: dropping db {}", databaseName);
+		try {
+			// Delete the test Database
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection conn = DriverManager.getConnection(jdbcConnectionUrl, user, password)) {
+				try (Statement create = conn.createStatement()) {
+					create.executeUpdate("DROP DATABASE `" + databaseName + "`");
+					log.info("Database {} dropped", databaseName);
+				}
+			}
+		} catch (Exception e) {
+			log.error("IGNORED (cannot cleanup test db!)", e);
+		}
+	}
+
+	/**
+	 * Returns the location of the new configuration file
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	private static String createTestDb() throws Exception {
+		log.info("Creating test db");
+		final String inputConfigurationFile = System.getProperty(BASIL_CONFIGURATION_FILE);
+		String str = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		final String dbPostfix = '_' + RandomStringUtils.random(8, str.toCharArray());
+		File f = new File(inputConfigurationFile);
+		if (!f.exists() || !f.canRead()) {
+			throw new Exception("Cannot use basil configuration file: " + f);
+		}
+		Ini ini = Ini.fromResourcePath(f.getAbsolutePath());
+		jdbcConnectionUrl = new StringBuilder().append("jdbc:mysql://").append(ini.get("").get("ds.serverName"))
+				.append(":").append(ini.get("").get("ds.port")).append("/").toString();
+		databaseName = ini.get("").get("ds.databaseName") + dbPostfix;
+		user = ini.get("").get("ds.user");
+		password = ini.get("").get("ds.password");
+
+		log.info("Attemp to init a test db {}", databaseName);
+
+		Class.forName("com.mysql.jdbc.Driver");
+		try (Connection conn = DriverManager.getConnection(jdbcConnectionUrl, user, password)) {
+			try (Statement create = conn.createStatement()) {
+				create.executeUpdate("CREATE DATABASE `" + databaseName + "`");
+				log.info("Database {} created", databaseName);
+			}
+			try (Statement create = conn.createStatement()) {
+				create.executeQuery("USE `" + databaseName + "`");
+			}
+			// Now init db
+			Resource r = new FileSystemResource(System.getProperty(TEST_DB_INIT_SCRIPT));
+			log.info("Running init script: {}", r);
+			ScriptUtils.executeSqlScript(conn, r);
+		}
+		String newConfigurationFile = inputConfigurationFile + dbPostfix;
+		log.info("Write configuration file for test server instance: {}", newConfigurationFile);
+		Path from = Paths.get(inputConfigurationFile);
+		Path to = Paths.get(newConfigurationFile);
+		Charset charset = StandardCharsets.UTF_8;
+		String content = new String(Files.readAllBytes(from), charset);
+		content = content.replaceAll(ini.get("").get("ds.databaseName"), databaseName);
+		Files.write(to, content.getBytes(charset));
+		// Configuration file
+		return newConfigurationFile;
+	}
+
+	public static synchronized void startServer(String configurationFile) throws Exception {
 		log.info("Starting testing server");
 		if (serverBaseUrl != null) {
 			// concurrent initialization by loading subclasses
@@ -81,7 +187,13 @@ public class BasilTestBase {
 			}
 			log.info(TEST_SERVER_URL_PROP + " is set: not starting server jar (" + serverBaseUrl + ")");
 		} else {
-			final JarExecutor j = JarExecutor.getInstance(System.getProperties());
+
+			Properties properties = System.getProperties();
+			// Add jvm option for basil configuration file
+			String opts = properties.getProperty("jar.executor.vm.options");
+			opts += " -Dbasil.configurationFile=" + configurationFile;
+			properties.setProperty("jar.executor.vm.options", opts);
+			final JarExecutor j = JarExecutor.getInstance(properties);
 			j.start();
 			serverBaseUrl = "http://localhost:" + j.getServerPort();
 			log.info("Forked subprocess server listening to: " + serverBaseUrl);
