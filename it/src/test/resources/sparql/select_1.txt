@@ -1,0 +1,11 @@
+# X-Basil-Endpoint: http://data.open.ac.uk/sparql
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX mlo: <http://purl.org/net/mlo/> 
+PREFIX aiiso: <http://purl.org/vocab/aiiso/schema#> 
+
+# Eg value for ?_geoid 2328926
+SELECT ?course FROM <http://data.open.ac.uk/context/course> 
+WHERE {
+ BIND(iri(CONCAT('http://sws.geonames.org/',?_geoid,'/')) as ?location) .
+ ?course mlo:location ?location . ?course a aiiso:Module 
+} 
