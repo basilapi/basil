@@ -32,7 +32,7 @@ public class JDBCUserManager implements UserManager {
                 Class.forName("com.mysql.jdbc.Driver");
                 // Setup the connection with the DB
                 connect = DriverManager.getConnection(jdbcUri);
-                PreparedStatement preparedStatement = connect.prepareStatement("insert into users values (?, ?, ?)");
+                PreparedStatement preparedStatement = connect.prepareStatement("insert into users (username, email, password) values (?, ?, ?)");
                 preparedStatement.setString(1, user.getUsername());
                 preparedStatement.setString(2, user.getEmail());
 
@@ -41,7 +41,7 @@ public class JDBCUserManager implements UserManager {
 
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
-                preparedStatement = connect.prepareStatement("insert into users_roles values (?, ?)");
+                preparedStatement = connect.prepareStatement("insert into users_roles (username, role_name) values (?, ?)");
                 preparedStatement.setString(1, user.getUsername());
                 preparedStatement.setString(2, "default");
                 preparedStatement.executeUpdate();
