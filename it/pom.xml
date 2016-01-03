@@ -33,6 +33,10 @@
 		<!-- Set this to run tests against an existing server instance -->
 		<test.server.url></test.server.url>
 
+		<!-- Test user/pwd to be used (created if db.init is true) -->
+		<test.server.user>test</test.server.user>
+		<test.server.pwd>testpwd</test.server.pwd>
+
 		<!-- Log4J Configuration -->
 		<log4j.configurationFile>src/test/resources/log4j2.xml</log4j.configurationFile>
 
@@ -126,6 +130,8 @@
 				<configuration>
 					<systemPropertyVariables>
 						<test.server.url>${test.server.url}</test.server.url>
+						<test.server.user>${test.server.user}</test.server.user>
+						<test.server.pwd>${test.server.pwd}</test.server.pwd>
 						<test.db.init>${test.db.init}</test.db.init>
 						<basil.configurationFile>${project.basedir}/target/dependency/${basil.configurationFile}</basil.configurationFile>
 						<test.db.init.script>${project.basedir}/target/dependency/db.sql</test.db.init.script>
@@ -141,6 +147,9 @@
 					<excludes>
 
 					</excludes>
+					<includes>
+						<include>**/BasilTestSuite.class</include>
+					</includes>
 					<classpathDependencyExcludes>
 						<classpathDependencyExclude>org.apache.http</classpathDependencyExclude>
 					</classpathDependencyExcludes>
@@ -204,6 +213,15 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.1</version>
 		</dependency>
 	</dependencies>
 

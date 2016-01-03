@@ -70,7 +70,8 @@ public class BasilTestBase {
 	public void prepare() throws Exception {
 		// initialize instance request builder and HTTP client
 		builder = new RequestBuilder(BasilTestServer.getServerBaseUrl());
-		httpClient = HttpClients.custom().setDefaultRequestConfig(getRequestConfig()).build();
+		httpClient = HttpClients.custom().setDefaultRequestConfig(getRequestConfig())
+				.setDefaultCookieStore(getClientContext().getCookieStore()).build();
 		executor = new RequestExecutor(httpClient);
 		//
 		waitForServerReady();
