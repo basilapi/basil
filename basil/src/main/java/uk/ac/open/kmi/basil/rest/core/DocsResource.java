@@ -83,8 +83,7 @@ public class DocsResource extends AbstractResource {
 	public Response delete(@PathParam("id") String id, @Auth Subject subject) {
 		log.trace("Calling DELETE docs with id: {}", id);
 		try {
-			subject.checkPermission(id + ":write");
-
+			subject.checkRole(id); // is the creator
 			if (getApiManager().getSpecification(id) == null) {
 				return Response.status(404).build();
 			}

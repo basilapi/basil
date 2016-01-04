@@ -20,6 +20,7 @@ import uk.ac.open.kmi.basil.core.ApiManager;
 import uk.ac.open.kmi.basil.core.ApiManagerImpl;
 import uk.ac.open.kmi.basil.core.auth.UserManager;
 import uk.ac.open.kmi.basil.rest.BasilApplication;
+import uk.ac.open.kmi.basil.rest.msg.ErrorMessage;
 import uk.ac.open.kmi.basil.search.SearchProvider;
 import uk.ac.open.kmi.basil.store.Store;
 
@@ -48,9 +49,7 @@ public class AbstractResource {
 	}
 
 	protected final ResponseBuilder packError(ResponseBuilder builder, String message){
-		JsonObject j = new JsonObject();
-		j.put("error", message);
-		return builder.header(Headers.Error, message).entity(j.toString());
+		return builder.header(Headers.Error, message).entity(new ErrorMessage(message).asJSON());
 	}
 	
 	protected final ResponseBuilder packError(ResponseBuilder builder, Exception e){

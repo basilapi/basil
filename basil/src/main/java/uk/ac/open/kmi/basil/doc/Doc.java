@@ -37,6 +37,7 @@ public class Doc implements Serializable {
 	}
 
 	public boolean isEmpty() {
-		return get(Field.NAME) == null && get(Field.DESCRIPTION) == null;
+		return (get(Field.NAME) == null || "".equals(get(Field.NAME)))
+				&& (get(Field.DESCRIPTION) == null || "".equals(get(Field.DESCRIPTION)));
 	}
 }

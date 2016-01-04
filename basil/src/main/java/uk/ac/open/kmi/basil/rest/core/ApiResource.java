@@ -49,6 +49,7 @@ import uk.ac.open.kmi.basil.rendering.MoreMediaType;
 import uk.ac.open.kmi.basil.rendering.Renderer;
 import uk.ac.open.kmi.basil.rendering.RendererFactory;
 import uk.ac.open.kmi.basil.rest.auth.AuthResource;
+import uk.ac.open.kmi.basil.rest.msg.SimpleMessage;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.view.Items;
 import uk.ac.open.kmi.basil.view.View;
@@ -136,7 +137,8 @@ public class ApiResource extends AbstractResource {
 	}
 
 	private Response buildNotAcceptable() {
-		return Response.notAcceptable(Variant.mediaTypes(MediaType.TEXT_PLAIN_TYPE).add().build()).build();
+		return packError(Response.notAcceptable(Variant.mediaTypes(MediaType.TEXT_PLAIN_TYPE).add().build()),
+				"Not acceptable").build();
 	}
 
 	public MediaType getFromExtension(String ext) {
@@ -211,13 +213,13 @@ public class ApiResource extends AbstractResource {
 		return performQuery(id, requestUri.getQueryParameters(), "");
 	}
 
-
 	@Path("direct")
 	@GET
 	@ApiOperation(value = "Returns a 303 redirect, querying the endpoint")
 	@ApiResponses(value = { @ApiResponse(code = 303, message = "See other"),
 			@ApiResponse(code = 500, message = "Internal error") })
-	public Response direct(@ApiParam(value = "ID of the API specification", required = true) @PathParam("id") String id) {
+	public Response direct(
+			@ApiParam(value = "ID of the API specification", required = true) @PathParam("id") String id) {
 		log.trace("Called GET /direct");
 		try {
 			String s = getApiManager().redirectUrl(id, requestUri.getQueryParameters());
@@ -259,10 +261,7 @@ public class ApiResource extends AbstractResource {
 			ResponseBuilder response;
 			URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
 			log.info("Replaced spec at: {}", spec);
-			JsonObject m = new JsonObject();
-			m.add("message", new JsonPrimitive("Replaced: " + spec.toString()));
-			m.add("location", new JsonPrimitive(spec.toString()));
-			response = Response.ok(spec).entity(m.toString());
+			response = Response.ok(spec).entity(new SimpleMessage("Replaced", spec.toString()).asJSON());
 			addHeaders(response, id);
 			return response.build();
 		} catch (AuthorizationException e) {
@@ -348,12 +347,8 @@ public class ApiResource extends AbstractResource {
 			getApiManager().deleteApi(id);
 			URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
 			ResponseBuilder response;
-			JsonObject m = new JsonObject();
-			m.add("message", new JsonPrimitive("Deleted: " + spec.toString()));
-			m.add("location", new JsonPrimitive(spec.toString()));
-			response = Response.ok().entity(m.toString());
+			response = Response.ok().entity(new SimpleMessage("Deleted", spec.toString()).asJSON());
 			addHeaders(response, id);
-
 			return response.build();
 		} catch (AuthorizationException e) {
 			log.trace("Not authorized");
@@ -391,12 +386,8 @@ public class ApiResource extends AbstractResource {
 				ResponseBuilder response;
 				URI spec = requestUri.getBaseUriBuilder().path(newId).path("spec").build();
 				log.info("Cloned spec at: {}", spec);
-				JsonObject m = new JsonObject();
-				m.add("message", new JsonPrimitive("Cloned at: " + spec.toString()));
-				m.add("location", new JsonPrimitive(spec.toString()));
-				response = Response.ok(spec).entity(m.toString());
+				response = Response.ok(spec).entity(new SimpleMessage("Cloned", spec.toString()).asJSON());
 				addHeaders(response, newId);
-
 				return response.build();
 			}
 		} catch (Exception e) {

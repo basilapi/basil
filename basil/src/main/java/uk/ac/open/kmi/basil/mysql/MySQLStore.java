@@ -237,7 +237,7 @@ public class MySQLStore implements Store, SearchProvider {
 					for (String property : properties) {
 						try (PreparedStatement stmt = connect.prepareStatement(q)) {
 							stmt.setString(1, property);
-							stmt.setInt(1, dbId);
+							stmt.setInt(2, dbId);
 							stmt.executeUpdate();
 						}
 					}

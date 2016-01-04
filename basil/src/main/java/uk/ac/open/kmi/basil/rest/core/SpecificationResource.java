@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.basil.core.ApiInfo;
 import uk.ac.open.kmi.basil.rest.auth.AuthResource;
+import uk.ac.open.kmi.basil.rest.msg.SimpleMessage;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -72,11 +73,7 @@ public class SpecificationResource extends AbstractResource {
 				URI spec = requestUri.getBaseUriBuilder().path(id).path("spec")
 						.build();
 				log.info("Created  spec at: {}", spec);
-				JsonObject m = new JsonObject();
-				m.add("message", new JsonPrimitive("Created: " + api.toString()));
-				m.add("location", new JsonPrimitive(api.toString()));
-				response = Response.created(api).entity(m.toString());
-
+				response = Response.created(api).entity(new SimpleMessage("Created", api.toString()).asJSON());
 				addHeaders(response, id);
 				return response.build();
 			}
@@ -85,8 +82,7 @@ public class SpecificationResource extends AbstractResource {
 
 		} catch (Exception e) {
 			log.error("An error occurred", e);
-			return Response.serverError()
-					.header(Headers.Error, e.getMessage()).build();
+			return packError(Response.serverError(), e).build();
 		}
 		return packError(Response.status(HttpURLConnection.HTTP_FORBIDDEN), "User must be authenticated").build();
 	}
