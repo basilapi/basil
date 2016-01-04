@@ -3,6 +3,7 @@ package uk.ac.open.kmi.basil.it;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.BasicHttpEntity;
 import org.junit.FixMethodOrder;
@@ -85,5 +86,18 @@ public class CRUDTest extends AuthenticatedTestBase {
 		executor.execute(builder.buildGetRequest("/basil/" + createdId + "/docs").withRedirects(false))
 				.assertStatus(200).assertContentType("text/plain").assertContentContains(TEST_DOCS_ENTITY)
 				.assertHeader("X-Basil-Name", TEST_DOCS_NAME);
+	}
+
+	@Test
+	public void CRUD7_DeleteDocs() throws Exception {
+		log.info("#{}", name.getMethodName());
+		HttpDelete del = new HttpDelete(BasilTestServer.getServerBaseUrl() + "/basil/" + createdId + "/docs");
+		executor.execute(builder.buildOtherRequest(del)).assertStatus(204);
+	}
+	
+	@Test
+	public void CRUD8_AccessEmptyDocs204() throws Exception {
+		log.info("#{}", name.getMethodName());
+		executor.execute(builder.buildGetRequest("/basil/" + createdId + "/docs")).assertStatus(204);
 	}
 }

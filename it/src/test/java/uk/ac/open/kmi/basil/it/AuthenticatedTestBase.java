@@ -15,17 +15,18 @@ import org.slf4j.LoggerFactory;
 public class AuthenticatedTestBase extends BasilTestBase {
 	private static final Logger log = LoggerFactory.getLogger(AuthenticatedTestBase.class);
 	protected static HttpClientContext context = null;
-
+	protected static RequestConfig config = null;
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		// Authenticate and remembed session cookie (in context)
 		context = HttpClientContext.create();
+		config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build();
 		authenticate();
 	}
 
 	@Override
 	protected RequestConfig getRequestConfig() {
-		return RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build();
+		return config;
 	}
 
 	@Override
