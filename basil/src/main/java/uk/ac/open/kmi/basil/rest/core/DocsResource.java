@@ -2,6 +2,7 @@ package uk.ac.open.kmi.basil.rest.core;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -20,14 +21,16 @@ import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.basil.doc.Doc;
-import uk.ac.open.kmi.basil.doc.Doc.Field;
-
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+
+import uk.ac.open.kmi.basil.doc.Doc;
+import uk.ac.open.kmi.basil.doc.Doc.Field;
 
 /**
  * 
@@ -131,7 +134,12 @@ public class DocsResource extends AbstractResource {
 			}
 			getApiManager().createDoc(id, name, body);
 			ResponseBuilder builder;
-			builder = Response.created(requestUri.getBaseUriBuilder().path(id).path("docs").build());
+			JsonObject m = new JsonObject();
+			URI docs = requestUri.getBaseUriBuilder().path(id).path("docs").build();
+			m.add("message", new JsonPrimitive("Created: " + docs));
+			m.add("location", new JsonPrimitive(docs.toString()));
+			builder = Response.created(docs);
+			builder.entity(m.toString());
 			addHeaders(builder, id);
 			return builder.build();
 		} catch (AuthorizationException e) {
