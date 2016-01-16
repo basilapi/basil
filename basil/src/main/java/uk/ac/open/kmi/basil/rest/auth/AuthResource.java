@@ -10,9 +10,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
@@ -20,13 +23,14 @@ import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.basil.core.auth.User;
-import uk.ac.open.kmi.basil.rest.core.AbstractResource;
-import uk.ac.open.kmi.basil.rest.core.Headers;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+
+import uk.ac.open.kmi.basil.core.auth.User;
+import uk.ac.open.kmi.basil.rest.core.AbstractResource;
+import uk.ac.open.kmi.basil.rest.core.Headers;
+import uk.ac.open.kmi.basil.rest.msg.ErrorMessage;
 
 /**
  * Created by Luca Panziera on 26/06/15.
@@ -59,11 +63,12 @@ public class AuthResource extends AbstractResource {
             m.add("message", new JsonPrimitive("Login successful: " + user.getUsername()));
             m.add("user", new JsonPrimitive(userUri.toASCIIString()));
             return Response.created(userUri).entity(m.toString()).build();
-        } catch (Exception e) {
+        } catch(IncorrectCredentialsException | UnknownAccountException ice){
+        	log.warn("Authentication failed", ice.getMessage());
+        	return Response.status(Status.FORBIDDEN).entity(new ErrorMessage(ice).asJSON()).build();
+        }catch (Exception e) {
         	log.error("An error occurred", e);
-            JsonObject m = new JsonObject();
-            m.add("message", new JsonPrimitive(e.getMessage()));
-            return Response.serverError().entity(m.toString()).build();
+            return Response.serverError().entity(new ErrorMessage(e).asJSON()).build();
         }
     }
 
