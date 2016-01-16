@@ -11,8 +11,8 @@
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
         </Root>
-        <Logger name="uk.ac.open.kmi.basil.it" level="trace"/>
-        <Logger name="org.apache.stanbol.commons" level="trace"/>
-        <Logger name="org.apache.http" level="trace"/>
+        <Logger name="uk.ac.open.kmi.basil.it" level="info"/>
+        <Logger name="org.apache.stanbol.commons" level="info"/>
+        <Logger name="org.apache.http" level="info"/>
     </Loggers>
 </Configuration>
