@@ -18,6 +18,8 @@ import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
 import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
 import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
 import uk.ac.open.kmi.basil.doc.Doc;
+import uk.ac.open.kmi.basil.invoke.DirectExecutor;
+import uk.ac.open.kmi.basil.invoke.QueryExecutor;
 import uk.ac.open.kmi.basil.sparql.QueryParameter;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
@@ -33,10 +35,18 @@ import uk.ac.open.kmi.basil.view.Views;
 public class ApiManagerImpl implements ApiManager {
 	private Store data;
 	private UserManager userManager;
+	private QueryExecutor executor;
 
 	public ApiManagerImpl(Store store, UserManager um) {
 		data = store;
 		userManager = um;
+		executor = new DirectExecutor();
+	}
+
+	public ApiManagerImpl(Store store, UserManager um, QueryExecutor exe) {
+		data = store;
+		userManager = um;
+		executor = exe;
 	}
 
 	/**
@@ -106,20 +116,7 @@ public class ApiManagerImpl implements ApiManager {
 		}
 		Specification specification = data.loadSpec(id);
 		Query q = rewrite(specification, parameters);
-		QueryExecution qe = QueryExecutionFactory.sparqlService(specification.getEndpoint(), q);
-
-		if (q.isSelectType()) {
-			return new InvocationResult(qe.execSelect(), q);
-		} else if (q.isConstructType()) {
-			return new InvocationResult(qe.execConstruct(), q);
-		} else if (q.isAskType()) {
-			return new InvocationResult(qe.execAsk(), q);
-		} else if (q.isDescribeType()) {
-			return new InvocationResult(qe.execDescribe(), q);
-		} else {
-			throw new ApiInvocationException("Unsupported query type: " + q.getQueryType());
-		}
-
+		return executor.execute(q, specification.getEndpoint());
 	}
 
 	public String createSpecification(String username, String endpoint, String body)
