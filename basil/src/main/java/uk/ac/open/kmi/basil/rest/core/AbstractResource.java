@@ -12,13 +12,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.jena.atlas.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.basil.core.ApiManager;
 import uk.ac.open.kmi.basil.core.ApiManagerImpl;
 import uk.ac.open.kmi.basil.core.auth.UserManager;
+import uk.ac.open.kmi.basil.invoke.QueryExecutor;
 import uk.ac.open.kmi.basil.rest.BasilApplication;
 import uk.ac.open.kmi.basil.rest.msg.ErrorMessage;
 import uk.ac.open.kmi.basil.search.SearchProvider;
@@ -39,13 +39,17 @@ public class AbstractResource {
 	private ApiManager apiManager;
 	protected ApiManager getApiManager() {
 		if (apiManager == null) {
-			apiManager = new ApiManagerImpl(getDataStore(), getUserManager());
+			apiManager = new ApiManagerImpl(getDataStore(), getUserManager(), getQueryExecutor());
 		}
 		return apiManager;
 	}
 	
 	protected SearchProvider getSearchProvider() {
 		return (SearchProvider) context.getAttribute(BasilApplication.Registry.SearchProvider);
+	}
+
+	protected QueryExecutor getQueryExecutor() {
+		return (QueryExecutor) context.getAttribute(BasilApplication.Registry.QueryExecutor);
 	}
 
 	protected final ResponseBuilder packError(ResponseBuilder builder, String message){
