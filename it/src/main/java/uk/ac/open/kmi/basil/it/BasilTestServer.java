@@ -13,13 +13,7 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Properties;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.config.Ini;
 import org.apache.stanbol.commons.testing.jarexec.JarExecutor;
@@ -105,16 +99,16 @@ public class BasilTestServer {
 		return serverBaseUrl;
 	}
 	
-	public static CloseableHttpResponse authenticate(String username, String password, HttpClientContext httpClientContext) throws Exception {
-		log.trace("Authenticating {}", username);
-		HttpPost post = new HttpPost(BasilTestServer.getServerBaseUrl() + "/basil/auth/login");
-		post.addHeader("Content-type", "application/json");
-		BasicHttpEntity e = new BasicHttpEntity();
-		e.setContent(IOUtils.toInputStream("{username: \"" + username + "\", password: \""
-				+ password + "\"}"));
-		post.setEntity(e);
-		return HttpClients.createDefault().execute(post, httpClientContext);
-	}
+//	public static CloseableHttpResponse authenticate(String username, String password, HttpClientContext httpClientContext) throws Exception {
+//		log.trace("Authenticating {}", username);
+//		HttpPost post = new HttpPost(BasilTestServer.getServerBaseUrl() + "/basil/auth/login");
+//		post.addHeader("Content-type", "application/json");
+//		BasicHttpEntity e = new BasicHttpEntity();
+//		e.setContent(IOUtils.toInputStream("{username: \"" + username + "\", password: \""
+//				+ password + "\"}"));
+//		post.setEntity(e);
+//		return HttpClients.createDefault().execute(post, httpClientContext);
+//	}
 
 	private static String createTestDb() throws Exception {
 		log.info("Creating test db (once only)");

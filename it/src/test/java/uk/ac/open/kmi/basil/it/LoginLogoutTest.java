@@ -33,14 +33,14 @@ public class LoginLogoutTest extends AuthenticatedTestBase {
 	@Test
 	public void L3_LoginFailed() throws Exception {
 		log.info("#{}", name.getMethodName());
-		HttpResponse response = BasilTestServer.authenticate("xxxxxxxxx", BasilTestServer.getBasilPassword(), getClientContext());
+		HttpResponse response = authenticator.authenticate(BasilTestServer.getServerBaseUrl(), "xxxxxxxxx", BasilTestServer.getBasilPassword(), getClientContext());
 		Assert.assertTrue(response.getStatusLine().getStatusCode() == 403);
 	}
 
 	@Test
 	public void L4_LoginFailed() throws Exception {
 		log.info("#{}", name.getMethodName());
-		HttpResponse response = BasilTestServer.authenticate(BasilTestServer.getBasilUser(), "yyyyyyyy", getClientContext());
+		HttpResponse response = authenticator.authenticate(BasilTestServer.getServerBaseUrl(), BasilTestServer.getBasilUser(), "yyyyyyyy", getClientContext());
 		log.info("authenticated: {}", response.getStatusLine());
 		Assert.assertTrue(response.getStatusLine().getStatusCode() == 403);
 	}
@@ -48,7 +48,7 @@ public class LoginLogoutTest extends AuthenticatedTestBase {
 	@Test
 	public void L5_LoginFailed() throws Exception {
 		log.info("#{}", name.getMethodName());
-		HttpResponse response = BasilTestServer.authenticate("xxxxxxxxxxxx", "yyyyyyyy", getClientContext());
+		HttpResponse response = authenticator.authenticate(BasilTestServer.getServerBaseUrl(), "xxxxxxxxxxxx", "yyyyyyyy", getClientContext());
 		Assert.assertTrue(response.getStatusLine().getStatusCode() == 403);
 	}
 }

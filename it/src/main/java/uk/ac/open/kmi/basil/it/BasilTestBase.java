@@ -47,7 +47,7 @@ public class BasilTestBase {
 	protected RequestBuilder builder;
 	protected CloseableHttpClient httpClient = null;
 	protected RequestExecutor executor;
-
+	protected static final Authenticator authenticator = new Authenticator();
 	/**
 	 * Override to add features
 	 * 

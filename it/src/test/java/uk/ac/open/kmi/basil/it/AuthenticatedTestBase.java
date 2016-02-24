@@ -18,7 +18,7 @@ public class AuthenticatedTestBase extends BasilTestBase {
 		// Authenticate and remembered session cookie (in context)
 		context = HttpClientContext.create();
 		config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build();
-		BasilTestServer.authenticate(BasilTestServer.getBasilUser(), BasilTestServer.getBasilPassword(), context);
+		authenticator.authenticate(BasilTestServer.getServerBaseUrl(), BasilTestServer.getBasilUser(), BasilTestServer.getBasilPassword(), context);
 	}
 
 	@Override
