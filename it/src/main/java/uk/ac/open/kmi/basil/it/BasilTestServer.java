@@ -1,7 +1,6 @@
 package uk.ac.open.kmi.basil.it;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -19,7 +18,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.HttpHostConnectException;
