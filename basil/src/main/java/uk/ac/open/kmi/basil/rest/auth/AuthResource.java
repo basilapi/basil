@@ -64,7 +64,7 @@ public class AuthResource extends AbstractResource {
             m.add("user", new JsonPrimitive(userUri.toASCIIString()));
             return Response.created(userUri).entity(m.toString()).build();
         } catch(IncorrectCredentialsException | UnknownAccountException ice){
-        	log.warn("Authentication failed", ice.getMessage());
+        	log.warn("Authentication failed: {}", ice.getMessage());
         	return Response.status(Status.FORBIDDEN).entity(new ErrorMessage(ice).asJSON()).build();
         }catch (Exception e) {
         	log.error("An error occurred", e);
