@@ -8,12 +8,12 @@ import java.io.IOException;
 
 public class TestUtils {
 
-	private static String loadQueryString(String qname) throws IOException {
+	public static String loadQueryString(String qname) throws IOException {
 		return IOUtils.toString(TestUtils.class.getClassLoader()
 				.getResourceAsStream("./sparql/" + qname + ".txt"), "UTF-8");
 	}
 
-	private static String endpoint(String qname) {
+	public static String endpoint(String qname) {
 		int pos = qname.indexOf(Headers.Endpoint + ":");
 		int len = (Headers.Endpoint + ":").length();
 		int eol = qname.indexOf('\n', pos);
@@ -23,7 +23,7 @@ public class TestUtils {
 	public static Specification loadQuery(String fileName) throws IOException {
 		String sparql = loadQueryString(fileName);
 		String endpoint = endpoint(sparql);
-		System.out.println(endpoint);
+		//System.out.println(endpoint);
 		return SpecificationFactory.create(endpoint, sparql);
 	}
 

@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 
 import uk.ac.open.kmi.basil.core.auth.UserManager;
@@ -36,15 +37,15 @@ public class ApiManagerImpl implements ApiManager {
 	private QueryExecutor executor;
 
 	public ApiManagerImpl(Store store, UserManager um) {
-		data = store;
-		userManager = um;
-		executor = new DirectExecutor();
+		this(store, um, new DirectExecutor());
 	}
 
 	public ApiManagerImpl(Store store, UserManager um, QueryExecutor exe) {
 		data = store;
 		userManager = um;
 		executor = exe;
+		// Force initialization of Jena/ARQ
+		ARQ.init();
 	}
 
 	/**

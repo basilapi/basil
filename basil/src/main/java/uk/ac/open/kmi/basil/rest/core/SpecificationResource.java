@@ -64,7 +64,9 @@ public class SpecificationResource extends AbstractResource {
 			if (subject.isAuthenticated()) {
 				String username = (String) subject.getSession().getAttribute(AuthResource.CURRENT_USER_KEY);
 				endpoint = getParameterOrHeader("endpoint");
-
+				if(log.isTraceEnabled()){
+					log.trace("Creating Specification with: \n > Username: {}\n > Endpoint: {}\n > Query: \n\n{}\n\n", new Object[]{username, endpoint, body});
+				}
 				String id = getApiManager().createSpecification(username, endpoint, body);
 				log.trace("Spec created: {}", id);
 				URI api = requestUri.getBaseUriBuilder().path(id).build();
