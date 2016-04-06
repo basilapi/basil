@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 
 public class Items implements Callable<Iterator<Map<String, String>>> {
 	private Iterator<Map<String, String>> items;

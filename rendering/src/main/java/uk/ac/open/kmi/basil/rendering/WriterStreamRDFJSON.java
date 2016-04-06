@@ -11,9 +11,9 @@ import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonString;
 import org.apache.jena.riot.writer.WriterStreamRDFBlocks;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.impl.LiteralLabel;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.impl.LiteralLabel;
 
 class WriterStreamRDFJSON extends WriterStreamRDFBlocks {
 	private boolean preamble = true;

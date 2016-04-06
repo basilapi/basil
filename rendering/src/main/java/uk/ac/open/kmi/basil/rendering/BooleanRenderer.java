@@ -8,12 +8,15 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.sparql.resultset.JSONOutput;
+import org.apache.jena.sparql.resultset.XMLOutput;
+import org.apache.jena.vocabulary.RDF;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.sparql.resultset.JSONOutput;
-import com.hp.hpl.jena.sparql.resultset.XMLOutput;
 
 public class BooleanRenderer extends Renderer<Boolean> {
 
@@ -31,7 +34,9 @@ public class BooleanRenderer extends Renderer<Boolean> {
 	public String render(MediaType type, String graphName, Map<String, String> pref) throws CannotRenderException {
 
 		if (MoreMediaType.isRDF(type)) {
-			return new ModelRenderer(ResultSetFormatter.toModel(getInput())).render(type, graphName, pref);
+			Model bm = ModelFactory.createDefaultModel();
+			bm.addLiteral(bm.createResource(),RDF.value, (boolean) getInput());
+			return new ModelRenderer(bm).render(type, graphName, pref);
 		}
 
 		// text/plain

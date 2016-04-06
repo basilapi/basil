@@ -26,7 +26,7 @@ import uk.ac.open.kmi.basil.rest.msg.SimpleMessage;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.hp.hpl.jena.query.QueryParseException;
+import org.apache.jena.query.QueryParseException;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;

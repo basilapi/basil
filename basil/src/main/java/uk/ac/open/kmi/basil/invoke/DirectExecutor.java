@@ -1,8 +1,8 @@
 package uk.ac.open.kmi.basil.invoke;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
 
 import uk.ac.open.kmi.basil.core.InvocationResult;
 import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;

@@ -11,27 +11,26 @@ import java.util.List;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.jena.atlas.iterator.Iter;
 import org.apache.jena.atlas.iterator.Transform;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.system.StreamOps;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWriter;
+import org.apache.jena.util.iterator.WrappedIterator;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
 public class RDFStreamerTest {
 	final static Logger log = LoggerFactory.getLogger(RDFStreamerTest.class);
@@ -52,6 +51,10 @@ public class RDFStreamerTest {
 			Integer rowIndex = 0;
 
 			@Override
+			public Iterator<Triple> apply(QuerySolution t) {
+				return convert(t);
+			}
+			
 			public Iterator<Triple> convert(QuerySolution qs) {
 				rowIndex++;
 				String ns = "http://www.example.org/test/row#";

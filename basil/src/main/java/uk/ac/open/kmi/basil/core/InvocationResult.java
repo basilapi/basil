@@ -1,6 +1,6 @@
 package uk.ac.open.kmi.basil.core;
 
-import com.hp.hpl.jena.query.Query;
+import org.apache.jena.query.Query;
 
 /**
  * Created by Luca Panziera on 19/06/15.

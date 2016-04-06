@@ -22,7 +22,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.query.QueryFactory;
+import org.apache.jena.query.QueryFactory;
 
 import uk.ac.open.kmi.basil.core.ApiInfo;
 import uk.ac.open.kmi.basil.doc.Doc;
@@ -87,7 +87,7 @@ public class MySQLStore implements Store, SearchProvider {
 						Entry<Integer, String> api = it.next();
 						stmt.setInt(1, api.getKey());
 						stmt.setString(2, SPEC_EXPANDED_QUERY);
-						com.hp.hpl.jena.query.Query qq = QueryFactory.create(api.getValue());
+						org.apache.jena.query.Query qq = QueryFactory.create(api.getValue());
 						qq.setPrefixMapping(null);
 						stmt.setString(3, qq.toString());
 						stmt.execute();
@@ -274,7 +274,7 @@ public class MySQLStore implements Store, SearchProvider {
 		data.put(SPEC_ENDPOINT, spec.getEndpoint());
 		data.put(SPEC_QUERY, spec.getQuery());
 		// Add a copy as expanded query
-		com.hp.hpl.jena.query.Query q = QueryFactory.create(spec.getQuery());
+		org.apache.jena.query.Query q = QueryFactory.create(spec.getQuery());
 		q.setPrefixMapping(null);
 		data.put(SPEC_EXPANDED_QUERY, q.toString());
 		_saveData(id, data);

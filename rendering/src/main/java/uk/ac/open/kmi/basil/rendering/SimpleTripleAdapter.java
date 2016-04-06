@@ -3,14 +3,15 @@ package uk.ac.open.kmi.basil.rendering;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 import org.apache.jena.atlas.iterator.Transform;
 
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 
 public class SimpleTripleAdapter implements Transform<QuerySolution,Iterator<Triple>> {
 	private int rowIndex = 0;
@@ -32,7 +33,7 @@ public class SimpleTripleAdapter implements Transform<QuerySolution,Iterator<Tri
 	}
 
 	@Override
-	public Iterator<Triple> convert(QuerySolution qs) {
+	public Iterator<Triple> apply(QuerySolution qs) {
 		rowIndex++;
 		Resource subject = ResourceFactory.createResource(new StringBuilder().append(instanceNS).append(instanceNamePrefix).append(rowIndex).toString());
 		Property property;

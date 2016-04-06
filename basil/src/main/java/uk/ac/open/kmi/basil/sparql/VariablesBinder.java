@@ -1,9 +1,9 @@
 package uk.ac.open.kmi.basil.sparql;
 
-import com.hp.hpl.jena.datatypes.BaseDatatype;
+import org.apache.jena.datatypes.BaseDatatype;
 
-import com.hp.hpl.jena.query.ParameterizedSparqlString;
-import com.hp.hpl.jena.query.Query;
+import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.Query;
 
 /**
  * To bind parameter values to variables in the SPARQL query.

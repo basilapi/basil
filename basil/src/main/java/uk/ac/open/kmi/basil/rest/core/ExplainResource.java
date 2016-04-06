@@ -2,7 +2,7 @@ package uk.ac.open.kmi.basil.rest.core;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.hp.hpl.jena.query.Query;
+import org.apache.jena.query.Query;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;

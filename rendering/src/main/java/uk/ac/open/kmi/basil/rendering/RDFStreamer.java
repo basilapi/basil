@@ -12,10 +12,10 @@ import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWriter;
 import org.apache.jena.riot.system.StreamRDFWriterFactory;
 
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.util.iterator.WrappedIterator;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.util.iterator.WrappedIterator;
 
 public class RDFStreamer {
 	static {

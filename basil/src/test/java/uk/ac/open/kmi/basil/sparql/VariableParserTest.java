@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.basil.sparql.ParameterException;
 import uk.ac.open.kmi.basil.sparql.VariableParser;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.vocabulary.XSD;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.vocabulary.XSD;
 
 public class VariableParserTest {
 

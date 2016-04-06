@@ -15,13 +15,13 @@ import org.apache.jena.riot.RDFFormat;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.sparql.resultset.CSVOutput;
-import com.hp.hpl.jena.sparql.resultset.JSONOutput;
-import com.hp.hpl.jena.sparql.resultset.XMLOutput;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.sparql.resultset.CSVOutput;
+import org.apache.jena.sparql.resultset.JSONOutput;
+import org.apache.jena.sparql.resultset.XMLOutput;
 
 public class ResultSetRenderer extends Renderer<ResultSet> {
 

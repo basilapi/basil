@@ -25,15 +25,15 @@ import org.apache.jena.riot.writer.TurtleWriter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.ResultSetFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.sparql.core.DatasetGraph;
-import com.hp.hpl.jena.sparql.core.DatasetGraphFactory;
-import com.hp.hpl.jena.sparql.core.DatasetGraphOne;
-import com.hp.hpl.jena.sparql.util.Context;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
+import org.apache.jena.sparql.core.DatasetGraphOne;
+import org.apache.jena.sparql.util.Context;
 
 public class ModelRenderer extends Renderer<Model> {
 
@@ -217,7 +217,7 @@ public class ModelRenderer extends Renderer<Model> {
 				MoreMediaType.SPARQL_RESULTS_JSON_TYPE.equals(type)||
 				MoreMediaType.TEXT_CSV_TYPE.equals(type)||
 				MoreMediaType.TEXT_TSV_TYPE.equals(type)) {
-			return RendererFactory.getRenderer(ResultSetFactory.fromRDF(getInput())).render(type, graphName, pref);
+			return RendererFactory.getRenderer(ResultSetFactory.makeResults(getInput())).render(type, graphName, pref);
 		}
 
 		throw new CannotRenderException(getInput(), type);

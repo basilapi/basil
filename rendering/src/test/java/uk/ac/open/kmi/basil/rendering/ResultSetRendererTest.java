@@ -15,10 +15,10 @@ import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 
 public class ResultSetRendererTest {
 	final static Logger log = LoggerFactory.getLogger(ResultSetRendererTest.class);
@@ -33,7 +33,7 @@ public class ResultSetRendererTest {
 	public static void beforeClass() {
 		Model m = ModelFactory.createDefaultModel();
 		m.read(ResultSetRendererTest.class.getClassLoader().getResourceAsStream("foaf.rdf"), "");
-		rs = ResultSetFactory.fromRDF(m);
+		rs = ResultSetFactory.makeResults(m);
 		r = new ResultSetRenderer(rs);
 	}
 
