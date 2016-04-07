@@ -249,7 +249,7 @@ public class BasilTestServer {
 			log.info("Create a test user: {}", basilUser);
 			try (Statement usr = conn.createStatement()) {
 				usr.executeUpdate(
-						"INSERT INTO USERS (username, email, password) values ('" + basilUser + "','" + basilUser
+						"INSERT INTO users (username, email, password) values ('" + basilUser + "','" + basilUser
 								+ "@email.com','" + new DefaultPasswordService().encryptPassword(basilPassword) + "')");
 				usr.executeUpdate(
 						"insert into users_roles (username, role_name) values ('" + basilUser + "', 'default')");
