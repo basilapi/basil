@@ -41,7 +41,8 @@
 		<log4j.configurationFile>src/test/resources/log4j2.xml</log4j.configurationFile>
 
 		<!-- Options for the VM that executes our runnable jar -->
-		<jar.executor.vm.options>-Xmx1g -Dlog4j.configurationFile=${log4j.configurationFile}</jar.executor.vm.options>
+		<jar.executor.vm.options>-Xmx1g
+			-Dlog4j.configurationFile=${log4j.configurationFile}</jar.executor.vm.options>
 
 		<!-- Set this to true to keep the runnable jar running - useful to debug 
 			tests -->
@@ -50,6 +51,21 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>com.github.github</groupId>
+				<artifactId>site-maven-plugin</artifactId>
+				<executions>
+					<!-- run site-maven-plugin's 'site' target as part of the build's normal 
+						'deploy' phase -->
+					<execution>
+						<goals>
+							<goal>site</goal>
+						</goals>
+						<phase>deploy</phase>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -155,6 +171,7 @@
 					</classpathDependencyExcludes>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 
