@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>it</artifactId>
+	<packaging>jar</packaging>
+
+	<name>BASIL :: Integration Tests</name>
+
+	<description>Integration Tests</description>
+
+	<parent>
+		<groupId>basil</groupId>
+		<artifactId>parent</artifactId>
+		<version>0.4.0-SNAPSHOT</version>
+		<relativePath>../parent</relativePath>
+	</parent>
+
+	<properties>
+		<!-- Set this to the basil configuration file -->
+		<basil.configurationFile>basil.ini</basil.configurationFile>
+
+		<!-- Create a new test database or use an existing one. When true, a new 
+			database is created using dbname from the config file plus a random postfix. 
+			After tests, the db is deleted. Note that DB User must have sufficient privileges 
+			to perform this. -->
+		<test.db.init>true</test.db.init>
+
+		<!-- Set this to run the server on a specific port -->
+		<http.port></http.port>
+
+		<!-- Set this to run tests against an existing server instance -->
+		<test.server.url></test.server.url>
+
+		<!-- Test user/pwd to be used (created if db.init is true) -->
+		<test.server.user>test</test.server.user>
+		<test.server.pwd>testpwd</test.server.pwd>
+
+		<!-- Log4J Configuration -->
+		<log4j.configurationFile>src/test/resources/log4j2.xml</log4j.configurationFile>
+
+		<!-- Options for the VM that executes our runnable jar -->
+		<jar.executor.vm.options>-Xmx1g
+			-Dlog4j.configurationFile=${log4j.configurationFile}</jar.executor.vm.options>
+
+		<!-- Set this to true to keep the runnable jar running - useful to debug 
+			tests -->
+		<keepJarRunning>false</keepJarRunning>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<phase>generate-test-resources</phase>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>basil</groupId>
+									<artifactId>basil-server</artifactId>
+									<version>${basil.version}</version>
+									<type>jar</type>
+									<overWrite>true</overWrite>
+									<!-- <outputDirectory>${project.build.directory}/alternateLocation</outputDirectory> 
+										<destFileName>optional-new-name.jar</destFileName> -->
+								</artifactItem>
+							</artifactItems>
+							<!-- <includeArtifactIds>basil-server</includeArtifactIds> -->
+							<excludeTransitive>true</excludeTransitive>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<!-- here the phase you need -->
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.basedir}/target/dependency</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/..</directory>
+									<include>db.sql</include>
+									<include>${basil.configurationFile}</include>
+									<!-- <filtering>true</filtering> -->
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!-- Find free ports to run our server -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>reserve-server-port</id>
+						<goals>
+							<goal>reserve-network-port</goal>
+						</goals>
+						<phase>process-resources</phase>
+						<configuration>
+							<portNames>
+								<portName>http.port</portName>
+							</portNames>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<test.server.url>${test.server.url}</test.server.url>
+						<test.server.user>${test.server.user}</test.server.user>
+						<test.server.pwd>${test.server.pwd}</test.server.pwd>
+						<test.db.init>${test.db.init}</test.db.init>
+						<basil.configurationFile>${project.basedir}/target/dependency/${basil.configurationFile}</basil.configurationFile>
+						<test.db.init.script>${project.basedir}/target/dependency/db.sql</test.db.init.script>
+						<jar.executor.server.port>${http.port}</jar.executor.server.port>
+						<jar.executor.vm.options>${jar.executor.vm.options}</jar.executor.vm.options>
+						<jar.executor.jar.folder>${project.basedir}/target/dependency</jar.executor.jar.folder>
+						<jar.executor.jar.name.regexp>basil-server-.*.jar$</jar.executor.jar.name.regexp>
+						<jar.executor.workingdirectory>${project.basedir}</jar.executor.workingdirectory>
+						<keepJarRunning>${keepJarRunning}</keepJarRunning>
+						<server.ready.timeout.seconds>180</server.ready.timeout.seconds>
+						<server.ready.path.1>/basil:[</server.ready.path.1>
+					</systemPropertyVariables>
+					<excludes>
+
+					</excludes>
+					<includes>
+						<include>**/BasilTestSuite.class</include>
+					</includes>
+					<classpathDependencyExcludes>
+						<classpathDependencyExclude>org.apache.http</classpathDependencyExclude>
+					</classpathDependencyExcludes>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.github.github</groupId>
+				<artifactId>site-maven-plugin</artifactId>
+				<executions>
+					<!-- run site-maven-plugin's 'site' target as part of the build's normal 
+						'deploy' phase -->
+					<execution>
+						<goals>
+							<goal>site</goal>
+						</goals>
+						<phase>deploy</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>
+				org.apache.stanbol.commons.testing.jarexec
+			</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>
+				org.apache.stanbol.commons.testing.http
+			</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>
+
