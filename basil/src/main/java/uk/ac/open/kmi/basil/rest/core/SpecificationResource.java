@@ -61,7 +61,7 @@ public class SpecificationResource extends AbstractResource {
 			@Auth Subject subject) {
 		log.trace("Called PUT");
 		try {
-			if (subject.isAuthenticated()) {
+			if (isAuthenticated()) {
 				String username = (String) subject.getSession().getAttribute(AuthResource.CURRENT_USER_KEY);
 				endpoint = getParameterOrHeader("endpoint");
 				if(log.isTraceEnabled()){

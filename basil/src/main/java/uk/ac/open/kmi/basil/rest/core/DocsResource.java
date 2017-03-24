@@ -83,6 +83,9 @@ public class DocsResource extends AbstractResource {
 	public Response delete(@PathParam("id") String id, @Auth Subject subject) {
 		log.trace("Calling DELETE docs with id: {}", id);
 		try {
+			if(!isAuthenticated()){
+				throw new AuthorizationException("Not authenticated");
+			}
 			subject.checkRole(id); // is the creator
 			if (getApiManager().getSpecification(id) == null) {
 				return Response.status(404).build();
@@ -123,7 +126,11 @@ public class DocsResource extends AbstractResource {
 			) {
 		log.trace("Calling PUT docs with id: {} name: {}", id, name);
 		try {
+			if(!isAuthenticated()){
+				throw new AuthorizationException("Not authenticated");
+			}
 			log.trace("Body is: {}", body);
+			
 			subject.checkRole(id);
 			if (!getApiManager().existsSpec(id)) {
 				return Response.status(409).entity("API does not exists (create the API first).").build();

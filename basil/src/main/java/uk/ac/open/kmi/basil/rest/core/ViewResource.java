@@ -54,6 +54,9 @@ public class ViewResource extends AbstractResource {
 			@Auth Subject subject) {
 		log.trace("Calling PUT view with id: {} name: ", id, name);
 		try {
+			if(!isAuthenticated()){
+				throw new AuthorizationException("Not authenticated");
+			}
 			subject.checkRole(id);
 			Engine engine;
 			// Content-type
@@ -181,6 +184,9 @@ public class ViewResource extends AbstractResource {
 			@Auth Subject subject) {
 		try {
 			log.trace("Deleting view id: {} name: {}", id, name);
+			if(!isAuthenticated()){
+				throw new AuthorizationException("Not authenticated");
+			}
 			subject.checkRole(id);
 			getApiManager().deleteView(id, name);
 			log.debug("View deleted: {}:{} ", id, name);

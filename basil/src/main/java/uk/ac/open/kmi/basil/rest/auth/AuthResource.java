@@ -66,7 +66,7 @@ public class AuthResource extends AbstractResource {
         } catch(IncorrectCredentialsException | UnknownAccountException ice){
         	log.warn("Authentication failed: {}", ice.getMessage());
         	return Response.status(Status.FORBIDDEN).entity(new ErrorMessage(ice).asJSON()).build();
-        }catch (Exception e) {
+        } catch (Exception e) {
         	log.error("An error occurred", e);
             return Response.serverError().entity(new ErrorMessage(e).asJSON()).build();
         }

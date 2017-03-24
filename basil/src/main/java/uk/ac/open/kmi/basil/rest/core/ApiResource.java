@@ -254,6 +254,9 @@ public class ApiResource extends AbstractResource {
 			@Auth Subject subject) {
 		log.trace("Called PUT with id: {}", id);
 		try {
+			if(!isAuthenticated()){
+				throw new AuthorizationException("Not authenticated");
+			}
 			subject.checkRole(id);
 			getApiManager().replaceSpecification(id, body);
 			endpoint = getParameterOrHeader("endpoint");
@@ -343,6 +346,9 @@ public class ApiResource extends AbstractResource {
 			@Auth Subject subject) {
 		log.trace("Called DELETE spec with id: {}", id);
 		try {
+			if(!isAuthenticated()){
+				throw new AuthorizationException("Not authenticated");
+			}
 			subject.checkRole(id);
 			getApiManager().deleteApi(id);
 			URI spec = requestUri.getBaseUriBuilder().path(id).path("spec").build();
@@ -377,7 +383,7 @@ public class ApiResource extends AbstractResource {
 			@Auth Subject subject) {
 		log.trace("Called GET clone with id: {}", id);
 		try {
-			if (subject.isAuthenticated()) {
+			if (isAuthenticated()) {
 				String username = (String) subject.getSession().getAttribute(AuthResource.CURRENT_USER_KEY);
 				String newId = getApiManager().cloneSpecification(username, id);
 				if (newId == null) {

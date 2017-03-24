@@ -12,6 +12,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.shiro.subject.Subject;
+import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +22,7 @@ import uk.ac.open.kmi.basil.core.ApiManagerImpl;
 import uk.ac.open.kmi.basil.core.auth.UserManager;
 import uk.ac.open.kmi.basil.invoke.QueryExecutor;
 import uk.ac.open.kmi.basil.rest.BasilApplication;
+import uk.ac.open.kmi.basil.rest.auth.StatelessBasicAuth;
 import uk.ac.open.kmi.basil.rest.msg.ErrorMessage;
 import uk.ac.open.kmi.basil.search.SearchProvider;
 import uk.ac.open.kmi.basil.store.Store;
@@ -27,6 +30,7 @@ import uk.ac.open.kmi.basil.store.Store;
 public class AbstractResource {
 
 	private static Logger log = LoggerFactory.getLogger(AbstractResource.class);
+	@Auth Subject subject;
 	
 	@Context
 	protected HttpHeaders requestHeaders;
@@ -42,6 +46,10 @@ public class AbstractResource {
 			apiManager = new ApiManagerImpl(getDataStore(), getUserManager(), getQueryExecutor());
 		}
 		return apiManager;
+	}
+	
+	protected boolean isAuthenticated(){
+		return subject.isAuthenticated() || new StatelessBasicAuth().authenticate(requestHeaders);
 	}
 	
 	protected SearchProvider getSearchProvider() {
