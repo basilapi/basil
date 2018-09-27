@@ -143,6 +143,9 @@ public class ModelRenderer extends Renderer<Model> {
 			vars.add(new JsonPrimitive("subject"));
 			vars.add(new JsonPrimitive("predicate"));
 			vars.add(new JsonPrimitive("object"));
+			vars.add(new JsonPrimitive("subject_type"));
+			vars.add(new JsonPrimitive("object_datatype"));
+			vars.add(new JsonPrimitive("object_lang"));
 			o.add("vars", vars);
 			JsonArray items = new JsonArray();
 			while (tr.hasNext()) {
@@ -151,6 +154,10 @@ public class ModelRenderer extends Renderer<Model> {
 				item.add("subject", new JsonPrimitive(t.getSubject().toString()));
 				item.add("predicate", new JsonPrimitive(t.getPredicate().toString()));
 				item.add("object", new JsonPrimitive(t.getObject().toString()));
+				item.add("subject_type", new JsonPrimitive(t.getSubject().isBlank()?"bnode":"uri"));
+				item.add("object_type", new JsonPrimitive(t.getObject().isBlank()?"bnode":(t.getObject().isLiteral()?"literal":"uri")));
+				item.add("object_datatype", new JsonPrimitive(t.getObject().isLiteral()?t.getObject().getLiteralDatatypeURI():""));
+				item.add("object_lang", new JsonPrimitive(t.getObject().isLiteral()?t.getObject().getLiteralLanguage():""));				
 				items.add(item);
 			}
 			o.add("items", items);
