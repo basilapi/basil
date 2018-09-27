@@ -185,6 +185,7 @@ public class ModelRenderer extends Renderer<Model> {
 			vars.add(new JsonPrimitive("predicate"));
 			vars.add(new JsonPrimitive("object"));
 			vars.add(new JsonPrimitive("subject_type"));
+			vars.add(new JsonPrimitive("object_type"));
 			vars.add(new JsonPrimitive("object_datatype"));
 			vars.add(new JsonPrimitive("object_lang"));
 			o.add("vars", vars);
