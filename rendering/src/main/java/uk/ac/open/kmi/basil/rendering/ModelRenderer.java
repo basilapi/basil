@@ -159,7 +159,14 @@ public class ModelRenderer extends Renderer<Model> {
 					}
 				}
 				p.append(">");
-				p.append(n.toString());
+				if (n.isBlank()) {
+					p.append(n.getBlankNodeLabel());
+				} else if (n.isURI()) {
+					p.append(n.getURI());
+				} else {
+					// Literal
+					p.append(n.getLiteralLexicalForm());
+				}
 				p.append("</");
 				p.append(v);
 				p.append(">");
@@ -195,7 +202,18 @@ public class ModelRenderer extends Renderer<Model> {
 				JsonObject item = new JsonObject();
 				item.add("subject", new JsonPrimitive(t.getSubject().toString()));
 				item.add("predicate", new JsonPrimitive(t.getPredicate().toString()));
-				item.add("object", new JsonPrimitive(t.getObject().toString()));
+				
+				String ostring;
+				if (t.getObject().isBlank()) {
+					ostring = t.getObject().getBlankNodeLabel();
+				} else if (t.getObject().isURI()) {
+					ostring = t.getObject().getURI();
+				} else {
+					// Literal
+					ostring = t.getObject().getLiteralLexicalForm();
+				}
+				item.add("object", new JsonPrimitive(ostring));
+				
 				item.add("subject_type", new JsonPrimitive(t.getSubject().isBlank() ? "bnode" : "uri"));
 				item.add("object_type", new JsonPrimitive(
 						t.getObject().isBlank() ? "bnode" : (t.getObject().isLiteral() ? "literal" : "uri")));
