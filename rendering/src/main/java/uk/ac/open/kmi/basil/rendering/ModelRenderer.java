@@ -93,6 +93,17 @@ public class ModelRenderer extends Renderer<Model> {
 				Node n = t.getSubject();
 				p.append("<");
 				p.append(v);
+
+				// Specify type as XML attribute
+				p.append(" ");
+				p.append("type=\"");
+				if (n.isBlank()) {
+					p.append("bnode");
+				} else {
+					p.append("uri");
+				}
+				p.append("\"");
+
 				p.append(">");
 				p.append(n.toString());
 				p.append("</");
@@ -102,7 +113,7 @@ public class ModelRenderer extends Renderer<Model> {
 				// predicate
 				p.append("\n\t\t\t");
 				v = "predicate";
-				n = t.getSubject();
+				n = t.getPredicate();
 				p.append("<");
 				p.append(v);
 				p.append(">");
@@ -114,9 +125,39 @@ public class ModelRenderer extends Renderer<Model> {
 				// object
 				p.append("\n\t\t\t");
 				v = "object";
-				n = t.getSubject();
+				n = t.getObject();
 				p.append("<");
 				p.append(v);
+
+				// Specify type as XML attribute
+				p.append(" ");
+				p.append("type=\"");
+				if (n.isBlank()) {
+					p.append("bnode");
+				} else if (n.isURI()) {
+					p.append("uri");
+				} else {
+					// Literal
+					p.append("literal");
+				}
+				p.append("\"");
+
+				if (n.isLiteral()) {
+					String lang = n.getLiteralLanguage();
+					if (lang != null && !"".equals(lang)) {
+						p.append(" ");
+						p.append("lang=\"");
+						p.append(lang);
+						p.append("\"");
+					}
+					String datatype = n.getLiteralDatatypeURI();
+					if (datatype != null && !"".equals(datatype)) {
+						p.append(" ");
+						p.append("datatype=\"");
+						p.append(datatype);
+						p.append("\"");
+					}
+				}
 				p.append(">");
 				p.append(n.toString());
 				p.append("</");
@@ -154,10 +195,13 @@ public class ModelRenderer extends Renderer<Model> {
 				item.add("subject", new JsonPrimitive(t.getSubject().toString()));
 				item.add("predicate", new JsonPrimitive(t.getPredicate().toString()));
 				item.add("object", new JsonPrimitive(t.getObject().toString()));
-				item.add("subject_type", new JsonPrimitive(t.getSubject().isBlank()?"bnode":"uri"));
-				item.add("object_type", new JsonPrimitive(t.getObject().isBlank()?"bnode":(t.getObject().isLiteral()?"literal":"uri")));
-				item.add("object_datatype", new JsonPrimitive(t.getObject().isLiteral()?t.getObject().getLiteralDatatypeURI():""));
-				item.add("object_lang", new JsonPrimitive(t.getObject().isLiteral()?t.getObject().getLiteralLanguage():""));				
+				item.add("subject_type", new JsonPrimitive(t.getSubject().isBlank() ? "bnode" : "uri"));
+				item.add("object_type", new JsonPrimitive(
+						t.getObject().isBlank() ? "bnode" : (t.getObject().isLiteral() ? "literal" : "uri")));
+				item.add("object_datatype",
+						new JsonPrimitive(t.getObject().isLiteral() ? t.getObject().getLiteralDatatypeURI() : ""));
+				item.add("object_lang",
+						new JsonPrimitive(t.getObject().isLiteral() ? t.getObject().getLiteralLanguage() : ""));
 				items.add(item);
 			}
 			o.add("items", items);
@@ -215,15 +259,13 @@ public class ModelRenderer extends Renderer<Model> {
 			writer.write(w, dg, PrefixMapNull.empty, null, Context.emptyContext);
 			return w.toString();
 		}
-		
+
 		// application/sparql-results+json
 		// application/sparql-results+xml
 		// text/csv
 		// text/tsv
-		if (MoreMediaType.SPARQL_RESULTS_XML_TYPE.equals(type)||
-				MoreMediaType.SPARQL_RESULTS_JSON_TYPE.equals(type)||
-				MoreMediaType.TEXT_CSV_TYPE.equals(type)||
-				MoreMediaType.TEXT_TSV_TYPE.equals(type)) {
+		if (MoreMediaType.SPARQL_RESULTS_XML_TYPE.equals(type) || MoreMediaType.SPARQL_RESULTS_JSON_TYPE.equals(type)
+				|| MoreMediaType.TEXT_CSV_TYPE.equals(type) || MoreMediaType.TEXT_TSV_TYPE.equals(type)) {
 			return RendererFactory.getRenderer(ResultSetFactory.makeResults(getInput())).render(type, graphName, pref);
 		}
 
