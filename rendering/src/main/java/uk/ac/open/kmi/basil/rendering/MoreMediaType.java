@@ -51,6 +51,7 @@ public class MoreMediaType {
 		extensions.put("xml", MediaType.APPLICATION_XML_TYPE);
 		extensions.put("rdf", MoreMediaType.RDFXML_TYPE);
 		extensions.put("json", MediaType.APPLICATION_JSON_TYPE);
+		extensions.put("jrdf", MoreMediaType.RDFJSON_TYPE);
 		extensions.put("sparql-json", MoreMediaType.SPARQL_RESULTS_JSON_TYPE);
 		extensions.put("sparql-xml", MoreMediaType.SPARQL_RESULTS_XML_TYPE);
 		extensions.put("ttl", MoreMediaType.TEXT_TURTLE_TYPE);
