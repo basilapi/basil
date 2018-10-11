@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 public class CRUDTest extends AuthenticatedTestBase {
 	private static final Logger log = LoggerFactory.getLogger(CollectionTest.class);
 	private static final String TEST_DOCS_ENTITY = "Description of a test API";
+	private static final String TEST_ALIAS_ENTITY = "my-alias";
 	private static final String TEST_DOCS_NAME = "This is a test API";
 
 	@Rule
@@ -26,7 +27,7 @@ public class CRUDTest extends AuthenticatedTestBase {
 	private static String createdId = null;
 
 	@Test
-	public void CRUD1_CreateAPI() throws Exception {
+	public void CRUD01_CreateAPI() throws Exception {
 		log.info("#{}", name.getMethodName());
 		String body = loadQueryString("select_1");
 		HttpPut put = new HttpPut(BasilTestServer.getServerBaseUrl() + "/basil");
@@ -45,7 +46,7 @@ public class CRUDTest extends AuthenticatedTestBase {
 	}
 
 	@Test
-	public void CRUD2_AccessCreatedAPIRedirect() throws Exception {
+	public void CRUD02_AccessCreatedAPIRedirect() throws Exception {
 		log.info("#{}", name.getMethodName());
 		log.trace("Attempting to access {}", createdId);
 		executor.execute(builder.buildGetRequest("/basil/" + createdId).withRedirects(true)).assertStatus(200)
@@ -54,7 +55,7 @@ public class CRUDTest extends AuthenticatedTestBase {
 	}
 
 	@Test
-	public void CRUD3_AccessCreatedAPISpec() throws Exception {
+	public void CRUD03_AccessCreatedAPISpec() throws Exception {
 		log.info("#{}", name.getMethodName());
 		log.trace("Attempting to access {}", createdId);
 		executor.execute(builder.buildGetRequest("/basil/" + createdId + "/spec").withRedirects(false))
@@ -63,14 +64,14 @@ public class CRUDTest extends AuthenticatedTestBase {
 	}
 
 	@Test
-	public void CRUD4_AccessCreatedAPI303() throws Exception {
+	public void CRUD04_AccessCreatedAPI303() throws Exception {
 		log.info("#{}", name.getMethodName());
 		log.trace("Attempting to access {}", createdId);
 		executor.execute(builder.buildGetRequest("/basil/" + createdId).withRedirects(false)).assertStatus(303);
 	}
 
 	@Test
-	public void CRUD5_PutDocs() throws Exception {
+	public void CRUD05_PutDocs() throws Exception {
 		log.info("#{}", name.getMethodName());
 		HttpPut put = new HttpPut(BasilTestServer.getServerBaseUrl() + "/basil/" + createdId + "/docs");
 		put.addHeader("X-Basil-Name", TEST_DOCS_NAME);
@@ -81,7 +82,7 @@ public class CRUDTest extends AuthenticatedTestBase {
 	}
 
 	@Test
-	public void CRUD6_AccessDocs() throws Exception {
+	public void CRUD06_AccessDocs() throws Exception {
 		log.info("#{}", name.getMethodName());
 		executor.execute(builder.buildGetRequest("/basil/" + createdId + "/docs").withRedirects(false))
 				.assertStatus(200).assertContentType("text/plain").assertContentContains(TEST_DOCS_ENTITY)
@@ -89,15 +90,47 @@ public class CRUDTest extends AuthenticatedTestBase {
 	}
 
 	@Test
-	public void CRUD7_DeleteDocs() throws Exception {
+	public void CRUD07_DeleteDocs() throws Exception {
 		log.info("#{}", name.getMethodName());
 		HttpDelete del = new HttpDelete(BasilTestServer.getServerBaseUrl() + "/basil/" + createdId + "/docs");
 		executor.execute(builder.buildOtherRequest(del)).assertStatus(204);
 	}
 	
 	@Test
-	public void CRUD8_AccessEmptyDocs204() throws Exception {
+	public void CRUD08_AccessEmptyDocs204() throws Exception {
 		log.info("#{}", name.getMethodName());
 		executor.execute(builder.buildGetRequest("/basil/" + createdId + "/docs")).assertStatus(204);
+	}
+	
+
+	@Test
+	public void CRUD09_AccessEmptyAlias204() throws Exception {
+		log.info("#{}", name.getMethodName());
+		executor.execute(builder.buildGetRequest("/basil/" + createdId + "/alias")).assertStatus(204);
+	}
+	
+	@Test
+	public void CRUD10_PutAlias() throws Exception {
+		log.info("#{}", name.getMethodName());
+		HttpPut put = new HttpPut(BasilTestServer.getServerBaseUrl() + "/basil/" + createdId + "/alias");
+		BasicHttpEntity entity = new BasicHttpEntity();
+		entity.setContent(IOUtils.toInputStream(TEST_ALIAS_ENTITY));
+		put.setEntity(entity);
+		executor.execute(builder.buildOtherRequest(put).withRedirects(false)).assertStatus(201);
+	}
+
+	@Test
+	public void CRUD11_AccessAlias() throws Exception {
+		log.info("#{}", name.getMethodName());
+		executor.execute(builder.buildGetRequest("/basil/" + createdId + "/alias").withRedirects(false))
+				.assertStatus(200).assertContentType("text/plain").assertContentContains(TEST_ALIAS_ENTITY)
+				;
+	}
+
+	@Test
+	public void CRUD12_DeleteAlias() throws Exception {
+		log.info("#{}", name.getMethodName());
+		HttpDelete del = new HttpDelete(BasilTestServer.getServerBaseUrl() + "/basil/" + createdId + "/alias");
+		executor.execute(builder.buildOtherRequest(del)).assertStatus(204);
 	}
 }
