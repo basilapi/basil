@@ -52,34 +52,25 @@ public class AbstractResource {
 		return apiManager;
 	}
 	
-	protected AliasCache getAliasCache() {
-		if (aliasCache == null) {
-			// XXX That't the only implementation at the moment.
-			aliasCache = new AliasMemCache();
-		}
-		return aliasCache;
-	}
-	
 	protected String getApiId(String idOrAlias) throws IOException {
 		// Try alias in cache
 		if(getAliasCache().containsAlias(idOrAlias)) {
+			log.trace("alias from cache: {}", idOrAlias);
 			return getAliasCache().getId(idOrAlias);
 		}
 		// Try id
-		try {
-			if(getApiManager().existsSpec(idOrAlias)) {
-				return idOrAlias;
-			}else {
-				// Try Alias
-				String id = getApiManager().byAlias(idOrAlias);
-				// Save in cache
-				getAliasCache().set(id, idOrAlias);
-				return id;
-			}
-		} catch (IOException e) {
-			
+	
+		if(getApiManager().existsSpec(idOrAlias)) {
+			log.trace("id is id: {}", idOrAlias);
+			return idOrAlias;
+		}else {
+			// Try Alias
+			String id = getApiManager().byAlias(idOrAlias);
+			log.trace("id from alias: {}={}", idOrAlias, id);
+			// Save in cache
+			getAliasCache().set(id, idOrAlias);
+			return id;
 		}
-		throw new IOException("This should never happen");
 	}
 	
 	protected boolean isAuthenticated(){
@@ -94,6 +85,14 @@ public class AbstractResource {
 		return (QueryExecutor) context.getAttribute(BasilApplication.Registry.QueryExecutor);
 	}
 
+	protected AliasCache getAliasCache() {
+		if (aliasCache == null) {
+			// XXX That't the only implementation at the moment.
+			aliasCache = (AliasCache) context.getAttribute(BasilApplication.Registry.AliasCache);
+		}
+		return aliasCache;
+	}
+	
 	protected final ResponseBuilder packError(ResponseBuilder builder, String message){
 		return builder.header(Headers.Error, message).entity(new ErrorMessage(message).asJSON());
 	}

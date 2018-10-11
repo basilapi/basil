@@ -1,8 +1,10 @@
 package uk.ac.open.kmi.basil.alias;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,7 @@ public class AliasMemCache implements AliasCache {
 	private Map<String, String> cache;
 	private int limit;
 	private static Logger log = LoggerFactory.getLogger(AliasMemCache.class);
+
 	public AliasMemCache() {
 		this(1000);
 	}
@@ -22,7 +25,7 @@ public class AliasMemCache implements AliasCache {
 
 			@Override
 			protected boolean removeEldestEntry(Map.Entry<String, String> eldest) {
-				if(log.isDebugEnabled() && size() > limit) {
+				if (log.isDebugEnabled() && size() > limit) {
 					log.debug("removing older cache entry");
 					return true;
 				}
@@ -69,10 +72,13 @@ public class AliasMemCache implements AliasCache {
 	 */
 	@Override
 	public void removeAll(String id) {
+		Set<String> remove = new HashSet<String>();
 		for (Entry<String, String> entry : cache.entrySet()) {
 			if (entry.getValue().equals(id)) {
-				cache.remove(entry.getKey());
+				remove.add(entry.getKey());
 			}
 		}
+		for (String key : remove)
+			cache.remove(key);
 	}
 }

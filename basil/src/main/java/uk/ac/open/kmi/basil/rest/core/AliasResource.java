@@ -100,9 +100,6 @@ public class AliasResource extends AbstractResource {
 			}
 
 			subject.checkRole(id); // is the creator
-			if (getApiManager().getSpecification(id) == null) {
-				return Response.status(404).build();
-			}
 			boolean success = getApiManager().deleteAlias(id);
 			if(success) {
 				// Clear alias cache

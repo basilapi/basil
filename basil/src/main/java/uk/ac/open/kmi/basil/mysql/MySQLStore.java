@@ -699,7 +699,7 @@ public class MySQLStore implements Store, SearchProvider {
 	public String getIdByAlias(String alias) throws IOException {
 		log.trace("get id by alias: {}", alias);
 		try {
-			String q = "SELECT API.NICKNAME FROM ALIAS INNER JOIN APIS ON ALIAS.API = APIS.ID WHERE ALIAS = ? LIMIT 1";
+			String q = "SELECT APIS.NICKNAME FROM ALIAS INNER JOIN APIS ON ALIAS.API = APIS.ID WHERE ALIAS.ALIAS = ? LIMIT 1";
 			Class.forName("com.mysql.jdbc.Driver");
 			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
 				try (PreparedStatement stmt = connect.prepareStatement(q)) {

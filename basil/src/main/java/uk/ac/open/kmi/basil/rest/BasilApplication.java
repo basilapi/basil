@@ -15,6 +15,7 @@ import com.wordnik.swagger.jersey.listing.ApiListingResourceJSON;
 import com.wordnik.swagger.jersey.listing.JerseyApiDeclarationProvider;
 import com.wordnik.swagger.jersey.listing.JerseyResourceListingProvider;
 
+import uk.ac.open.kmi.basil.alias.AliasMemCache;
 import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
 import uk.ac.open.kmi.basil.invoke.DirectExecutor;
 import uk.ac.open.kmi.basil.invoke.QueryExecutor;
@@ -60,6 +61,7 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 		MySQLStore store = new MySQLStore(environment.getJdbcConnectionUrl());
 		ctx.setAttribute(Registry.Store, store);
 		ctx.setAttribute(Registry.SearchProvider, store);
+		ctx.setAttribute(Registry.AliasCache, new AliasMemCache(10000));
 		QueryExecutor exec;
 		try {
 			exec = environment.getQueryExecutorClass().newInstance();
@@ -79,5 +81,6 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 		public final static String UserManager = "_UserManager";
 		public final static String JdbcUri = "_JdbcUri";
 		public final static String SearchProvider = "_SearchProvider";
+		public static final String AliasCache = "_AliasCache";
 	}
 }
