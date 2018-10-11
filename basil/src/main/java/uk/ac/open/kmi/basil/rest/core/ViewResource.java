@@ -61,7 +61,7 @@ public class ViewResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "Not Found").build();
 			}
 			subject.checkRole(id);
 			Engine engine;
@@ -124,7 +124,7 @@ public class ViewResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "Not Found").build();
 			}
 			Views views = getApiManager().listViews(id);
 			ResponseBuilder r;
@@ -170,7 +170,7 @@ public class ViewResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "API Not Found").build();
 			}
 			View view = getApiManager().getView(id, name);
 			if (view == null) {
@@ -209,7 +209,7 @@ public class ViewResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "Not Found").build();
 			}
 			subject.checkRole(id);
 			getApiManager().deleteView(id, name);

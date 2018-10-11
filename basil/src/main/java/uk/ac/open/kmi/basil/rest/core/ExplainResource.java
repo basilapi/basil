@@ -36,11 +36,7 @@ public class ExplainResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
-			}
-
-			if (!getApiManager().existsSpec(id)) {
-				return Response.status(404).build();
+				return packError(Response.status(404), "Not Found").build();
 			}
 
 			Specification specification = getApiManager().getSpecification(id);

@@ -58,7 +58,7 @@ public class DocsResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "Not Found").build();
 			}
 			Doc doc = getApiManager().getDoc(id);
 			ResponseBuilder builder;
@@ -95,12 +95,9 @@ public class DocsResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "Not Found").build();
 			}
 			subject.checkRole(id); // is the creator
-			if (getApiManager().getSpecification(id) == null) {
-				return Response.status(404).build();
-			}
 			boolean success = getApiManager().deleteDoc(id);
 			ResponseBuilder builder;
 			if (success) {
@@ -146,12 +143,9 @@ public class DocsResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "API Not Found").build();
 			}
 			subject.checkRole(id);
-			if (!getApiManager().existsSpec(id)) {
-				return Response.status(409).entity("API does not exists (create the API first).").build();
-			}
 			if (name == null) {
 				name = getParameterOrHeader("name");
 			}

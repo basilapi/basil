@@ -61,7 +61,7 @@ public class AliasResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "Not Found").build();
 			}
 			Set<String> alias = getApiManager().getAlias(id);
 			ResponseBuilder builder;
@@ -96,7 +96,7 @@ public class AliasResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "Not Found").build();
 			}
 
 			subject.checkRole(id); // is the creator
@@ -151,7 +151,7 @@ public class AliasResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "Not Found").build();
 			}
 
 			subject.checkRole(id);

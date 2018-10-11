@@ -65,7 +65,7 @@ public class ApiResource extends AbstractResource {
 			// supports alias
 			id = getApiId(id); 
 		}catch(IOException e) {
-			return Response.status(404).entity("API not found").build();
+			return packError(Response.status(404), "Not Found").build();
 		}
 		log.trace("API execution.");
 		try {
@@ -187,6 +187,7 @@ public class ApiResource extends AbstractResource {
 	@Consumes("application/x-www-form-urlencoded")
 	@ApiOperation(value = "Invoke API")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal error") })
 	public Response postExt(
 			@ApiParam(value = "ID of the API specification", required = true) @PathParam("id") String id,
@@ -200,6 +201,7 @@ public class ApiResource extends AbstractResource {
 	@GET
 	@ApiOperation(value = "Invoke API with a specific extension")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal error") })
 	public Response getExt(@ApiParam(value = "ID of the API specification", required = true) @PathParam("id") String id,
 			@ApiParam(value = "Extension of the output data format (e.g., .json, .xml)", required = false) @PathParam("ext") String extension) {
@@ -231,7 +233,7 @@ public class ApiResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "Not Found").build();
 			}
 			String s = getApiManager().redirectUrl(id, requestUri.getQueryParameters());
 			ResponseBuilder response;
@@ -273,7 +275,7 @@ public class ApiResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "Not Found").build();
 			}
 			subject.checkRole(id);
 			getApiManager().replaceSpecification(id, body);

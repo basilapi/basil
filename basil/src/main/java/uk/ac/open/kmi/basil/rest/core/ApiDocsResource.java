@@ -22,6 +22,7 @@ public class ApiDocsResource extends AbstractResource {
 	@ApiOperation(value = "Get API Swagger Description")
 	@ApiResponses(value = {
     		@ApiResponse(code = 200, message = "OK"),
+    		@ApiResponse(code = 404, message = "Not Found"),
     		@ApiResponse(code = 500, message = "Internal error") 
     })
 	public Response get(@PathParam("id") String id,
@@ -32,7 +33,7 @@ public class ApiDocsResource extends AbstractResource {
 				// supports alias
 				id = getApiId(id); 
 			}catch(IOException e) {
-				return Response.status(404).entity("API not found").build();
+				return packError(Response.status(404), "Not Found").build();
 			}
 
 			 if (accept.contains("text/html")) {
