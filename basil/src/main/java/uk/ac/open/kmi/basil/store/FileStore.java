@@ -9,9 +9,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,9 +65,7 @@ public class FileStore implements Store {
 		}
 	}
 
-
-	synchronized Object read(String id, String ext) throws IOException,
-			ClassNotFoundException {
+	synchronized Object read(String id, String ext) throws IOException, ClassNotFoundException {
 		log.trace("reading {}.{}", id, ext);
 		try {
 			Object o;
@@ -103,26 +106,22 @@ public class FileStore implements Store {
 		}
 	}
 
-
 	synchronized public List<String> listSpecs() {
 		List<String> specs = new ArrayList<String>();
-		for (File f : org.apache.commons.io.FileUtils.listFiles(home,
-				new String[] { "spec" }, false)) {
+		for (File f : org.apache.commons.io.FileUtils.listFiles(home, new String[] { "spec" }, false)) {
 			specs.add(f.getName().substring(0, f.getName().lastIndexOf('.')));
 		}
 		return specs;
 	}
 
-
 	synchronized public List<ApiInfo> list() {
 		List<ApiInfo> specs = new ArrayList<ApiInfo>();
-		for (File f : org.apache.commons.io.FileUtils.listFiles(home,
-				new String[] { "spec" }, false)) {
+		for (File f : org.apache.commons.io.FileUtils.listFiles(home, new String[] { "spec" }, false)) {
 			final String id = f.getName().substring(0, f.getName().lastIndexOf('.'));
 			try {
 				specs.add(info(id));
 			} catch (IOException e) {
-				log.error("",e);
+				log.error("", e);
 			}
 		}
 		return specs;
@@ -167,7 +166,7 @@ public class FileStore implements Store {
 	synchronized public void saveDoc(String id, Doc doc) throws IOException {
 		write(id, doc, "doc");
 	}
-	
+
 	/**
 	 * File store implementation always return the last modified date
 	 */
@@ -175,7 +174,7 @@ public class FileStore implements Store {
 	public Date created(String id) throws IOException {
 		return new Date(getFile(id, "spec").lastModified());
 	}
-	
+
 	@Override
 	public Date modified(String id) throws IOException {
 		return new Date(getFile(id, "spec").lastModified());
@@ -183,7 +182,7 @@ public class FileStore implements Store {
 
 	@Override
 	public ApiInfo info(String id) throws IOException {
-		return new ApiInfo(){
+		return new ApiInfo() {
 			@Override
 			public Date created() {
 				try {
@@ -193,11 +192,12 @@ public class FileStore implements Store {
 					return new Date(0);
 				}
 			}
+
 			@Override
 			public String getId() {
 				return id;
 			}
-			
+
 			@Override
 			public String getName() {
 				try {
@@ -207,6 +207,7 @@ public class FileStore implements Store {
 					return "";
 				}
 			}
+
 			public Date modified() {
 				try {
 					return FileStore.this.modified(id);
@@ -215,6 +216,31 @@ public class FileStore implements Store {
 					return new Date(0);
 				}
 			};
+			
+			public Set<String> alias() {
+				try {
+					return FileStore.this.loadAlias(id);
+				} catch (IOException e) {
+					log.error("", e);
+					return Collections.emptySet();
+				}
+			};
 		};
+	}
+
+	@Override
+	public void saveAlias(String id, Set<String> alias) throws IOException {
+		write(id, StringUtils.join(alias.iterator(), "\n"), "alias");
+	}
+
+	@Override
+	public Set<String> loadAlias(String id) throws IOException {
+		String dat;
+		try {
+			dat = (String) read(id, "alias");
+		} catch (ClassNotFoundException e) {
+			throw new IOException(e);
+		}
+		return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(StringUtils.split(dat, "\n"))));
 	}
 }

@@ -79,7 +79,10 @@ public class AbstractResource {
 				.build();
 		URI docs = requestUri.getBaseUriBuilder().path(id).path("docs")
 				.build();
+		URI alias = requestUri.getBaseUriBuilder().path(id).path("alias")
+				.build();
 		builder.header(Headers.Api, api);
+		builder.header(Headers.Alias, alias);
 		builder.header(Headers.Spec, spec);
 		builder.header(Headers.Direct, direct);
 		builder.header(Headers.View, views);

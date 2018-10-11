@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -35,7 +37,6 @@ public class ApiManagerImpl implements ApiManager {
 	private Store data;
 	private UserManager userManager;
 	private QueryExecutor executor;
-
 	public ApiManagerImpl(Store store, UserManager um) {
 		this(store, um, new DirectExecutor());
 	}
@@ -110,9 +111,6 @@ public class ApiManagerImpl implements ApiManager {
 
 	public InvocationResult invokeApi(String id, MultivaluedMap<String, String> parameters)
 			throws IOException, ApiInvocationException {
-		if (!data.existsSpec(id)) {
-			throw new ApiInvocationException("Specification not found");
-		}
 		Specification specification = data.loadSpec(id);
 		Query q = rewrite(specification, parameters);
 		return executor.execute(q, specification.getEndpoint());
@@ -226,5 +224,21 @@ public class ApiManagerImpl implements ApiManager {
 	@Override
 	public ApiInfo getInfo(String api) throws IOException {
 		return data.info(api);
+	}
+
+	@Override
+	public void createAlias(String id, Set<String> alias) throws IOException {
+		data.saveAlias(id, alias);
+	}
+
+	@Override
+	public boolean deleteAlias(String id) throws IOException {
+		data.saveAlias(id, Collections.emptySet());
+		return true;
+	}
+
+	@Override
+	public Set<String> getAlias(String id) throws IOException {
+		return data.loadAlias(id);
 	}
 }

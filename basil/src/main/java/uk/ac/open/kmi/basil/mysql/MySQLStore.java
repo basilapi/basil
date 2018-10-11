@@ -13,16 +13,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.jena.query.QueryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.jena.query.QueryFactory;
 
 import uk.ac.open.kmi.basil.core.ApiInfo;
 import uk.ac.open.kmi.basil.doc.Doc;
@@ -54,20 +55,21 @@ public class MySQLStore implements Store, SearchProvider {
 		} catch (IOException e) {
 			log.error("FATAL: Upgrade 0.3 -> 0.4.0 failed", e);
 		}
+
 	}
 
 	private void _migrate_0_3__0_4_0() throws IOException {
 		// XXX
 		// Add expanded queries when not already there
 		String q = "SELECT API, VALUE FROM DATA WHERE PROPERTY = 'spec:query' AND NOT EXISTS (SELECT * FROM DATA WHERE PROPERTY = 'spec:expanded-query')";
-		Map<Integer, String> toUpgrade = new HashMap<Integer,String>();
+		Map<Integer, String> toUpgrade = new HashMap<Integer, String>();
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			try (Connection connect = DriverManager.getConnection(jdbcUri);
 					PreparedStatement stmt = connect.prepareStatement(q)) {
 				ResultSet rs = stmt.executeQuery();
 				while (rs.next()) {
-					toUpgrade.put(rs.getInt(1),rs.getString(2));
+					toUpgrade.put(rs.getInt(1), rs.getString(2));
 				}
 			} catch (Exception e) {
 				throw new IOException(e);
@@ -87,6 +89,7 @@ public class MySQLStore implements Store, SearchProvider {
 						Entry<Integer, String> api = it.next();
 						stmt.setInt(1, api.getKey());
 						stmt.setString(2, SPEC_EXPANDED_QUERY);
+						log.debug(" UPDATE ---> {}", api.getValue());
 						org.apache.jena.query.Query qq = QueryFactory.create(api.getValue());
 						qq.setPrefixMapping(null);
 						stmt.setString(3, qq.toString());
@@ -105,7 +108,7 @@ public class MySQLStore implements Store, SearchProvider {
 		} catch (ClassNotFoundException e) {
 			throw new IOException(e);
 		}
-		
+
 	}
 
 	/**
@@ -351,8 +354,8 @@ public class MySQLStore implements Store, SearchProvider {
 	@Override
 	public void saveViews(String id, Views views) throws IOException {
 		/**
-		 * FIXME This method is very inefficient... It does not harm for the
-		 * moment but we should change it. - enridaga
+		 * FIXME This method is very inefficient... It does not harm for the moment but
+		 * we should change it. - enridaga
 		 */
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -621,6 +624,15 @@ public class MySQLStore implements Store, SearchProvider {
 								}
 								return new Date(modified.getTime());
 							};
+
+							public Set<String> alias() {
+								try {
+									return MySQLStore.this.loadAlias(id);
+								} catch (IOException e) {
+									log.error("", e);
+									return Collections.emptySet();
+								}
+							};
 						};
 					}
 				}
@@ -664,6 +676,15 @@ public class MySQLStore implements Store, SearchProvider {
 							public Date modified() {
 								return new Date(modified.getTime());
 							};
+
+							@Override
+							public Set<String> alias() {
+								try {
+									return MySQLStore.this.loadAlias(nickname);
+								} catch (IOException e) {
+									return Collections.emptySet();
+								}
+							}
 						});
 					}
 				}
@@ -673,6 +694,61 @@ public class MySQLStore implements Store, SearchProvider {
 			throw new IOException(e);
 		}
 	};
+
+	@Override
+	public Set<String> loadAlias(String id) throws IOException {
+		log.trace("load alias: {}", id);
+		try {
+			String q = "SELECT ALIAS FROM ALIAS WHERE API = ?";
+			int dbId = _dbId(id);
+			Set<String> alias = new HashSet<String>();
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
+				try (PreparedStatement stmt = connect.prepareStatement(q)) {
+					stmt.setInt(1, dbId);
+					ResultSet s = stmt.executeQuery();
+					while (s.next()) {
+						alias.add(s.getString(1));
+					}
+				}
+			}
+			return Collections.unmodifiableSet(alias);
+		} catch (ClassNotFoundException | SQLException e) {
+			throw new IOException(e);
+		}
+	}
+
+	@Override
+	public void saveAlias(String id, Set<String> alias) throws IOException {
+		log.trace("save alias {}: {}", id, alias);
+		try {
+			int intId = _dbId(id);
+			String d = "DELETE FROM ALIAS WHERE API = ?";
+			String i = "INSERT INTO ALIAS (API, ALIAS) VALUES (?,?)";
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
+				boolean acs = connect.getAutoCommit(); 
+				connect.setAutoCommit(false);
+				try (PreparedStatement stmtd = connect.prepareStatement(d);
+						PreparedStatement stmti = connect.prepareStatement(i)) {
+					stmtd.setInt(1, intId);
+					boolean dr = stmtd.execute();
+					log.trace("delete alias {}: {}", id, dr);
+					Iterator<String> aliasi = alias.iterator();
+					while (aliasi.hasNext()) {
+						stmti.setInt(1, intId);
+						stmti.setString(2, aliasi.next());
+						boolean ir = stmti.execute();
+						log.trace("insert alias {}: {}", id, ir);
+					}
+				}
+				connect.commit();
+				connect.setAutoCommit(acs);
+			}
+		} catch (ClassNotFoundException | SQLException e) {
+			throw new IOException(e);
+		}
+	}
 
 	class ResultSetResult implements Result {
 

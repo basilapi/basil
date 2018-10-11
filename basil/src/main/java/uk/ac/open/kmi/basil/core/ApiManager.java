@@ -2,6 +2,7 @@ package uk.ac.open.kmi.basil.core;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -57,4 +58,32 @@ public interface ApiManager {
     String getCreatorOfApi(String id) throws IOException;
 
 	ApiInfo getInfo(String api) throws IOException;
+	
+	/**
+	 * 
+	 * @param id
+	 * @param name
+	 * @param body
+	 * @since 0.5.0
+	 * @throws IOException
+	 */
+	void createAlias(String id, Set<String> alias) throws IOException;
+	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 * @since 0.5.0
+	 * @throws IOException
+	 */
+	boolean deleteAlias(String id) throws IOException;
+	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 * @since 0.5.0
+	 * @throws IOException - If no alias is set
+	 */
+	Set<String> getAlias(String id) throws IOException;
 }

@@ -117,6 +117,20 @@ CREATE TABLE `VIEWS` (
   `modified` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+--
+-- Table structure for table `ALIAS`
+--
+
+CREATE TABLE `ALIAS` (
+  `id` int(11) NOT NULL,
+  `api` int(11) NOT NULL,
+  `alias` varchar(16) NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `modified` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+
+
 --
 -- Indexes for dumped tables
 --
@@ -158,6 +172,12 @@ ALTER TABLE `VIEWS`
  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `api_view` (`api`,`view`);
 
 --
+-- Indexes for table `ALIAS`
+--
+ALTER TABLE `ALIAS`
+ ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `alias` (`alias`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -176,6 +196,13 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=13;
 --
 ALTER TABLE `VIEWS`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `ALIAS`
+--
+ALTER TABLE `ALIAS`
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;
+
 --
 -- Constraints for dumped tables
 --
@@ -191,3 +218,9 @@ ADD CONSTRAINT `data_ibfk_1` FOREIGN KEY (`api`) REFERENCES `APIS` (`id`) ON DEL
 --
 ALTER TABLE `VIEWS`
 ADD CONSTRAINT `views_ibfk_1` FOREIGN KEY (`api`) REFERENCES `APIS` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `ALIAS`
+--
+ALTER TABLE `ALIAS`
+ADD CONSTRAINT `alias_ibfk_1` FOREIGN KEY (`api`) REFERENCES `APIS` (`id`) ON DELETE CASCADE;

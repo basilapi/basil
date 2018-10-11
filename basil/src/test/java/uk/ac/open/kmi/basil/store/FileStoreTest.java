@@ -1,21 +1,29 @@
 package uk.ac.open.kmi.basil.store;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.io.FileUtils;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.ac.open.kmi.basil.sparql.QueryParameter;
 import uk.ac.open.kmi.basil.sparql.QueryParameter.Type;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
 import uk.ac.open.kmi.basil.sparql.TestUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
 
 public class FileStoreTest {
 
@@ -102,4 +110,39 @@ public class FileStoreTest {
 		stones.contains("myspecid4");
 	}
 
+
+	@Test
+	public void saveAndLoadAlias() throws IOException {
+		Specification spec = SpecificationFactory.create(
+				"http://data.open.ac.uk/sparql",
+				"SELECT * WHERE {?X a ?_type_iri}");
+		store.saveSpec("myspecid", spec);
+		store.saveSpec("myspecid1", spec);
+		store.saveSpec("myspecid2", spec);
+		
+		store.saveAlias("myspecid", new HashSet<String>(Arrays.asList(new String[] {"alias", "another", "again"})));
+		store.saveAlias("myspecid1", new HashSet<String>(Arrays.asList(new String[] {"alias1", "another1", "again1"})));
+		store.saveAlias("myspecid2", new HashSet<String>(Arrays.asList(new String[] {"alias2", "another2", "again2"})));
+
+		Set<String> alias = store.loadAlias("myspecid");
+		Set<String> alias0 = store.loadAlias("myspecid");
+		Set<String> alias1 = store.loadAlias("myspecid1");
+		Set<String> alias2 = store.loadAlias("myspecid2");
+		
+		Assert.assertTrue(alias.size() == 3);
+		Assert.assertTrue(alias1.size() == 3);
+		Assert.assertTrue(alias1.size() == 3);
+		
+		Assert.assertTrue(alias.equals(alias0));
+		Assert.assertTrue(!alias1.equals(alias0));
+		Assert.assertTrue(!alias2.equals(alias0));
+		
+		Assert.assertTrue(alias.contains("alias"));
+		Assert.assertTrue(alias1.contains("alias1"));
+		Assert.assertTrue(alias2.contains("alias2"));
+
+		Assert.assertTrue(!alias.contains("alias1"));
+		Assert.assertTrue(!alias1.contains("alias2"));
+		Assert.assertTrue(!alias2.contains("alias"));
+	}
 }
