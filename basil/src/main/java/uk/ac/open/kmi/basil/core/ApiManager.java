@@ -49,7 +49,7 @@ public interface ApiManager {
 
     boolean deleteDoc(String id) throws IOException;
 
-    boolean existsSpec(String id) throws IOException;
+    boolean existsSpec(String id);
 
     void createDoc(String id, String name, String body) throws IOException;
 
@@ -86,4 +86,13 @@ public interface ApiManager {
 	 * @throws IOException - If no alias is set
 	 */
 	Set<String> getAlias(String id) throws IOException;
+
+	/**
+	 * 
+	 * @param alias
+	 * @return
+	 * @since 0.5.0
+	 * @throws IOException - If id does not exist for that alias
+	 */
+	String byAlias(String alias) throws IOException;
 }

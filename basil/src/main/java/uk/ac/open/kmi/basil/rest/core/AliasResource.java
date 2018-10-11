@@ -50,13 +50,17 @@ public class AliasResource extends AbstractResource {
 	@ApiOperation(value = "List API aliases")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal error"),
 			@ApiResponse(code = 204, message = "No content")
 	})
 	public Response get(@PathParam("id") String id) {
 		log.trace("Calling GET alias with id: {}", id);
 		try {
-			if (getApiManager().getAlias(id) == null) {
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
 				return Response.status(404).entity("API not found").build();
 			}
 			Set<String> alias = getApiManager().getAlias(id);
@@ -88,11 +92,22 @@ public class AliasResource extends AbstractResource {
 			if(!isAuthenticated()){
 				throw new AuthorizationException("Not authenticated");
 			}
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
+			}
+
 			subject.checkRole(id); // is the creator
 			if (getApiManager().getSpecification(id) == null) {
 				return Response.status(404).build();
 			}
-			boolean success = getApiManager().deleteDoc(id);
+			boolean success = getApiManager().deleteAlias(id);
+			if(success) {
+				// Clear alias cache
+				getAliasCache().removeAll(id);
+			}
 			ResponseBuilder builder;
 			if (success) {
 				builder = Response.noContent();
@@ -132,7 +147,13 @@ public class AliasResource extends AbstractResource {
 				throw new AuthorizationException("Not authenticated");
 			}
 			log.info("Body is: {}", body);
-			
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
+			}
+
 			subject.checkRole(id);
 			if (!getApiManager().existsSpec(id)) {
 				return Response.status(409).entity("API does not exists (create the API first).").build();

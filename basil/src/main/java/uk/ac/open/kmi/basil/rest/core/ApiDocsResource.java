@@ -28,10 +28,13 @@ public class ApiDocsResource extends AbstractResource {
 						@ApiParam(value = "Accepted Media Type", allowableValues = "application/json,text/html")
 						@HeaderParam("Accept") String accept) {
 		try {
-
-			if (getApiManager().getSpecification(id) == null) {
-				return Response.status(404).build();
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
 			}
+
 			 if (accept.contains("text/html")) {
 				String msg = SwaggerUIBuilder.build(requestUri);
 				ResponseBuilder builder = Response.ok(msg);

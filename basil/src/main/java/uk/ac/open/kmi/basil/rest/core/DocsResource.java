@@ -47,13 +47,17 @@ public class DocsResource extends AbstractResource {
 	@ApiOperation(value = "API documentation")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal error"),
 			@ApiResponse(code = 204, message = "No content")
 	})
 	public Response get(@PathParam("id") String id) {
 		log.trace("Calling GET docs with id: {}", id);
 		try {
-			if (getApiManager().getSpecification(id) == null) {
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
 				return Response.status(404).entity("API not found").build();
 			}
 			Doc doc = getApiManager().getDoc(id);
@@ -78,6 +82,7 @@ public class DocsResource extends AbstractResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 500, message = "Internal error"),
 			@ApiResponse(code = 403, message = "Forbidden"),
+			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 204, message = "Deleted. No content")
 	})
 	public Response delete(@PathParam("id") String id, @Auth Subject subject) {
@@ -85,6 +90,12 @@ public class DocsResource extends AbstractResource {
 		try {
 			if(!isAuthenticated()){
 				throw new AuthorizationException("Not authenticated");
+			}
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
 			}
 			subject.checkRole(id); // is the creator
 			if (getApiManager().getSpecification(id) == null) {
@@ -116,6 +127,7 @@ public class DocsResource extends AbstractResource {
 	@ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
 			@ApiResponse(code = 201, message = "Doc file created"),
 			@ApiResponse(code = 403, message = "Forbidden"),
+			@ApiResponse(code = 404, message = "API not found"),
 			@ApiResponse(code = 409, message = "API does not exists (create the API first)."),
 			@ApiResponse(code = 500, message = "Internal error") })
 	public Response put(
@@ -130,7 +142,12 @@ public class DocsResource extends AbstractResource {
 				throw new AuthorizationException("Not authenticated");
 			}
 			log.trace("Body is: {}", body);
-			
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
+			}
 			subject.checkRole(id);
 			if (!getApiManager().existsSpec(id)) {
 				return Response.status(409).entity("API does not exists (create the API first).").build();

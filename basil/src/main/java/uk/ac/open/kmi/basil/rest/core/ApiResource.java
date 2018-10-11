@@ -61,6 +61,12 @@ public class ApiResource extends AbstractResource {
 
 	@SuppressWarnings("unchecked")
 	private Response performQuery(String id, MultivaluedMap<String, String> parameters, String extension) {
+		try {
+			// supports alias
+			id = getApiId(id); 
+		}catch(IOException e) {
+			return Response.status(404).entity("API not found").build();
+		}
 		log.trace("API execution.");
 		try {
 			InvocationResult r = getApiManager().invokeApi(id, parameters);
@@ -215,11 +221,18 @@ public class ApiResource extends AbstractResource {
 	@GET
 	@ApiOperation(value = "Returns a 303 redirect, querying the endpoint")
 	@ApiResponses(value = { @ApiResponse(code = 303, message = "See other"),
+			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 500, message = "Internal error") })
 	public Response direct(
 			@ApiParam(value = "ID of the API specification", required = true) @PathParam("id") String id) {
 		log.trace("Called GET /direct");
 		try {
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
+			}
 			String s = getApiManager().redirectUrl(id, requestUri.getQueryParameters());
 			ResponseBuilder response;
 			response = Response.seeOther(URI.create(s));
@@ -244,6 +257,7 @@ public class ApiResource extends AbstractResource {
 	@ApiOperation(value = "Update existing API specification", response = URI.class)
 	@ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
 			@ApiResponse(code = 200, message = "Specification updated"),
+			@ApiResponse(code = 404, message = "Not Found"),
 			@ApiResponse(code = 403, message = "Forbidden"), @ApiResponse(code = 500, message = "Internal error") })
 	public Response replaceSpec(
 			@ApiParam(value = "ID of the API specification", required = true) @PathParam(value = "id") String id,
@@ -254,6 +268,12 @@ public class ApiResource extends AbstractResource {
 		try {
 			if(!isAuthenticated()){
 				throw new AuthorizationException("Not authenticated");
+			}
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
 			}
 			subject.checkRole(id);
 			getApiManager().replaceSpecification(id, body);
@@ -285,6 +305,12 @@ public class ApiResource extends AbstractResource {
 	public Response redirectToSpec(@PathParam(value = "id") String id) {
 		// If requests HTML, go to API Docs instead
 		ResponseBuilder builder = Response.status(303);
+		try {
+			// supports alias
+			id = getApiId(id); 
+		}catch(IOException e) {
+			return Response.status(404).entity("API not found").build();
+		}
 		addHeaders(builder, id);
 		if (requestHeaders.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
 			return builder.location(requestUri.getBaseUriBuilder().path(id).path("api-docs").build()).build();
@@ -309,11 +335,13 @@ public class ApiResource extends AbstractResource {
 			@ApiParam(value = "ID of the API specification", required = true) @PathParam(value = "id") String id) {
 		log.trace("Called GET spec with id: {}", id);
 		try {
-
-			Specification spec = getApiManager().getSpecification(id);
-			if (spec == null) {
-				return Response.status(Response.Status.NOT_FOUND).build();
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
 			}
+			Specification spec = getApiManager().getSpecification(id);
 			ResponseBuilder response = Response.ok();
 			response.header(Headers.Name, getApiManager().getDoc(id).get(Field.NAME));
 			response.header(Headers.Endpoint, spec.getEndpoint());
@@ -346,6 +374,12 @@ public class ApiResource extends AbstractResource {
 		try {
 			if(!isAuthenticated()){
 				throw new AuthorizationException("Not authenticated");
+			}
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
 			}
 			subject.checkRole(id);
 			getApiManager().deleteApi(id);
@@ -383,6 +417,13 @@ public class ApiResource extends AbstractResource {
 		try {
 			if (isAuthenticated()) {
 				String username = (String) subject.getSession().getAttribute(AuthResource.CURRENT_USER_KEY);
+				try {
+					// supports alias
+					id = getApiId(id); 
+				}catch(IOException e) {
+					return Response.status(404).entity("API not found").build();
+				}
+				
 				String newId = getApiManager().cloneSpecification(username, id);
 				if (newId == null) {
 					return Response.status(Response.Status.NOT_FOUND).build();

@@ -16,7 +16,7 @@ public interface Store {
 
 	Specification loadSpec(String id) throws IOException;
 
-	boolean existsSpec(String id) throws IOException;
+	boolean existsSpec(String id);
 
 	List<String> listSpecs() throws IOException;
 
@@ -53,4 +53,11 @@ public interface Store {
 	 * @return
 	 */
 	Set<String> loadAlias(String id) throws IOException;
+
+	/**
+	 * @since 0.5.0
+	 * @param id
+	 * @return
+	 */
+	String getIdByAlias(String alias) throws IOException;
 }

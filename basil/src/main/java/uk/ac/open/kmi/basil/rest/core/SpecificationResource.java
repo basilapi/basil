@@ -14,24 +14,24 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.jena.query.QueryParseException;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.basil.core.ApiInfo;
-import uk.ac.open.kmi.basil.rest.auth.AuthResource;
-import uk.ac.open.kmi.basil.rest.msg.SimpleMessage;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.apache.jena.query.QueryParseException;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+
+import uk.ac.open.kmi.basil.core.ApiInfo;
+import uk.ac.open.kmi.basil.rest.auth.AuthResource;
+import uk.ac.open.kmi.basil.rest.msg.SimpleMessage;
 
 @Path("/")
 @Api(value = "/basil", description = "BASIL operations")
@@ -112,6 +112,11 @@ public class SpecificationResource extends AbstractResource {
 				object.add("id", new JsonPrimitive(api));
 				object.add("modified", new JsonPrimitive(info.modified().getTime()));
 				object.add("name", new JsonPrimitive(String.valueOf(info.getName())));
+				JsonArray array = new JsonArray();
+				for(String s:info.alias()) {
+					array.add(new JsonPrimitive(s));
+				}
+				object.add("alias", array);
 				String c = getApiManager().getCreatorOfApi(api);
 				if (c == null)
 					c = "";

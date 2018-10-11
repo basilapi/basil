@@ -57,6 +57,12 @@ public class ViewResource extends AbstractResource {
 			if(!isAuthenticated()){
 				throw new AuthorizationException("Not authenticated");
 			}
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
+			}
 			subject.checkRole(id);
 			Engine engine;
 			// Content-type
@@ -114,6 +120,12 @@ public class ViewResource extends AbstractResource {
             @ApiParam(value = "ID of the API specification", required = true)
             @PathParam("id") String id) {
 		try {
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
+			}
 			Views views = getApiManager().listViews(id);
 			ResponseBuilder r;
 			if (views.numberOf() == 0) {
@@ -144,7 +156,7 @@ public class ViewResource extends AbstractResource {
 	@GET
 	@Path("{name}")
 	@ApiOperation(value = "See an API view")
-    @ApiResponses(value = { @ApiResponse(code = 404, message = "API view not found"),
+    @ApiResponses(value = { @ApiResponse(code = 404, message = "API or view not found"),
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Internal error") })
     public Response spec(
@@ -154,9 +166,15 @@ public class ViewResource extends AbstractResource {
 			@PathParam("name") String name) {
 		log.trace("Calling GET view with id: {} and name: {}", id, name);
 		try {
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
+			}
 			View view = getApiManager().getView(id, name);
 			if (view == null) {
-				return packError(Response.status(404),"Not found").build();
+				return packError(Response.status(404),"View not found").build();
 			}
 			ResponseBuilder builder = Response.ok(view.getTemplate());
 			addHeaders(builder, id);
@@ -186,6 +204,12 @@ public class ViewResource extends AbstractResource {
 			log.trace("Deleting view id: {} name: {}", id, name);
 			if(!isAuthenticated()){
 				throw new AuthorizationException("Not authenticated");
+			}
+			try {
+				// supports alias
+				id = getApiId(id); 
+			}catch(IOException e) {
+				return Response.status(404).entity("API not found").build();
 			}
 			subject.checkRole(id);
 			getApiManager().deleteView(id, name);

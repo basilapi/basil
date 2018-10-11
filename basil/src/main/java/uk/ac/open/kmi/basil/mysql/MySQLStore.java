@@ -696,6 +696,27 @@ public class MySQLStore implements Store, SearchProvider {
 	};
 
 	@Override
+	public String getIdByAlias(String alias) throws IOException {
+		log.trace("get id by alias: {}", alias);
+		try {
+			String q = "SELECT API.NICKNAME FROM ALIAS INNER JOIN APIS ON ALIAS.API = APIS.ID WHERE ALIAS = ? LIMIT 1";
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
+				try (PreparedStatement stmt = connect.prepareStatement(q)) {
+					stmt.setString(1, alias);
+					ResultSet s = stmt.executeQuery();
+					while (s.next()) {
+					 return s.getString(1);
+					}
+				}
+			}
+			throw new IOException("Not Found");
+		} catch (ClassNotFoundException | SQLException e) {
+			throw new IOException(e);
+		}
+	}
+	
+	@Override
 	public Set<String> loadAlias(String id) throws IOException {
 		log.trace("load alias: {}", id);
 		try {

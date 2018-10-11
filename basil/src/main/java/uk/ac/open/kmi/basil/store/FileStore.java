@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -216,7 +217,7 @@ public class FileStore implements Store {
 					return new Date(0);
 				}
 			};
-			
+
 			public Set<String> alias() {
 				try {
 					return FileStore.this.loadAlias(id);
@@ -242,5 +243,22 @@ public class FileStore implements Store {
 			throw new IOException(e);
 		}
 		return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(StringUtils.split(dat, "\n"))));
+	}
+
+	@Override
+	public String getIdByAlias(String alias) throws IOException {
+		for (File f : org.apache.commons.io.FileUtils.listFiles(home, new String[] { "alias" }, false)) {
+			final String id = f.getName().substring(0, f.getName().lastIndexOf('.'));
+			try {
+				List<String> a = IOUtils.readLines(new FileInputStream(f));
+				if (a.contains(alias)) {
+					return id;
+				}
+			} catch (IOException e) {
+				log.error("", e);
+				throw e;
+			}
+		}
+		throw new IOException("Not found");
 	}
 }

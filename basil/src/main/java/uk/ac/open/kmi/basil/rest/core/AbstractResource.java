@@ -17,6 +17,8 @@ import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.open.kmi.basil.alias.AliasCache;
+import uk.ac.open.kmi.basil.alias.AliasMemCache;
 import uk.ac.open.kmi.basil.core.ApiManager;
 import uk.ac.open.kmi.basil.core.ApiManagerImpl;
 import uk.ac.open.kmi.basil.core.auth.UserManager;
@@ -41,11 +43,43 @@ public class AbstractResource {
 	@Context
 	protected ServletContext context;
 	private ApiManager apiManager;
+	private AliasCache aliasCache;
+	
 	protected ApiManager getApiManager() {
 		if (apiManager == null) {
 			apiManager = new ApiManagerImpl(getDataStore(), getUserManager(), getQueryExecutor());
 		}
 		return apiManager;
+	}
+	
+	protected AliasCache getAliasCache() {
+		if (aliasCache == null) {
+			// XXX That't the only implementation at the moment.
+			aliasCache = new AliasMemCache();
+		}
+		return aliasCache;
+	}
+	
+	protected String getApiId(String idOrAlias) throws IOException {
+		// Try alias in cache
+		if(getAliasCache().containsAlias(idOrAlias)) {
+			return getAliasCache().getId(idOrAlias);
+		}
+		// Try id
+		try {
+			if(getApiManager().existsSpec(idOrAlias)) {
+				return idOrAlias;
+			}else {
+				// Try Alias
+				String id = getApiManager().byAlias(idOrAlias);
+				// Save in cache
+				getAliasCache().set(id, idOrAlias);
+				return id;
+			}
+		} catch (IOException e) {
+			
+		}
+		throw new IOException("This should never happen");
 	}
 	
 	protected boolean isAuthenticated(){

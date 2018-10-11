@@ -202,7 +202,7 @@ public class ApiManagerImpl implements ApiManager {
 		return data.deleteDoc(id);
 	}
 
-	public boolean existsSpec(String id) throws IOException {
+	public boolean existsSpec(String id) {
 		return data.existsSpec(id);
 	}
 
@@ -240,5 +240,10 @@ public class ApiManagerImpl implements ApiManager {
 	@Override
 	public Set<String> getAlias(String id) throws IOException {
 		return data.loadAlias(id);
+	}
+	
+	@Override
+	public String byAlias(String alias) throws IOException {
+		return data.getIdByAlias(alias);
 	}
 }
