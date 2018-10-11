@@ -261,7 +261,7 @@ public class BasilTestServer {
 		Path to = Paths.get(newConfigurationFile);
 		Charset charset = StandardCharsets.UTF_8;
 		String content = new String(Files.readAllBytes(from), charset);
-		content = content.replaceAll(ini.get("").get("ds.databaseName"), databaseName);
+		content = content.replaceAll("ds.databaseName = " + ini.get("").get("ds.databaseName"),"ds.databaseName = " + databaseName);
 		Files.write(to, content.getBytes(charset));
 
 		// Avoid to create again!
