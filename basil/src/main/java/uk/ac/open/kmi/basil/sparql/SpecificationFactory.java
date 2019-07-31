@@ -34,10 +34,7 @@ public class SpecificationFactory {
 	
 	public static Specification createUpdate(String endpoint, String sparql) {
 		VariablesCollector collector = new VariablesCollector();
-		UpdateRequest request = UpdateFactory.create(sparql);
-		for(Update update : request.getOperations()) {
-			update.visit(collector);
-		}
+		collector.collect(sparql);
 		Set<String> vars = collector.getVariables();
 		VariableParser parser;
 		Specification spec = new Specification();
