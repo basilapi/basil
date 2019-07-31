@@ -40,4 +40,17 @@ public class SpecificationFactoryTest {
 		Assert.assertTrue(spec.getQuery().equals(q));
 		
 	}
+	
+	@Test
+	public void createUpdate() throws IOException {
+		String q = "# X-Basil-Endpoint: http://data.open.ac.uk/sparql\n" + 
+				"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n" + 
+				"INSERT { <http://example/egbook> dc:title  \"This is an example title\" } WHERE {}\n" + 
+				"";
+		String endpoint = TestUtils.endpoint(q);
+		Specification spec = SpecificationFactory.createUpdate(endpoint, q);
+		Assert.assertTrue(spec.getEndpoint().equals(endpoint));
+		Assert.assertTrue(spec.getQuery().equals(q));
+	}
+	
 }
