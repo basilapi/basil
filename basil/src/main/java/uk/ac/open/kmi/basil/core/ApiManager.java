@@ -95,4 +95,31 @@ public interface ApiManager {
 	 * @throws IOException - If id does not exist for that alias
 	 */
 	String byAlias(String alias) throws IOException;
+
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 * @since 0.6.0
+	 * @throws IOException
+	 */
+	String[] getCredentials(String id) throws IOException;
+
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 * @since 0.6.0
+	 * @throws IOException
+	 */
+	boolean deleteCredentials(String id) throws IOException;
+
+	/**
+	 * 
+	 * @param id
+	 * @param credentials
+	 * @since 0.6.0
+	 * @throws IOException
+	 */
+	void createCredentials(String id, String[] credentials) throws IOException;
 }

@@ -261,4 +261,20 @@ public class FileStore implements Store {
 		}
 		throw new IOException("Not found");
 	}
+
+	@Override
+	public void saveCredentials(String id, String user, String password) throws IOException {
+		write(id, StringUtils.join(new String[] { user, password }, "\n"), "auth");
+	}
+
+	@Override
+	public String[] credentials(String id) throws IOException {
+		String dat;
+		try {
+			dat = (String) read(id, "auth");
+		} catch (ClassNotFoundException e) {
+			throw new IOException(e);
+		}
+		return StringUtils.split(dat, "\n");
+	}
 }

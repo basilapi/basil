@@ -47,6 +47,8 @@ public class MySQLStore implements Store, SearchProvider {
 	static final String DOC_NAME = "doc:name";
 	static final String DOC_DESCRIPTION = "doc:description";
 	static final String SPEC_EXPANDED_QUERY = "spec:expanded-query";
+	static final String AUTH_USER = "auth:user";
+	static final String AUTH_PASSWORD = "auth:password";
 
 	public MySQLStore(String jdbcUri) {
 		this.jdbcUri = jdbcUri;
@@ -588,6 +590,41 @@ public class MySQLStore implements Store, SearchProvider {
 		}
 	}
 
+	@Override
+	public String[] credentials(String id) throws IOException {
+		String username = "";
+		String password = "";
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
+				String q = "SELECT DATA.PROPERTY, DATA.VALUE FROM APIS LEFT JOIN DATA ON DATA.API = APIS.ID AND DATA.PROPERTY IN ('" + AUTH_USER + "','" + AUTH_PASSWORD + "') WHERE APIS.NICKNAME = ?";
+				try (PreparedStatement stmt = connect.prepareStatement(q)) {
+					stmt.setString(1, id);
+					ResultSet s = stmt.executeQuery();
+					while (s.next()) {
+						if(s.getString(1).equals(AUTH_USER)){
+							username = s.getString(2);
+						}else if(s.getString(1).equals(AUTH_PASSWORD)){
+							username = s.getString(2);
+						}else throw new IOException("This should never happen");
+					}
+				}
+			}
+
+			return new String[] {username, password};
+		} catch (ClassNotFoundException | SQLException e) {
+			throw new IOException(e);
+		}
+	}
+	
+	@Override
+	public void saveCredentials(String id, String user, String password) throws IOException {
+		Map<String, String> data = new HashMap<String, String>();
+		data.put(AUTH_USER, user);
+		data.put(AUTH_PASSWORD, password);
+		_saveData(id, data);
+	}
+	
 	@Override
 	public ApiInfo info(String id) throws IOException {
 		try {

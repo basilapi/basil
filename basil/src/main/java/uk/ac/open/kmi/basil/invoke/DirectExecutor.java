@@ -38,6 +38,6 @@ public class DirectExecutor implements QueryExecutor {
 	public InvocationResult execute(UpdateRequest update, String endpoint, HttpAuthenticator authenticator) throws ApiInvocationException {
 		UpdateHandler handler = new UpdateHandler();
 		HttpOp.execHttpPost(endpoint, WebContent.contentTypeSPARQLUpdate, update.toString(), "",  handler, null, null, authenticator) ;
-		return new InvocationResult(handler, update);
+		return new InvocationResult(handler.getResponse(), update);
 	}
 }

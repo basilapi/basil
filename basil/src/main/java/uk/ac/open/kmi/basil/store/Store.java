@@ -39,7 +39,7 @@ public interface Store {
 	Date modified(String id) throws IOException;
 
 	ApiInfo info(String id) throws IOException;
-
+	
 	/**
 	 * @since 0.5.0
 	 * @param id
@@ -60,4 +60,22 @@ public interface Store {
 	 * @return
 	 */
 	String getIdByAlias(String alias) throws IOException;
+	
+	/**
+	 * @param id
+	 * @return
+	 * @since 0.6.0
+	 * @throws IOException
+	 */
+	String[] credentials(String id) throws IOException;
+	
+	/**
+	 * @param id
+	 * @param user
+	 * @param password
+	 * @since 0.6.0
+	 * @throws IOException
+	 */
+	void saveCredentials(String id, String user, String password) throws IOException;
+
 }

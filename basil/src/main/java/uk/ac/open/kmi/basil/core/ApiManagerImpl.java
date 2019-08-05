@@ -271,4 +271,22 @@ public class ApiManagerImpl implements ApiManager {
 	public String byAlias(String alias) throws IOException {
 		return data.getIdByAlias(alias);
 	}
+
+	@Override
+	public String[] getCredentials(String id) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean deleteCredentials(String id) throws IOException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void createCredentials(String id, String[] credentials) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
 }
