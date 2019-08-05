@@ -273,7 +273,7 @@ public class ModelRenderer extends Renderer<Model> {
 		if (MoreMediaType.TEXT_X_NQUADS_TYPE.equals(type)) {
 			StringWriter w = new StringWriter();
 			NQuadsWriter writer = new NQuadsWriter();
-			DatasetGraph dg = DatasetGraphFactory.createMem();
+			DatasetGraph dg = DatasetGraphFactory.createMemFixed();
 			dg.addGraph(NodeFactory.createURI(graphName), getInput().getGraph());
 			writer.write(w, dg, PrefixMapNull.empty, null, Context.emptyContext);
 			return w.toString();

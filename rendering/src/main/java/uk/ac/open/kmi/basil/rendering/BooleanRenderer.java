@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.sparql.resultset.JSONOutput;
@@ -22,7 +21,6 @@ public class BooleanRenderer extends Renderer<Boolean> {
 
 	public BooleanRenderer(Boolean input) {
 		super(input);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
