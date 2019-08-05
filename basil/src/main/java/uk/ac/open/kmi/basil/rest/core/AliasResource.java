@@ -138,7 +138,7 @@ public class AliasResource extends AbstractResource {
 			@ApiParam(value = "Alias list for the API (newline separated)", required = true) String body,
 			@Auth Subject subject
 			) {
-		log.trace("Calling PUT docs with id: {}", id);
+		log.trace("Calling PUT credentials with id: {}", id);
 		try {
 			if(!isAuthenticated()){
 				throw new AuthorizationException("Not authenticated");
