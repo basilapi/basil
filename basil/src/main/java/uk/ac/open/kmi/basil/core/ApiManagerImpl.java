@@ -13,6 +13,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
+import org.apache.jena.update.UpdateRequest;
 
 import uk.ac.open.kmi.basil.core.auth.UserManager;
 import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
@@ -37,6 +38,7 @@ public class ApiManagerImpl implements ApiManager {
 	private Store data;
 	private UserManager userManager;
 	private QueryExecutor executor;
+
 	public ApiManagerImpl(Store store, UserManager um) {
 		this(store, um, new DirectExecutor());
 	}
@@ -64,17 +66,30 @@ public class ApiManagerImpl implements ApiManager {
 		return Long.toString(l, Character.MAX_RADIX);
 	}
 
+	/**
+	 * TODO This method does not supports UPDATE
+	 */
 	public String redirectUrl(String id, MultivaluedMap<String, String> parameters)
 			throws IOException, ApiInvocationException {
 		if (!data.existsSpec(id)) {
 			throw new ApiInvocationException("Specification not found");
 		}
 		Specification specification = data.loadSpec(id);
-		Query q = rewrite(specification, parameters);
+		Query q = (Query) rewrite(specification, parameters);
 		return specification.getEndpoint() + "?query=" + URLEncoder.encode(q.toString(), "UTF-8");
 	}
 
-	private Query rewrite(Specification specification, MultivaluedMap<String, String> parameters)
+	/**
+	 * 
+	 * @param specification
+	 * @param parameters
+	 * @return Object - Castable to either {@link org.apache.jena.query.Query} or {@link org.apache.jena.update.UpdateRequest}
+	 * @throws IOException
+	 * @throws ApiInvocationException
+	 * @see org.apache.jena.query.Query
+	 * @see org.apache.jena.update.UpdateRequest
+	 */
+	private Object rewrite(Specification specification, MultivaluedMap<String, String> parameters)
 			throws IOException, ApiInvocationException {
 		VariablesBinder binder = new VariablesBinder(specification);
 
@@ -98,22 +113,32 @@ public class ApiManagerImpl implements ApiManager {
 			ms.append("\n");
 			throw new ApiInvocationException(ms.toString());
 		}
-
-		Query q = binder.toQuery();
-		if (parameters.containsKey("limit")) {
-			q.setLimit(Long.parseLong(parameters.getFirst("limit")));
+		if (specification.isUpdate()) {
+			UpdateRequest r = binder.toUpdate();
+			return r;
+		} else {
+			Query q = binder.toQuery();
+			if (parameters.containsKey("limit")) {
+				q.setLimit(Long.parseLong(parameters.getFirst("limit")));
+			}
+			if (parameters.containsKey("offset")) {
+				q.setOffset(Long.parseLong(parameters.getFirst("offset")));
+			}
+			return q;
 		}
-		if (parameters.containsKey("offset")) {
-			q.setOffset(Long.parseLong(parameters.getFirst("offset")));
-		}
-		return q;
 	}
 
 	public InvocationResult invokeApi(String id, MultivaluedMap<String, String> parameters)
 			throws IOException, ApiInvocationException {
 		Specification specification = data.loadSpec(id);
-		Query q = rewrite(specification, parameters);
-		return executor.execute(q, specification.getEndpoint());
+
+		if (!specification.isUpdate()) {
+			Query q = (Query) rewrite(specification, parameters);
+			return executor.execute(q, specification.getEndpoint());
+		} else {
+			UpdateRequest r = (UpdateRequest) rewrite(specification, parameters);
+			return executor.execute(r, specification.getEndpoint(), null);
+		}
 	}
 
 	public String createSpecification(String username, String endpoint, String body)
@@ -241,7 +266,7 @@ public class ApiManagerImpl implements ApiManager {
 	public Set<String> getAlias(String id) throws IOException {
 		return data.loadAlias(id);
 	}
-	
+
 	@Override
 	public String byAlias(String alias) throws IOException {
 		return data.getIdByAlias(alias);

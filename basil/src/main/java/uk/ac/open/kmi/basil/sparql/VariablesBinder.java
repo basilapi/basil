@@ -1,9 +1,9 @@
 package uk.ac.open.kmi.basil.sparql;
 
 import org.apache.jena.datatypes.BaseDatatype;
-
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.Query;
+import org.apache.jena.update.UpdateRequest;
 
 /**
  * To bind parameter values to variables in the SPARQL query.
@@ -166,5 +166,14 @@ public class VariablesBinder {
 	 */
 	public Query toQuery() {
 		return pss.asQuery();
+	}
+	
+	/**
+	 * Returns the update with the replaced bindings.
+	 * 
+	 * @return the query as UpdateRequest.
+	 */
+	public UpdateRequest toUpdate() {
+		return pss.asUpdate();
 	}
 }

@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.jena.query.QueryException;
+import org.apache.jena.update.UpdateFactory;
+
 public class Specification implements Serializable {
 	private static final long serialVersionUID = 9010724117224824994L;
 
@@ -13,6 +16,8 @@ public class Specification implements Serializable {
 	private String query;
 	private Map<String, QueryParameter> variablesParameters = new HashMap<String, QueryParameter>();
 	private Map<String, String> parametersVariables = new HashMap<String, String>();
+
+	private boolean isUpdate = false;
 
 	public String getEndpoint() {
 		return endpoint;
@@ -27,6 +32,12 @@ public class Specification implements Serializable {
 	}
 
 	void setQuery(String query) {
+		// Test if QUERY or UPDATE
+		try {
+			UpdateFactory.create(query);
+			this.isUpdate  = true;
+		} catch (QueryException qe2) {
+		}
 		this.query = query;
 	}
 
@@ -46,6 +57,7 @@ public class Specification implements Serializable {
 	public QueryParameter getParameterOfVariable(String variable) {
 		return variablesParameters.get(variable);
 	}
+
 	public String getVariableOfParameter(String param) {
 		return parametersVariables.get(param);
 	}
@@ -56,5 +68,9 @@ public class Specification implements Serializable {
 
 	public boolean hasVariable(String name) {
 		return variablesParameters.containsKey(name);
+	}
+	
+	public boolean isUpdate() {
+		return isUpdate;
 	}
 }
