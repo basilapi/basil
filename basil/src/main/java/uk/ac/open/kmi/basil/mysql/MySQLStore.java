@@ -592,8 +592,8 @@ public class MySQLStore implements Store, SearchProvider {
 
 	@Override
 	public String[] credentials(String id) throws IOException {
-		String username = "";
-		String password = "";
+		String username = null;
+		String password = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
@@ -605,12 +605,15 @@ public class MySQLStore implements Store, SearchProvider {
 						if(s.getString(1).equals(AUTH_USER)){
 							username = s.getString(2);
 						}else if(s.getString(1).equals(AUTH_PASSWORD)){
-							username = s.getString(2);
+							password = s.getString(2);
 						}else throw new IOException("This should never happen");
 					}
 				}
 			}
-
+			if(username == null || password == null) {
+				// no credentials
+				return null;
+			}
 			return new String[] {username, password};
 		} catch (ClassNotFoundException | SQLException e) {
 			throw new IOException(e);

@@ -11,6 +11,8 @@ import java.util.UUID;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.jena.atlas.web.auth.HttpAuthenticator;
+import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.update.UpdateRequest;
@@ -131,13 +133,19 @@ public class ApiManagerImpl implements ApiManager {
 	public InvocationResult invokeApi(String id, MultivaluedMap<String, String> parameters)
 			throws IOException, ApiInvocationException {
 		Specification specification = data.loadSpec(id);
+		
+		HttpAuthenticator authenticator = null;
+		String[] credentials = data.credentials(id);
+		if(credentials != null) {
+			authenticator = new SimpleAuthenticator(credentials[0], credentials[1].toCharArray());
+		}
 
 		if (!specification.isUpdate()) {
 			Query q = (Query) rewrite(specification, parameters);
 			return executor.execute(q, specification.getEndpoint());
 		} else {
 			UpdateRequest r = (UpdateRequest) rewrite(specification, parameters);
-			return executor.execute(r, specification.getEndpoint(), null);
+			return executor.execute(r, specification.getEndpoint(), authenticator);
 		}
 	}
 

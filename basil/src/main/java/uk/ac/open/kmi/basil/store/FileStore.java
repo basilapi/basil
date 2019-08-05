@@ -274,6 +274,8 @@ public class FileStore implements Store {
 			dat = (String) read(id, "auth");
 		} catch (ClassNotFoundException e) {
 			throw new IOException(e);
+		}catch (FileNotFoundException e) {
+			return null;
 		}
 		return StringUtils.split(dat, "\n");
 	}

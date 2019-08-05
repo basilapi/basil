@@ -63,7 +63,7 @@ public interface Store {
 	
 	/**
 	 * @param id
-	 * @return
+	 * @return - null if no credentials
 	 * @since 0.6.0
 	 * @throws IOException
 	 */
