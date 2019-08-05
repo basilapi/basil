@@ -19,9 +19,6 @@ public class Specification implements Serializable {
 
 	private boolean isUpdate = false;
 
-	private String username = null;
-	private char[] password = null;
-
 	public String getEndpoint() {
 		return endpoint;
 	}
@@ -75,25 +72,5 @@ public class Specification implements Serializable {
 
 	public boolean isUpdate() {
 		return isUpdate;
-	}
-
-	public char[] getPassword() {
-		return password;
-	}
-
-	public void setPassword(char[] password) {
-		this.password = password;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public boolean isAuthenticated() {
-		return getUsername() != null;
 	}
 }
