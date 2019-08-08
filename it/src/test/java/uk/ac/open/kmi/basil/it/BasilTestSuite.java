@@ -8,12 +8,13 @@ import org.junit.runners.Suite;
 import junit.framework.TestCase;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ CollectionTest.class, LoginLogoutTest.class, CRUDTest.class, ForbiddenTest.class })
+@Suite.SuiteClasses({ CollectionTest.class, LoginLogoutTest.class, CRUDTest.class, ForbiddenTest.class, ExecutionTest.class })
 public class BasilTestSuite extends TestCase {
 
 	@BeforeClass
 	public static void oneTimeSetup() throws Exception {
 		BasilTestServer.start();
+		FusekiTestServer.start();
 	}
 
 	@AfterClass

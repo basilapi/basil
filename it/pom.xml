@@ -48,7 +48,7 @@
 		<!-- Options for the VM that executes our runnable jar -->
 		<fuseki.jar.executor.vm.options>-Xmx1g</fuseki.jar.executor.vm.options>
 		<fuseki.server.url></fuseki.server.url>
-		<fuseki.passwordFile>passwords.txt</fuseki.passwordFile>
+		<fuseki.passwordsFile>fuseki_pwd.txt</fuseki.passwordsFile>
 		
 
 		<!-- Set this to true to keep the runnable jar running - useful to debug 
@@ -126,6 +126,9 @@
 									<directory>${project.basedir}/..</directory>
 									<include>db.sql</include>
 									<include>${basil.configurationFile}</include>
+								</resource>
+								<resource>
+									<directory>src/test/resources/</directory>
 									<include>${fuseki.passwordsFile}</include>
 									<!-- <filtering>true</filtering> -->
 								</resource>
@@ -164,7 +167,7 @@
 						<test.server.pwd>${test.server.pwd}</test.server.pwd>
 						<test.db.init>${test.db.init}</test.db.init>
 						<basil.configurationFile>${project.basedir}/target/dependency/${basil.configurationFile}</basil.configurationFile>
-						<fuseki.passwordFile>${project.basedir}/target/dependency/${fuseki.passwordFile}</fuseki.passwordFile>
+						<fuseki.passwordsFile>${project.basedir}/target/dependency/${fuseki.passwordsFile}</fuseki.passwordsFile>
 						<test.db.init.script>${project.basedir}/target/dependency/db.sql</test.db.init.script>
 						<jar.executor.server.port>${basil.http.port}</jar.executor.server.port>
 						<fuseki.jar.executor.server.port>${fuseki.http.port}</fuseki.jar.executor.server.port>

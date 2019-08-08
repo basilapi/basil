@@ -64,7 +64,7 @@ public class FusekiTestServer {
 		propertyNames.addAll(System.getProperties().keySet());
 		for (Object o : propertyNames) {
 			final String key = (String) o;
-			if (key.startsWith(BasilTestServer.SERVER_READY_PROP_PREFIX)) {
+			if (key.startsWith(FusekiTestServer.SERVER_READY_PROP_PREFIX)) {
 				testPaths.add(System.getProperty(key));
 			}
 		}
@@ -107,7 +107,7 @@ public class FusekiTestServer {
 					log.debug("  > response: {}", response);
 					entity = response.getEntity();
 					final int status = response.getStatusLine().getStatusCode();
-					if (status != 200) {
+					if (status != 401) { // Fuseki is ready when expects authentication!
 						log.info("Got {} at {} - will retry", status, url);
 						continue readyLoop;
 					} else {
