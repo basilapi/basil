@@ -19,6 +19,7 @@ public class CRUDTest extends AuthenticatedTestBase {
 	private static final Logger log = LoggerFactory.getLogger(CollectionTest.class);
 	private static final String TEST_DOCS_ENTITY = "Description of a test API";
 	private static final String TEST_ALIAS_ENTITY = "my-alias";
+	private static final String TEST_AUTH_ENTITY = "my-user\nmy-password";
 	private static final String TEST_DOCS_NAME = "This is a test API";
 
 	@Rule
@@ -102,7 +103,6 @@ public class CRUDTest extends AuthenticatedTestBase {
 		executor.execute(builder.buildGetRequest("/basil/" + createdId + "/docs")).assertStatus(204);
 	}
 	
-
 	@Test
 	public void CRUD09_AccessEmptyAlias204() throws Exception {
 		log.info("#{}", name.getMethodName());
@@ -133,4 +133,48 @@ public class CRUDTest extends AuthenticatedTestBase {
 		HttpDelete del = new HttpDelete(BasilTestServer.getServerBaseUrl() + "/basil/" + createdId + "/alias");
 		executor.execute(builder.buildOtherRequest(del)).assertStatus(204);
 	}
+	
+	@Test
+	public void CRUD12b_AccessEmptyAlias204() throws Exception {
+		log.info("#{}", name.getMethodName());
+		executor.execute(builder.buildGetRequest("/basil/" + createdId + "/alias")).assertStatus(204);
+	}
+	
+	@Test
+	public void CRUD13_AccessEmptyAuth204() throws Exception {
+		log.info("#{}", name.getMethodName());
+		executor.execute(builder.buildGetRequest("/basil/" + createdId + "/auth")).assertStatus(204);
+	}
+	
+	@Test
+	public void CRUD14_PutAuth() throws Exception {
+		log.info("#{}", name.getMethodName());
+		HttpPut put = new HttpPut(BasilTestServer.getServerBaseUrl() + "/basil/" + createdId + "/auth");
+		BasicHttpEntity entity = new BasicHttpEntity();
+		entity.setContent(IOUtils.toInputStream(TEST_AUTH_ENTITY));
+		put.setEntity(entity);
+		executor.execute(builder.buildOtherRequest(put).withRedirects(false)).assertStatus(201);
+	}
+
+	@Test
+	public void CRUD15_AccessAuth() throws Exception {
+		log.info("#{}", name.getMethodName());
+		executor.execute(builder.buildGetRequest("/basil/" + createdId + "/auth").withRedirects(false))
+				.assertStatus(200).assertContentType("text/plain").assertContentContains(TEST_AUTH_ENTITY)
+				;
+	}
+
+	@Test
+	public void CRUD16_DeleteAuth() throws Exception {
+		log.info("#{}", name.getMethodName());
+		HttpDelete del = new HttpDelete(BasilTestServer.getServerBaseUrl() + "/basil/" + createdId + "/auth");
+		executor.execute(builder.buildOtherRequest(del)).assertStatus(204);
+	}
+	
+	@Test
+	public void CRUD17_AccessEmptyAuth204() throws Exception {
+		log.info("#{}", name.getMethodName());
+		executor.execute(builder.buildGetRequest("/basil/" + createdId + "/auth")).assertStatus(204);
+	}
+
 }
