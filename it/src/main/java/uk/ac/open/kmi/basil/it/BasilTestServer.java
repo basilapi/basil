@@ -25,7 +25,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.config.Ini;
-import org.apache.stanbol.commons.testing.jarexec.JarExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -61,8 +60,9 @@ public class BasilTestServer {
 	//
 	public static String serverReadyPropPrefix = System.getProperty(SERVER_READY_PROP_PREFIX);
 
-	private static final Logger log = LoggerFactory.getLogger(BasilTestBase.class);
+	private static final Logger log = LoggerFactory.getLogger(BasilTestServer.class);
 
+	private static JarExecutor j = null;
 	public static void start() throws Exception {
 		log.debug("Configuration: {}", serverConfiguration);
 		log.debug("Init a test db: {}", dbInit);
@@ -289,14 +289,17 @@ public class BasilTestServer {
 			log.info(TEST_SERVER_URL_PROP + " is set: not starting server jar (" + serverBaseUrl + ")");
 		} else {
 
-			Properties properties = System.getProperties();
+			Properties properties = new Properties(System.getProperties());
 			// Add jvm option for basil configuration file
 			String opts = properties.getProperty("jar.executor.vm.options");
 			opts += " -Dbasil.configurationFile=" + serverConfiguration;
 			properties.setProperty("jar.executor.vm.options", opts);
-			final JarExecutor j = JarExecutor.getInstance(properties);
+			// Set command line args
+			String port = properties.getProperty("jar.executor.server.port");
+			properties.setProperty("jar.executor.jar.args", "-p " + port);
+			j = new JarExecutor(properties);
 			j.start();
-			serverBaseUrl = "http://localhost:" + j.getServerPort();
+			serverBaseUrl = "http://localhost:" + port;
 			log.info("Forked subprocess server listening to: " + serverBaseUrl);
 
 			// Optionally block here so that the runnable jar stays up - we can
