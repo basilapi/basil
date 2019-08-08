@@ -597,7 +597,7 @@ public class MySQLStore implements Store, SearchProvider {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
-				String q = "SELECT DATA.PROPERTY, DATA.VALUE FROM APIS LEFT JOIN DATA ON DATA.API = APIS.ID AND DATA.PROPERTY IN ('" + AUTH_USER + "','" + AUTH_PASSWORD + "') WHERE APIS.NICKNAME = ?";
+				String q = "SELECT DATA.PROPERTY, DATA.VALUE FROM APIS JOIN DATA ON DATA.API = APIS.ID AND DATA.PROPERTY IN ('" + AUTH_USER + "','" + AUTH_PASSWORD + "') WHERE APIS.NICKNAME = ?";
 				try (PreparedStatement stmt = connect.prepareStatement(q)) {
 					stmt.setString(1, id);
 					ResultSet s = stmt.executeQuery();
@@ -626,6 +626,11 @@ public class MySQLStore implements Store, SearchProvider {
 		data.put(AUTH_USER, user);
 		data.put(AUTH_PASSWORD, password);
 		_saveData(id, data);
+	}
+	
+	@Override
+	public void deleteCredentials(String id) throws IOException {
+		_deleteData(id, AUTH_USER, AUTH_PASSWORD);
 	}
 	
 	@Override

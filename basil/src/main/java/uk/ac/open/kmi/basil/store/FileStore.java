@@ -279,4 +279,9 @@ public class FileStore implements Store {
 		}
 		return StringUtils.split(dat, "\n");
 	}
+	
+	@Override
+	public void deleteCredentials(String id) throws IOException {
+		delete(id, "auth");
+	}
 }

@@ -44,19 +44,15 @@ public class CredentialsResource extends AbstractResource {
 	@GET
 	@Produces("text/plain")
 	@ApiOperation(value = "Get backend credentials")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 404, message = "Not Found"),
-			@ApiResponse(code = 500, message = "Internal error"),
-			@ApiResponse(code = 204, message = "No content")
-	})
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"), @ApiResponse(code = 404, message = "Not Found"),
+			@ApiResponse(code = 500, message = "Internal error"), @ApiResponse(code = 204, message = "No content") })
 	public Response get(@PathParam("id") String id) {
 		log.trace("Calling GET credentials with id: {}", id);
 		try {
 			try {
-				// supports credentials
-				id = getApiId(id); 
-			}catch(IOException e) {
+				// supports alias
+				id = getApiId(id);
+			} catch (IOException e) {
 				return packError(Response.status(404), "Not Found").build();
 			}
 			String[] credentials = getApiManager().getCredentials(id);
@@ -70,43 +66,32 @@ public class CredentialsResource extends AbstractResource {
 			return builder.build();
 		} catch (IOException e) {
 			log.error("", e);
-			return packError(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-					, e).build();
+			return packError(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR), e).build();
 		}
 	}
 
 	@DELETE
 	@ApiOperation(value = "Delete credentials")
-	@ApiResponses(value = {
-			@ApiResponse(code = 500, message = "Internal error"),
+	@ApiResponses(value = { @ApiResponse(code = 500, message = "Internal error"),
 			@ApiResponse(code = 403, message = "Forbidden"),
-			@ApiResponse(code = 204, message = "Deleted. No content")
-	})
+			@ApiResponse(code = 204, message = "Deleted. No content") })
 	public Response delete(@PathParam("id") String id, @Auth Subject subject) {
 		log.trace("Calling DELETE credentials for API id: {}", id);
 		try {
-			if(!isAuthenticated()){
+			if (!isAuthenticated()) {
 				throw new AuthorizationException("Not authenticated");
 			}
 			try {
 				// supports alias
-				id = getApiId(id); 
-			}catch(IOException e) {
+				id = getApiId(id);
+			} catch (IOException e) {
 				return packError(Response.status(404), "Not Found").build();
 			}
 
 			subject.checkRole(id); // is the creator
-			boolean success = getApiManager().deleteCredentials(id);
-			if(success) {
-				// Clear alias cache
-				getAliasCache().removeAll(id);
-			}
 			ResponseBuilder builder;
-			if (success) {
-				builder = Response.noContent();
-			} else {
-				builder = Response.serverError();
-			}
+			getApiManager().deleteCredentials(id);
+			builder = Response.noContent();
 			addHeaders(builder, id);
 			return builder.build();
 		} catch (AuthorizationException e) {
@@ -114,8 +99,7 @@ public class CredentialsResource extends AbstractResource {
 			return packError(Response.status(Status.FORBIDDEN), e).build();
 		} catch (IOException e) {
 			log.error("", e);
-			return packError(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-					, e).build();
+			return packError(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR), e).build();
 		}
 	}
 
@@ -123,36 +107,49 @@ public class CredentialsResource extends AbstractResource {
 	@Produces("text/plain")
 	@ApiOperation(value = "To create or update the credentials for the backend endpoint")
 	@ApiResponses(value = { @ApiResponse(code = 400, message = "Body cannot be empty"),
-			@ApiResponse(code = 201, message = "Credentials created"),
-			@ApiResponse(code = 403, message = "Forbidden"),
+			@ApiResponse(code = 201, message = "Credentials created"), @ApiResponse(code = 403, message = "Forbidden"),
 			@ApiResponse(code = 400, message = "Malformed body"),
 			@ApiResponse(code = 409, message = "API does not exists (create the API first)."),
 			@ApiResponse(code = 500, message = "Internal error") })
-	public Response put(
-			@ApiParam(value = "ID of the API specification", required = true) @PathParam("id") String id,
+	public Response put(@ApiParam(value = "ID of the API specification", required = true) @PathParam("id") String id,
 			@ApiParam(value = "Credentials for the back-end (user and passoword, newline separated)", required = true) String body,
-			@Auth Subject subject
-			) {
+			@Auth Subject subject) {
 		log.trace("Calling PUT credentials with id: {}", id);
 		try {
-			if(!isAuthenticated()){
+			if (!isAuthenticated()) {
 				throw new AuthorizationException("Not authenticated");
 			}
 			log.info("Body is: {}", body);
 			try {
 				// supports alias
-				id = getApiId(id); 
-			}catch(IOException e) {
-				return packError(Response.status(404), "Not Found").build();
+				id = getApiId(id);
+			} catch (IOException e) {
+				log.debug("{}", e);
+				return packError(Response.status(409), "API does not exists (create the API first).").build();
 			}
 
 			subject.checkRole(id);
-			if (!getApiManager().existsSpec(id)) {
-				return Response.status(409).entity("API does not exists (create the API first).").build();
-			}
+
+//			This should be already covered by the code above
+//			if (!getApiManager().existsSpec(id)) {
+//				return Response.status(409).entity("API does not exists (create the API first).").build();
+//			}
 			String[] credentials = StringUtils.split(body.trim(), "\n");
+
+			try {
+				// We allow for an empty password.
+				// We also allow for an additional newline after the password
+				if (!(credentials.length > 1 && credentials[0].length() > 0 && credentials[1] != null)) {
+					throw new Exception("Bad body: " + body);
+				}
+			} catch (Exception e) {
+				// This is expected behavior so logging only if debug
+				log.debug("{}", e);
+				return packError(Response.status(400), "Malformed. Expected format: username<newline>password").build();
+			}
+
 			getApiManager().createCredentials(id, credentials);
-			
+
 			ResponseBuilder builder;
 			JsonObject m = new JsonObject();
 			URI authUri = requestUri.getBaseUriBuilder().path(id).path("auth").build();

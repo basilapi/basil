@@ -77,5 +77,13 @@ public interface Store {
 	 * @throws IOException
 	 */
 	void saveCredentials(String id, String user, String password) throws IOException;
+	
+
+	/**
+	 * @param id
+	 * @since 0.6.0
+	 * @throws IOException
+	 */
+	void deleteCredentials(String id) throws IOException;
 
 }

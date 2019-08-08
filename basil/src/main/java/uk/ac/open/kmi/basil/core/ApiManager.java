@@ -112,7 +112,7 @@ public interface ApiManager {
 	 * @since 0.6.0
 	 * @throws IOException
 	 */
-	boolean deleteCredentials(String id) throws IOException;
+	void deleteCredentials(String id) throws IOException;
 
 	/**
 	 * 
