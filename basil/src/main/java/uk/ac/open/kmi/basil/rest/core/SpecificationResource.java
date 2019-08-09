@@ -80,6 +80,7 @@ public class SpecificationResource extends AbstractResource {
 				return response.build();
 			}
 		} catch (QueryParseException e) {
+			log.error("An error occurred", e);
 			return packError(Response.status(Status.BAD_REQUEST), e).build();
 
 		} catch (Exception e) {

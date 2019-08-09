@@ -21,7 +21,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.jena.query.QueryException;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -279,9 +282,26 @@ public class MySQLStore implements Store, SearchProvider {
 		data.put(SPEC_ENDPOINT, spec.getEndpoint());
 		data.put(SPEC_QUERY, spec.getQuery());
 		// Add a copy as expanded query
-		org.apache.jena.query.Query q = QueryFactory.create(spec.getQuery());
-		q.setPrefixMapping(null);
-		data.put(SPEC_EXPANDED_QUERY, q.toString());
+		
+		String expandedQuery = null;
+		try {
+			org.apache.jena.query.Query q = QueryFactory.create(spec.getQuery());
+			q.setPrefixMapping(null);
+			expandedQuery = q.toString();
+		}catch(QueryException qe) {
+			// may be update
+			try{
+				UpdateRequest q = UpdateFactory.create(spec.getQuery());
+				q.setPrefixMapping(null);
+				expandedQuery = q.toString();
+			}catch(QueryException qe2) {
+				// some parameterized queries are not supported by the SPARQL 1.1 parser (e.g. Insert data { ?_uri ...)
+				// In those cases we just keep the original syntax
+				expandedQuery = spec.getQuery();
+			}
+			
+		}
+		data.put(SPEC_EXPANDED_QUERY, expandedQuery);
 		_saveData(id, data);
 	}
 

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.jena.query.QueryException;
-import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.query.QueryFactory;
 
 public class Specification implements Serializable {
 	private static final long serialVersionUID = 9010724117224824994L;
@@ -34,9 +34,9 @@ public class Specification implements Serializable {
 	void setQuery(String query) {
 		// Test if QUERY or UPDATE
 		try {
-			UpdateFactory.create(query);
-			this.isUpdate = true;
+			QueryFactory.create(query);
 		} catch (QueryException qe2) {
+			this.isUpdate = true;
 		}
 		this.query = query;
 	}

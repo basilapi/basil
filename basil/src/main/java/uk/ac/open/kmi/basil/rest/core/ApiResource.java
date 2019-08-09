@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -23,15 +24,16 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Variant;
 
+import org.apache.http.HttpResponse;
+import org.apache.jena.query.QueryParseException;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.jena.query.QueryParseException;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Model;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -59,6 +61,10 @@ public class ApiResource extends AbstractResource {
 
 	private static Logger log = LoggerFactory.getLogger(ApiResource.class);
 
+//	private Response performUpdate(String id, MultivaluedMap<String, String> parameters, String extension) {
+//		
+//	}
+	
 	@SuppressWarnings("unchecked")
 	private Response performQuery(String id, MultivaluedMap<String, String> parameters, String extension) {
 		try {
@@ -94,7 +100,10 @@ public class ApiResource extends AbstractResource {
 							data = Items.create((Boolean) r.getResult());
 						} else if (r.getResult() instanceof List) {
 							data = Items.create((List<Map<String, String>>) r.getResult());
-						}
+						} else if (r.getResult() instanceof HttpResponse) {
+							// boolean true if response code starts with 2
+							data = Items.create(Integer.toString(((HttpResponse) r.getResult()).getStatusLine().getStatusCode()).startsWith("2"));
+						} 
 						view.getEngine().exec(writer, view.getTemplate(), data);
 
 						// Yeah!
@@ -121,7 +130,13 @@ public class ApiResource extends AbstractResource {
 				return buildNotAcceptable();
 			}
 			log.trace("API execution. Prepare response.");
-			Map<String, String> prefixMap = r.getQuery().getPrefixMapping().getNsPrefixMap();
+			Map<String, String> prefixMap ;
+			if(r.isUpdate()) {
+				prefixMap = r.getUpdate().getPrefixMapping().getNsPrefixMap();
+			}else {
+				prefixMap = r.getQuery().getPrefixMapping().getNsPrefixMap();
+			}
+			
 			Renderer<?> renderer = RendererFactory.getRenderer(r.getResult());
 			ResponseBuilder rb = Response.ok()
 					.entity(renderer.stream(type, requestUri.getRequestUri().toString(), prefixMap));
