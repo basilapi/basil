@@ -142,7 +142,7 @@ public class ApiManagerImpl implements ApiManager {
 
 		if (!specification.isUpdate()) {
 			Query q = (Query) rewrite(specification, parameters);
-			return executor.execute(q, specification.getEndpoint());
+			return executor.execute(q, specification.getEndpoint(), authenticator);
 		} else {
 			UpdateRequest r = (UpdateRequest) rewrite(specification, parameters);
 			return executor.execute(r, specification.getEndpoint(), authenticator);

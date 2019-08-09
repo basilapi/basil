@@ -6,6 +6,8 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.riot.WebContent;
 import org.apache.jena.riot.web.HttpOp;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 
 import uk.ac.open.kmi.basil.core.InvocationResult;
@@ -19,8 +21,8 @@ import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
 public class DirectExecutor implements QueryExecutor {
 
 	@Override
-	public InvocationResult execute(Query q, String endpoint) throws ApiInvocationException {
-		QueryExecution qe = QueryExecutionFactory.sparqlService(endpoint, q);
+	public InvocationResult execute(Query q, String endpoint, HttpAuthenticator authenticator) throws ApiInvocationException {
+		QueryExecution qe = QueryExecutionFactory.sparqlService(endpoint, q, authenticator);
 		if (q.isSelectType()) {
 			return new InvocationResult(qe.execSelect(), q);
 		} else if (q.isConstructType()) {
@@ -37,6 +39,9 @@ public class DirectExecutor implements QueryExecutor {
 	@Override
 	public InvocationResult execute(UpdateRequest update, String endpoint, HttpAuthenticator authenticator) throws ApiInvocationException {
 		UpdateHandler handler = new UpdateHandler();
+		System.out.println(update.toString());
+//		UpdateProcessor p = UpdateExecutionFactory.createRemote(update, endpoint, authenticator);
+//		p.execute();
 		HttpOp.execHttpPost(endpoint, WebContent.contentTypeSPARQLUpdate, update.toString(), "",  handler, null, null, authenticator) ;
 		return new InvocationResult(handler.getResponse(), update);
 	}

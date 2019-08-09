@@ -8,7 +8,7 @@ import uk.ac.open.kmi.basil.core.InvocationResult;
 import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
 
 public interface QueryExecutor {
-	public InvocationResult execute(Query query, String endpoint) throws ApiInvocationException;
+	public InvocationResult execute(Query query, String endpoint, HttpAuthenticator authenticator) throws ApiInvocationException;
 	public InvocationResult execute(UpdateRequest query, String endpoint, HttpAuthenticator authenticator)
 			throws ApiInvocationException;
 
