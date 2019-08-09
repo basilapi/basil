@@ -1,0 +1,18 @@
+INSERT {
+ ?iri dc:title ?_title ;
+     dc:creator ?_author .
+} WHERE {
+  BIND(IRI(CONCAT("http://www.example.org/books/",MD5(?title))) as ?iri) .
+  ?bnode dc:title ?_title ;
+         dc:creator ?_author .
+  FILTER(isBLANK(?bnode))
+} ;
+
+DELETE {
+ ?bnode dc:title ?_title ;
+        dc:creator ?_author 
+} WHERE { 
+  ?bnode dc:title ?_title ;
+         dc:creator ?_author .
+  FILTER(isBLANK(?bnode))
+} ;

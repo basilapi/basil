@@ -1,0 +1,8 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+INSERT DATA
+{ 
+  [] dc:title ?_title ;
+     dc:creator ?_author .
+} 
+
+

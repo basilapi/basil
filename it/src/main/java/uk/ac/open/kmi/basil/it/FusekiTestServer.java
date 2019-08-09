@@ -107,7 +107,7 @@ public class FusekiTestServer {
 					log.debug("  > response: {}", response);
 					entity = response.getEntity();
 					final int status = response.getStatusLine().getStatusCode();
-					if (status != 401) { // Fuseki is ready when expects authentication!
+					if (status != 401) { // The Fuseki test server is ready and expects authentication
 						log.info("Got {} at {} - will retry", status, url);
 						continue readyLoop;
 					} else {
@@ -162,7 +162,9 @@ public class FusekiTestServer {
 			Properties properties = new Properties( System.getProperties()); // override system properties
 			// Add jvm option for fuseki
 			String port = properties.getProperty("fuseki.jar.executor.server.port");
-			properties.setProperty("fuseki.jar.executor.jar.args", "--port " + port + " --mem --update --auth=basic --passwd=" + passwordsFile + " /fuseki");
+//			properties.setProperty("fuseki.jar.executor.jar.args", "--port " + port + " --mem --update --auth=basic --passwd=" + passwordsFile + " /fuseki");
+			String cmd = "--port " + port + " --mem --update --auth=basic --passwd=" + passwordsFile + " /fuseki";
+			properties.setProperty("fuseki.jar.executor.jar.args", cmd);
 			jarExecutor = new JarExecutor("fuseki.jar.executor.", properties);
 			jarExecutor.start();
 			serverBaseUrl = "http://localhost:" + port;

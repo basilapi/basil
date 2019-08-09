@@ -130,6 +130,7 @@
 								<resource>
 									<directory>src/test/resources/</directory>
 									<include>${fuseki.passwordsFile}</include>
+									<include>shiro.ini</include>
 									<!-- <filtering>true</filtering> -->
 								</resource>
 							</resources>
