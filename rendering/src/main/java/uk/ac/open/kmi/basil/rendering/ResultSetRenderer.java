@@ -49,13 +49,18 @@ public class ResultSetRenderer extends Renderer<ResultSet> {
 				f = RDFFormat.TURTLE_FLAT;
 			}else if (MoreMediaType.RDFXML_TYPE.equals(type)) {
 				f = RDFFormat.RDFXML;
-			}else if (MoreMediaType.TEXT_X_NQUADS_TYPE.equals(type)) {
-				f = RDFFormat.NQUADS_UTF8;
 			}
+			
 			if (f != null) {
 				RDFStreamer.stream(baos, getInput(), f, new SimpleTripleAdapter(uri + "#"));
 				return new ByteArrayInputStream(baos.toByteArray());
-			} 
+			}
+			
+			if (MoreMediaType.TEXT_X_NQUADS_TYPE.equals(type)) {
+				f = RDFFormat.NQUADS_UTF8;
+				RDFStreamer.streamQuads(baos, getInput(), f, new SimpleQuadAdapter(uri + "#"));
+				return new ByteArrayInputStream(baos.toByteArray());
+			}
 		} catch (Throwable e) {
 			throw new CannotRenderException("An error occurred: " + e.getMessage(), e);
 		}
