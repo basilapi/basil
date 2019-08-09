@@ -1,5 +1,7 @@
+
 DELETE {
- ?_iri_iri ?P ?O
+ graph <http://www.example.org/books/> { ?iri ?P ?O }
 } WHERE {
- ?_iri_iri ?P ?O .
+ BIND(IRI(CONCAT("http://www.example.org/books/", STR(?_id_int))) AS ?iri) .
+ graph <http://www.example.org/books/> { ?iri ?P ?O } .
 }

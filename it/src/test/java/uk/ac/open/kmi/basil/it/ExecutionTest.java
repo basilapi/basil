@@ -327,7 +327,48 @@ public class ExecutionTest extends AuthenticatedTestBase {
 	}
 	
 	@Test
-	public void EXEC16_ExecDeleteAll() throws Exception {
+	public void EXEC16_CreateDeleteOne() throws Exception {
+		log.info("#{}", name.getMethodName());
+		delete_2_Id = _putApi("delete_2", getFusekiUpdateURL());
+		_putAuth(delete_2_Id);
+		log.info(" > Api {} created", delete_2_Id);
+		
+	}
+
+	@Test
+	public void EXEC17_ExecDeleteOneByOne() throws Exception {
+		log.info("#{}", name.getMethodName());
+		Map<String, String> m = books();
+		int c = 0;
+		for (Entry<String, String> en : m.entrySet()) {
+			c++;
+			Request req = builder.buildGetRequest(new URIBuilder("/basil/" + delete_2_Id + "/api")
+					// this time the id is a int and it is passed
+					.addParameter("id", Integer.toString(c)).toString())
+					.withRedirects(true);
+			executor.execute(req);
+			int s = executor.getResponse().getStatusLine().getStatusCode();
+			log.info(">> {} [{}]", req.getRequest().getURI(), s);
+			
+			String content = executor.assertStatus(200).assertContentType("text/plain").getContent();
+			log.trace(">> {}", content);
+		}
+		
+		// after this, the graph should contain 0 items
+		log.trace("Running select API {}", select_3_Id);
+		String json = executor.execute(builder
+				.buildGetRequest(new URIBuilder("/basil/" + select_3_Id + "/api.json").toString()).withRedirects(true))
+				.assertStatus(200).assertContentType("application/json").getContent();
+		log.info(" > (read: expected 0 items) {}", json);
+		
+		JsonParser p = new JsonParser();
+		int size = p.parse(json).getAsJsonObject().get("items").getAsJsonArray().size();
+		log.info(" > (read: got {} items)", size);
+		Assert.assertTrue( size == 0);
+	}
+	
+	@Test
+	public void EXEC18_ExecDeleteAll() throws Exception {
 		log.info("#{}", name.getMethodName());
 		// Before closing, we delete everything
 		EXEC10_ExecDeleteAll();

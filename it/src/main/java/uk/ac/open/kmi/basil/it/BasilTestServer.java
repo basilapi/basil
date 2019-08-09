@@ -78,7 +78,7 @@ public class BasilTestServer {
 		// Timeout for readiness test
 		final String sec = BasilTestServer.getServerReadyTimeout();
 		final int timeoutSec = sec == null ? 60 : Integer.valueOf(sec);
-		log.info("Will wait up to " + timeoutSec + " seconds for server to become ready");
+		log.debug("Will wait up to " + timeoutSec + " seconds for server to become ready");
 		final long endTime = System.currentTimeMillis() + timeoutSec * 1000L;
 
 		// Get the list of paths to test and expected content regexps
@@ -139,17 +139,17 @@ public class BasilTestServer {
 
 					if (substring != null) {
 						if (entity == null) {
-							log.info("No entity returned for {} - will retry", url);
+							log.debug("No entity returned for {} - will retry", url);
 							continue readyLoop;
 						}
 						final String content = EntityUtils.toString(entity);
 						if (!content.contains(substring)) {
-							log.info("Returned content for {}  does not contain " + "{} - will retry", url, substring);
+							log.debug("Returned content for {}  does not contain " + "{} - will retry", url, substring);
 							continue readyLoop;
 						}
 					}
 				} catch (HttpHostConnectException e) {
-					log.info("Got HttpHostConnectException at " + url + " - will retry");
+					log.trace("Got HttpHostConnectException at " + url + " - will retry");
 					continue readyLoop;
 				} finally {
 					EntityUtils.consumeQuietly(entity);
@@ -159,7 +159,8 @@ public class BasilTestServer {
 				}
 			}
 			serverReady = true;
-			log.info("Got expected content for all configured requests, server is ready");
+			log.debug("Got expected content for all configured requests, server is ready");
+			log.info("Server ready");
 		}
 
 		if (!serverReady) {
