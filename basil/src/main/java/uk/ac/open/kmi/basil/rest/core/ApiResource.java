@@ -76,6 +76,9 @@ public class ApiResource extends AbstractResource {
 		log.trace("API execution.");
 		try {
 			InvocationResult r = getApiManager().invokeApi(id, parameters);
+			if(log.isTraceEnabled()) {
+				log.trace("{}", (r.isQuery() ? r.getQuery() : r.getUpdate()).toString());
+			}
 			MediaType type = null;
 			// If we have an extension
 			if (!extension.equals("")) {

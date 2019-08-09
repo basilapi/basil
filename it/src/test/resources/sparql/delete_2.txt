@@ -1,0 +1,5 @@
+DELETE {
+ ?_iri_iri ?P ?O
+} WHERE {
+ ?_iri_iri ?P ?O .
+}

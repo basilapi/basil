@@ -1,0 +1,3 @@
+CONSTRUCT { ?S ?P ?O } WHERE {
+BIND(IRI(CONCAT("http://www.example.org/books/", STR(?_id_int))) AS ?S) .
+ GRAPH ?G { ?S ?P ?O } }

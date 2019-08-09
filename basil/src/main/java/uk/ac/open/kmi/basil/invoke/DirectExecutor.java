@@ -39,9 +39,6 @@ public class DirectExecutor implements QueryExecutor {
 	@Override
 	public InvocationResult execute(UpdateRequest update, String endpoint, HttpAuthenticator authenticator) throws ApiInvocationException {
 		UpdateHandler handler = new UpdateHandler();
-		System.out.println(update.toString());
-//		UpdateProcessor p = UpdateExecutionFactory.createRemote(update, endpoint, authenticator);
-//		p.execute();
 		HttpOp.execHttpPost(endpoint, WebContent.contentTypeSPARQLUpdate, update.toString(), "",  handler, null, null, authenticator) ;
 		return new InvocationResult(handler.getResponse(), update);
 	}

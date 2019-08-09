@@ -1,0 +1,13 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+
+INSERT {
+ graph <http://www.example.org/books/> {
+   ?iri dc:title ?_title ;
+     dc:creator ?_author ;
+     dc:identifier ?_id_int
+   }
+} WHERE {
+  SELECT ?iri WHERE { 
+  	BIND(IRI(CONCAT("http://www.example.org/books/", STR(?_id_int))) as ?iri) }
+} 
+
