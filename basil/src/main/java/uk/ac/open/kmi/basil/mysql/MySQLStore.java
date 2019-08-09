@@ -95,10 +95,14 @@ public class MySQLStore implements Store, SearchProvider {
 						stmt.setInt(1, api.getKey());
 						stmt.setString(2, SPEC_EXPANDED_QUERY);
 						log.debug(" UPDATE ---> {}", api.getValue());
-						org.apache.jena.query.Query qq = QueryFactory.create(api.getValue());
-						qq.setPrefixMapping(null);
-						stmt.setString(3, qq.toString());
-						stmt.execute();
+						try {
+							org.apache.jena.query.Query qq = QueryFactory.create(api.getValue());
+							qq.setPrefixMapping(null);
+							stmt.setString(3, qq.toString());
+							stmt.execute();
+						} catch (Exception e) {
+							log.error("Update failed for api {} {}", new Object[] { api.getKey(), api.getValue() });
+						}
 					}
 					connect.commit();
 				} catch (Exception e) {
@@ -282,24 +286,25 @@ public class MySQLStore implements Store, SearchProvider {
 		data.put(SPEC_ENDPOINT, spec.getEndpoint());
 		data.put(SPEC_QUERY, spec.getQuery());
 		// Add a copy as expanded query
-		
+
 		String expandedQuery = null;
 		try {
 			org.apache.jena.query.Query q = QueryFactory.create(spec.getQuery());
 			q.setPrefixMapping(null);
 			expandedQuery = q.toString();
-		}catch(QueryException qe) {
+		} catch (QueryException qe) {
 			// may be update
-			try{
+			try {
 				UpdateRequest q = UpdateFactory.create(spec.getQuery());
 				q.setPrefixMapping(null);
 				expandedQuery = q.toString();
-			}catch(QueryException qe2) {
-				// some parameterized queries are not supported by the SPARQL 1.1 parser (e.g. Insert data { ?_uri ...)
+			} catch (QueryException qe2) {
+				// some parameterized queries are not supported by the SPARQL 1.1 parser (e.g.
+				// Insert data { ?_uri ...)
 				// In those cases we just keep the original syntax
 				expandedQuery = spec.getQuery();
 			}
-			
+
 		}
 		data.put(SPEC_EXPANDED_QUERY, expandedQuery);
 		_saveData(id, data);
@@ -617,29 +622,31 @@ public class MySQLStore implements Store, SearchProvider {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
-				String q = "SELECT DATA.PROPERTY, DATA.VALUE FROM APIS JOIN DATA ON DATA.API = APIS.ID AND DATA.PROPERTY IN ('" + AUTH_USER + "','" + AUTH_PASSWORD + "') WHERE APIS.NICKNAME = ?";
+				String q = "SELECT DATA.PROPERTY, DATA.VALUE FROM APIS JOIN DATA ON DATA.API = APIS.ID AND DATA.PROPERTY IN ('"
+						+ AUTH_USER + "','" + AUTH_PASSWORD + "') WHERE APIS.NICKNAME = ?";
 				try (PreparedStatement stmt = connect.prepareStatement(q)) {
 					stmt.setString(1, id);
 					ResultSet s = stmt.executeQuery();
 					while (s.next()) {
-						if(s.getString(1).equals(AUTH_USER)){
+						if (s.getString(1).equals(AUTH_USER)) {
 							username = s.getString(2);
-						}else if(s.getString(1).equals(AUTH_PASSWORD)){
+						} else if (s.getString(1).equals(AUTH_PASSWORD)) {
 							password = s.getString(2);
-						}else throw new IOException("This should never happen");
+						} else
+							throw new IOException("This should never happen");
 					}
 				}
 			}
-			if(username == null || password == null) {
+			if (username == null || password == null) {
 				// no credentials
 				return null;
 			}
-			return new String[] {username, password};
+			return new String[] { username, password };
 		} catch (ClassNotFoundException | SQLException e) {
 			throw new IOException(e);
 		}
 	}
-	
+
 	@Override
 	public void saveCredentials(String id, String user, String password) throws IOException {
 		Map<String, String> data = new HashMap<String, String>();
@@ -647,12 +654,12 @@ public class MySQLStore implements Store, SearchProvider {
 		data.put(AUTH_PASSWORD, password);
 		_saveData(id, data);
 	}
-	
+
 	@Override
 	public void deleteCredentials(String id) throws IOException {
 		_deleteData(id, AUTH_USER, AUTH_PASSWORD);
 	}
-	
+
 	@Override
 	public ApiInfo info(String id) throws IOException {
 		try {
@@ -771,7 +778,7 @@ public class MySQLStore implements Store, SearchProvider {
 					stmt.setString(1, alias);
 					ResultSet s = stmt.executeQuery();
 					while (s.next()) {
-					 return s.getString(1);
+						return s.getString(1);
 					}
 				}
 			}
@@ -780,7 +787,7 @@ public class MySQLStore implements Store, SearchProvider {
 			throw new IOException(e);
 		}
 	}
-	
+
 	@Override
 	public Set<String> loadAlias(String id) throws IOException {
 		log.trace("load alias: {}", id);
@@ -813,7 +820,7 @@ public class MySQLStore implements Store, SearchProvider {
 			String i = "INSERT INTO ALIAS (API, ALIAS) VALUES (?,?)";
 			Class.forName("com.mysql.jdbc.Driver");
 			try (Connection connect = DriverManager.getConnection(jdbcUri)) {
-				boolean acs = connect.getAutoCommit(); 
+				boolean acs = connect.getAutoCommit();
 				connect.setAutoCommit(false);
 				try (PreparedStatement stmtd = connect.prepareStatement(d);
 						PreparedStatement stmti = connect.prepareStatement(i)) {
