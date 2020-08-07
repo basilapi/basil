@@ -6,7 +6,7 @@ ds = com.mysql.jdbc.jdbc2.optional.MysqlDataSource
 ds.serverName = localhost
 ds.port = 3306
 ds.user = basil
-ds.password = pV7JuwTj7FAjDG3B
+ds.password = yourpasswordhere
 ds.databaseName = basil
 #
 # ------------------------------------------------------
@@ -26,3 +26,4 @@ jdbcRealm.dataSource=$ds
 securityManager.realms = $jdbcRealm
 sessionManager = org.apache.shiro.web.session.mgt.DefaultWebSessionManager
 securityManager.sessionManager = $sessionManager
+filterChainResolver = org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver
