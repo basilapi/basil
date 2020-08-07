@@ -27,6 +27,7 @@ import uk.ac.open.kmi.basil.invoke.QueryExecutor;
 import uk.ac.open.kmi.basil.sparql.QueryParameter;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
+import uk.ac.open.kmi.basil.sparql.UnknownQueryTypeException;
 import uk.ac.open.kmi.basil.sparql.VariablesBinder;
 import uk.ac.open.kmi.basil.store.Store;
 import uk.ac.open.kmi.basil.view.Engine;
@@ -187,7 +188,8 @@ public class ApiManagerImpl implements ApiManager {
 		if (body.equals("")) {
 			throw new SpecificationParsingException("Body cannot be empty");
 		}
-		Specification specification = SpecificationFactory.create(endpoint, body);
+		Specification specification;
+		specification = SpecificationFactory.create(endpoint, body);
 		data.saveSpec(id, specification);
 	}
 

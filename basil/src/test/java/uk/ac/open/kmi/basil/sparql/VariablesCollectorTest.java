@@ -100,6 +100,12 @@ public class VariablesCollectorTest {
 	}
 
 	@Test
+	public void select_8() throws IOException {
+		Set<String> vars = extractVarsUpdate(loadQuery(testName.getMethodName()));
+		Assert.assertTrue(vars.contains("?_limit_number"));
+	}
+
+	@Test
 	public void insert_1() throws IOException {
 		Set<String> vars = extractVarsUpdate(loadQuery(testName.getMethodName()));
 		//

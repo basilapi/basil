@@ -57,16 +57,33 @@ public class VariablesBinderTest {
 	}
 	
 	@Test
-	public void select_3() throws IOException{
+	public void select_12() throws IOException{
 		Specification spec = TestUtils.loadQuery(method.getMethodName());
-		log.debug("before: \n{}\n", spec.getQuery());
-		Assert.assertTrue(spec.hasParameter("code"));
-		Assert.assertTrue(spec.hasVariable("?_code_literal"));
+		log.info("before: \n{}\n", spec.getQuery());
+		Assert.assertTrue(spec.hasParameter("limit"));
+		Assert.assertTrue(spec.hasVariable("?_limit_number"));
 		binder = new VariablesBinder(spec);
-		binder.bindLiteral( "code", "A170");
-		log.debug("after: \n{}\n", binder.toString());
+		binder.bind( "limit", "11");
+		log.info("after: \n{}\n", binder.toString());
 		VariablesCollector vars = new VariablesCollector();
 		vars.collect(binder.toString());
-		Assert.assertFalse(vars.getVariables().contains("?_code_literal"));
+		Assert.assertFalse(vars.getVariables().contains("?_limit_number"));
+	}
+
+	@Test
+	public void select_13() throws IOException{
+		Specification spec = TestUtils.loadQuery(method.getMethodName());
+		log.info("before: \n{}\n", spec.getQuery());
+		Assert.assertTrue(spec.hasParameter("limit"));
+		Assert.assertTrue(spec.hasVariable("?_limit_number"));
+		Assert.assertTrue(spec.hasVariable("?_offset_number"));
+		binder = new VariablesBinder(spec);
+		binder.bind( "limit", "10");
+		binder.bind( "offset", "10");
+		log.info("after: \n{}\n", binder.toString());
+		VariablesCollector vars = new VariablesCollector();
+		vars.collect(binder.toString());
+		Assert.assertFalse(vars.getVariables().contains("?_limit_number"));
+		Assert.assertFalse(vars.getVariables().contains("?_offset_number"));
 	}
 }

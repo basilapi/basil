@@ -35,6 +35,7 @@ import uk.ac.open.kmi.basil.search.Result;
 import uk.ac.open.kmi.basil.search.SearchProvider;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
+import uk.ac.open.kmi.basil.sparql.UnknownQueryTypeException;
 import uk.ac.open.kmi.basil.store.Store;
 import uk.ac.open.kmi.basil.view.Engine;
 import uk.ac.open.kmi.basil.view.View;
@@ -313,7 +314,11 @@ public class MySQLStore implements Store, SearchProvider {
 	@Override
 	public Specification loadSpec(String id) throws IOException {
 		Map<String, String> data = _loadData(id);
-		return SpecificationFactory.create(data.get(SPEC_ENDPOINT), data.get(SPEC_QUERY));
+		try {
+			return SpecificationFactory.create(data.get(SPEC_ENDPOINT), data.get(SPEC_QUERY));
+		} catch (UnknownQueryTypeException e) {
+			throw new IOException(e);
+		}
 	}
 
 	@Override

@@ -22,7 +22,7 @@ public class SpecificationFactoryTest {
 	}
 
 	@Test
-	public void create() throws IOException {
+	public void create() throws IOException, UnknownQueryTypeException {
 		String q = "# X-Basil-Endpoint: http://data.open.ac.uk/sparql\n" + 
 				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" + 
 				"PREFIX mlo: <http://purl.org/net/mlo/> \n" + 
@@ -42,13 +42,13 @@ public class SpecificationFactoryTest {
 	}
 	
 	@Test
-	public void createUpdate() throws IOException {
+	public void createUpdate() throws IOException, UnknownQueryTypeException {
 		String q = "# X-Basil-Endpoint: http://data.open.ac.uk/sparql\n" + 
 				"PREFIX dc: <http://purl.org/dc/elements/1.1/>\n" + 
 				"INSERT { <http://example/egbook> dc:title  \"This is an example title\" } WHERE {}\n" + 
 				"";
 		String endpoint = TestUtils.endpoint(q);
-		Specification spec = SpecificationFactory.createUpdate(endpoint, q);
+		Specification spec = SpecificationFactory.create(endpoint, q);
 		Assert.assertTrue(spec.getEndpoint().equals(endpoint));
 		Assert.assertTrue(spec.getQuery().equals(q));
 	}

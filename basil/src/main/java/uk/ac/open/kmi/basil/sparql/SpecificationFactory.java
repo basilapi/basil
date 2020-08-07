@@ -2,27 +2,19 @@ package uk.ac.open.kmi.basil.sparql;
 
 import java.util.Set;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryException;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.sparql.syntax.Element;
-import org.apache.jena.sparql.syntax.ElementWalker;
-
 public class SpecificationFactory {
-
-	public static Specification create(String endpoint, String sparql) {
-		VariablesCollector collector = new VariablesCollector();
-		Query q;
-		
-		try{
-			q = QueryFactory.create(sparql);
-		}catch(QueryException qw) {
-			// try update
+	
+	public static Specification create(String endpoint, String sparql) throws UnknownQueryTypeException {
+		if(QueryType.isUpdate(sparql)) {
 			return createUpdate(endpoint, sparql);
+		} else {
+			return createQuery(endpoint, sparql);
 		}
-		
-		Element element = q.getQueryPattern();
-		ElementWalker.walk(element, collector);
+	}
+	
+	private static Specification createQuery(String endpoint, String sparql) {
+		VariablesCollector collector = new VariablesCollector();
+		collector.collect(sparql);
 		Set<String> vars = collector.getVariables();
 		VariableParser parser;
 		Specification spec = new Specification();
@@ -38,14 +30,14 @@ public class SpecificationFactory {
 		return spec;
 	}
 	
-	public static Specification createUpdate(String endpoint, String sparql) {
+	private static Specification createUpdate(String endpoint, String sparql) {
 		VariablesCollector collector = new VariablesCollector();
 		collector.collect(sparql);
 		Set<String> vars = collector.getVariables();
 		VariableParser parser;
 		Specification spec = new Specification();
 		spec.setEndpoint(endpoint);
-		spec.setQuery(sparql);
+		spec.setUpdate(sparql);
 		
 		for (String var : vars) {
 			parser = new VariableParser(var);

@@ -32,13 +32,13 @@ public class Specification implements Serializable {
 	}
 
 	void setQuery(String query) {
-		// Test if QUERY or UPDATE
-		try {
-			QueryFactory.create(query);
-		} catch (QueryException qe2) {
-			this.isUpdate = true;
-		}
+		this.isUpdate = false;
 		this.query = query;
+	}
+	
+	void setUpdate(String update) {
+		this.isUpdate = true;
+		this.query = update;
 	}
 
 	public Collection<QueryParameter> getParameters() {

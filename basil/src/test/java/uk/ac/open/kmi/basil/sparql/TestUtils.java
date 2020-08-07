@@ -9,8 +9,8 @@ import java.io.IOException;
 public class TestUtils {
 
 	public static String loadQueryString(String qname) throws IOException {
-		return IOUtils.toString(TestUtils.class.getClassLoader()
-				.getResourceAsStream("./sparql/" + qname + ".txt"), "UTF-8");
+		return IOUtils.toString(TestUtils.class.getClassLoader().getResourceAsStream("./sparql/" + qname + ".txt"),
+				"UTF-8");
 	}
 
 	public static String endpoint(String qname) {
@@ -23,12 +23,15 @@ public class TestUtils {
 	public static Specification loadQuery(String fileName) throws IOException {
 		String sparql = loadQueryString(fileName);
 		String endpoint = endpoint(sparql);
-		//System.out.println(endpoint);
-		return SpecificationFactory.create(endpoint, sparql);
+		// System.out.println(endpoint);
+		try {
+			return SpecificationFactory.create(endpoint, sparql);
+		} catch (UnknownQueryTypeException e) {
+			throw new IOException(e);
+		}
 	}
 
-	public static QueryParameter buildQueryParameter(String name, Type type,
-			String lang, String datatype) {
+	public static QueryParameter buildQueryParameter(String name, Type type, String lang, String datatype) {
 		QueryParameter qp = new QueryParameter();
 		qp.setName(name);
 		if (type == Type.IRI) {
@@ -44,7 +47,7 @@ public class TestUtils {
 	}
 
 	public static String loadTemplate(String type, String qname) throws IOException {
-		return IOUtils.toString(TestUtils.class.getClassLoader()
-				.getResourceAsStream("./" + type + "/" + qname + ".tmpl"), "UTF-8");
+		return IOUtils.toString(
+				TestUtils.class.getClassLoader().getResourceAsStream("./" + type + "/" + qname + ".tmpl"), "UTF-8");
 	}
 }

@@ -24,6 +24,7 @@ import uk.ac.open.kmi.basil.sparql.QueryParameter.Type;
 import uk.ac.open.kmi.basil.sparql.Specification;
 import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
 import uk.ac.open.kmi.basil.sparql.TestUtils;
+import uk.ac.open.kmi.basil.sparql.UnknownQueryTypeException;
 
 public class FileStoreTest {
 
@@ -65,9 +66,14 @@ public class FileStoreTest {
 	@Test
 	public void serializeSpecification() throws IOException,
 			ClassNotFoundException {
-		Specification spec = SpecificationFactory.create(
-				"http://data.open.ac.uk/sparql",
-				"SELECT * WHERE {?X a ?_type_iri}");
+		Specification spec;
+		try {
+			spec = SpecificationFactory.create(
+					"http://data.open.ac.uk/sparql",
+					"SELECT * WHERE {?X a ?_type_iri}");
+		} catch (UnknownQueryTypeException e) {
+			throw new IOException(e);
+		}
 		store.write(testName.getMethodName(), spec, "spec");
 		Specification spec2 = (Specification) store.read(
 				testName.getMethodName(), "spec");
@@ -79,9 +85,14 @@ public class FileStoreTest {
 
 	@Test
 	public void saveAndLoadSpec() throws IOException {
-		Specification spec = SpecificationFactory.create(
-				"http://data.open.ac.uk/sparql",
-				"SELECT * WHERE {?X a ?_type_iri}");
+		Specification spec;
+		try {
+			spec = SpecificationFactory.create(
+					"http://data.open.ac.uk/sparql",
+					"SELECT * WHERE {?X a ?_type_iri}");
+		} catch (UnknownQueryTypeException e) {
+			throw new IOException(e);
+		}
 		store.saveSpec("myspecid", spec);
 		Specification spec2 = store.loadSpec("myspecid");
 		Assert.assertTrue(spec.getEndpoint().equals(spec2.getEndpoint()));
@@ -92,9 +103,14 @@ public class FileStoreTest {
 
 	@Test
 	public void saveAndListSpec() throws IOException {
-		Specification spec = SpecificationFactory.create(
-				"http://data.open.ac.uk/sparql",
-				"SELECT * WHERE {?X a ?_type_iri}");
+		Specification spec;
+		try {
+			spec = SpecificationFactory.create(
+					"http://data.open.ac.uk/sparql",
+					"SELECT * WHERE {?X a ?_type_iri}");
+		} catch (UnknownQueryTypeException e) {
+			throw new IOException(e);
+		}
 		store.saveSpec("myspecid", spec);
 		store.saveSpec("myspecid2", spec);
 		store.saveSpec("myspecid3", spec);
@@ -113,9 +129,14 @@ public class FileStoreTest {
 
 	@Test
 	public void saveAndLoadAlias() throws IOException {
-		Specification spec = SpecificationFactory.create(
-				"http://data.open.ac.uk/sparql",
-				"SELECT * WHERE {?X a ?_type_iri}");
+		Specification spec;
+		try {
+			spec = SpecificationFactory.create(
+					"http://data.open.ac.uk/sparql",
+					"SELECT * WHERE {?X a ?_type_iri}");
+		} catch (UnknownQueryTypeException e) {
+			throw new IOException(e);
+		}
 		store.saveSpec("myspecid", spec);
 		store.saveSpec("myspecid1", spec);
 		store.saveSpec("myspecid2", spec);
