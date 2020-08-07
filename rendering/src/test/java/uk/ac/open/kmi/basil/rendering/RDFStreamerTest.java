@@ -26,12 +26,18 @@ import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWriter;
 import org.apache.jena.util.iterator.WrappedIterator;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * FIXME - These tests use a live service at http://data.open.ac.uk and should better be moved to a separate module
+ * @author ed4565
+ *
+ */
 public class RDFStreamerTest {
 	final static Logger log = LoggerFactory.getLogger(RDFStreamerTest.class);
 
@@ -87,6 +93,11 @@ public class RDFStreamerTest {
 		RDFStreamer.stream(os, qe.execSelect(), RDFFormat.NTRIPLES, new SimpleTripleAdapter("http://www.example.org/test/"));
 	}
 
+	/**
+	 * FIXME - to understand why this test works intermittently
+	 * @throws IOException
+	 */
+	@Ignore 
 	@Test
 	public void testRDFXML() throws IOException {
 		log.info("{}", test.getMethodName());
@@ -101,6 +112,7 @@ public class RDFStreamerTest {
 			
 			ModelFactory.createDefaultModel().read(in, "");
 		} catch (Exception e) {
+			log.error("",e);
 			Assert.assertTrue(false);
 		}
 	}
