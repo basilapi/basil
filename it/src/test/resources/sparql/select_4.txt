@@ -1,0 +1,9 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+
+SELECT * 
+WHERE {
+GRAPH <http://www.example.org/books/> {
+ ?id dc:title ?title ;
+     dc:creator ?author . 
+} }
+LIMIT ?_limit_number

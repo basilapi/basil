@@ -3,6 +3,7 @@ package uk.ac.open.kmi.basil.it;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -43,6 +44,8 @@ public class ExecutionTest extends AuthenticatedTestBase {
 
 	private static String select_2_Id = null;
 	private static String select_3_Id = null;
+	private static String select_4_Id = null;
+	private static String select_5_Id = null;
 	private static String construct_1_Id = null;
 
 	@Rule
@@ -200,9 +203,7 @@ public class ExecutionTest extends AuthenticatedTestBase {
 		_putAuth(delete_1_Id);
 	}
 
-	@Test
-	public void EXEC10_ExecDeleteAll() throws Exception {
-		log.info("#{}", name.getMethodName());
+	private void _performDeleteAll() throws ClientProtocolException, IOException, URISyntaxException {
 		log.info(" > (delete) {}",
 				executor.execute(builder.buildGetRequest(new URIBuilder("/basil/" + delete_1_Id + "/api").toString())
 						.withRedirects(true)).assertStatus(200).assertContentType("text/plain"));
@@ -218,18 +219,24 @@ public class ExecutionTest extends AuthenticatedTestBase {
 	}
 
 	@Test
+	public void EXEC10_ExecDeleteAll() throws Exception {
+		log.info("#{}", name.getMethodName());
+		_performDeleteAll();
+	}
+
+	@Test
 	public void EXEC11_CreateInsertAPI() throws Exception {
 		log.info("#{}", name.getMethodName());
 		insert_2_Id = _putApi("insert_2", getFusekiUpdateURL());
 		_putAuth(insert_2_Id);
 		log.info(" > Api {} created", insert_2_Id);
 	}
-	
+
 	@Test
 	public void EXEC12_ExecInsertManyAPI() throws Exception {
 		log.info("#{}", name.getMethodName());
 		log.trace("Running insert API {}", insert_2_Id);
-		
+
 		Map<String, String> m = books();
 		for (Entry<String, String> en : m.entrySet()) {
 			Request req = builder.buildGetRequest(new URIBuilder("/basil/" + insert_2_Id + "/api")
@@ -241,23 +248,23 @@ public class ExecutionTest extends AuthenticatedTestBase {
 
 			executor.assertStatus(200).assertContentType("text/plain");
 		}
-		
+
 		// after this, the dataset should contain 100 items
 		log.trace("Running select API {}", select_2_Id);
 		String json = executor.execute(builder
 				.buildGetRequest(new URIBuilder("/basil/" + select_2_Id + "/api.json").toString()).withRedirects(true))
 				.assertStatus(200).assertContentType("application/json").getContent();
 		log.info(" > (read: expected 97 items) {}", json);
-		
+
 		JsonParser p = new JsonParser();
 		int size = p.parse(json).getAsJsonObject().get("items").getAsJsonArray().size();
 		log.info(" > (read: got {} objects", size);
-		Assert.assertTrue( size == 97);
+		Assert.assertTrue(size == 97);
 	}
-			
+
 	@Test
 	public void EXEC13_CreateAPIs_withQuads() throws Exception {
-		
+
 		log.info("#{}", name.getMethodName());
 		insert_3_Id = _putApi("insert_3", getFusekiUpdateURL());
 		_putAuth(insert_3_Id);
@@ -269,54 +276,52 @@ public class ExecutionTest extends AuthenticatedTestBase {
 		_putAuth(construct_1_Id);
 		log.info(" > Api {} created", construct_1_Id);
 	}
-	
+
 	@Test
 	public void EXEC14_ExecInsertMany_withQuads() throws Exception {
 		log.info("#{}", name.getMethodName());
 		log.trace("Running insert API {}", insert_3_Id);
-		
+
 		Map<String, String> m = books();
 		int c = 0;
 		for (Entry<String, String> en : m.entrySet()) {
 			c++;
 			Request req = builder.buildGetRequest(new URIBuilder("/basil/" + insert_3_Id + "/api")
 					// this time the id is a int and it is passed
-					.addParameter("id", Integer.toString(c))
-					.addParameter("title", en.getKey()).addParameter("author", en.getValue()).toString())
-					.withRedirects(true);
+					.addParameter("id", Integer.toString(c)).addParameter("title", en.getKey())
+					.addParameter("author", en.getValue()).toString()).withRedirects(true);
 			executor.execute(req);
 			int s = executor.getResponse().getStatusLine().getStatusCode();
 			log.info(">> {} [{}]", req.getRequest().getURI(), s);
 
 			executor.assertStatus(200).assertContentType("text/plain");
 		}
-		
+
 		// after this, the graph should contain 97 items
 		log.trace("Running select API {}", select_3_Id);
 		String json = executor.execute(builder
 				.buildGetRequest(new URIBuilder("/basil/" + select_3_Id + "/api.json").toString()).withRedirects(true))
 				.assertStatus(200).assertContentType("application/json").getContent();
 		log.info(" > (read: expected 97 items) {}", json);
-		
+
 		JsonParser p = new JsonParser();
 		int size = p.parse(json).getAsJsonObject().get("items").getAsJsonArray().size();
 		log.info(" > (read: got {} items)", size);
-		Assert.assertTrue( size == 97);
+		Assert.assertTrue(size == 97);
 	}
 
 	@Test
 	public void EXEC15_ExecConstructAPI() throws Exception {
 		log.info("#{}", name.getMethodName());
 		log.trace("Running construct API {}", construct_1_Id);
-		
+
 		Map<String, String> m = books();
 		int c = 0;
 		for (Entry<String, String> en : m.entrySet()) {
 			c++;
 			Request req = builder.buildGetRequest(new URIBuilder("/basil/" + construct_1_Id + "/api")
 					// this time the id is a int and it is passed
-					.addParameter("id", Integer.toString(c)).toString())
-					.withRedirects(true);
+					.addParameter("id", Integer.toString(c)).toString()).withRedirects(true);
 			executor.execute(req);
 			int s = executor.getResponse().getStatusLine().getStatusCode();
 			log.info(">> {} [{}]", req.getRequest().getURI(), s);
@@ -325,14 +330,14 @@ public class ExecutionTest extends AuthenticatedTestBase {
 			log.trace(">> {}", content);
 		}
 	}
-	
+
 	@Test
 	public void EXEC16_CreateDeleteOne() throws Exception {
 		log.info("#{}", name.getMethodName());
 		delete_2_Id = _putApi("delete_2", getFusekiUpdateURL());
 		_putAuth(delete_2_Id);
 		log.info(" > Api {} created", delete_2_Id);
-		
+
 	}
 
 	@Test
@@ -344,33 +349,116 @@ public class ExecutionTest extends AuthenticatedTestBase {
 			c++;
 			Request req = builder.buildGetRequest(new URIBuilder("/basil/" + delete_2_Id + "/api")
 					// this time the id is a int and it is passed
-					.addParameter("id", Integer.toString(c)).toString())
-					.withRedirects(true);
+					.addParameter("id", Integer.toString(c)).toString()).withRedirects(true);
 			executor.execute(req);
 			int s = executor.getResponse().getStatusLine().getStatusCode();
 			log.info(">> {} [{}]", req.getRequest().getURI(), s);
-			
+
 			String content = executor.assertStatus(200).assertContentType("text/plain").getContent();
 			log.trace(">> {}", content);
 		}
-		
+
 		// after this, the graph should contain 0 items
 		log.trace("Running select API {}", select_3_Id);
 		String json = executor.execute(builder
 				.buildGetRequest(new URIBuilder("/basil/" + select_3_Id + "/api.json").toString()).withRedirects(true))
 				.assertStatus(200).assertContentType("application/json").getContent();
 		log.info(" > (read: expected 0 items) {}", json);
-		
+
 		JsonParser p = new JsonParser();
 		int size = p.parse(json).getAsJsonObject().get("items").getAsJsonArray().size();
 		log.info(" > (read: got {} items)", size);
-		Assert.assertTrue( size == 0);
+		Assert.assertTrue(size == 0);
 	}
-	
+
 	@Test
 	public void EXEC18_ExecDeleteAll() throws Exception {
 		log.info("#{}", name.getMethodName());
 		// Before closing, we delete everything
 		EXEC10_ExecDeleteAll();
 	}
+
+	@Test
+	public void EXEC19_CreateSelectLimit() throws Exception {
+		log.info("#{}", name.getMethodName());
+		select_4_Id = _putApi("select_4", getFusekiQueryURL());
+		_putAuth(select_4_Id);
+		log.info(" > Api {} created", select_4_Id);
+	}
+
+	@Test
+	public void EXEC20_ExecPrepareSelectLimit() throws Exception {
+		log.info("#{}", name.getMethodName());
+		// Populate the data again
+		log.trace("Running insert API {}", insert_3_Id);
+
+		Map<String, String> m = books();
+		int c = 0;
+		for (Entry<String, String> en : m.entrySet()) {
+			c++;
+			Request req = builder.buildGetRequest(new URIBuilder("/basil/" + insert_3_Id + "/api")
+					// this time the id is a int and it is passed
+					.addParameter("id", Integer.toString(c)).addParameter("title", en.getKey())
+					.addParameter("author", en.getValue()).toString()).withRedirects(true);
+			executor.execute(req);
+			int s = executor.getResponse().getStatusLine().getStatusCode();
+			log.info(">> {} [{}]", req.getRequest().getURI(), s);
+
+			executor.assertStatus(200).assertContentType("text/plain");
+		}
+	}
+
+	@Test
+	public void EXEC21_ExecSelectLimit() throws Exception {
+		log.info("#{}", name.getMethodName());
+
+		// Test select with limit
+		// after this, the query should return 10 items
+		log.trace("Running select_4 API {}", select_4_Id);
+		String json = executor.execute(builder
+				.buildGetRequest(
+						new URIBuilder("/basil/" + select_4_Id + "/api.json").addParameter("limit", "10").toString())
+				.withRedirects(true)).assertStatus(200).assertContentType("application/json").getContent();
+		log.info(" > (read: expected 10 items) {}", json);
+
+		JsonParser p = new JsonParser();
+		int size = p.parse(json).getAsJsonObject().get("items").getAsJsonArray().size();
+		log.info(" > (read: got {} items)", size);
+		Assert.assertTrue(size == 10);
+	}
+	
+	@Test
+	public void EXEC22_CreateSelectOffsetLimit() throws Exception {
+		log.info("#{}", name.getMethodName());
+		select_5_Id = _putApi("select_5", getFusekiQueryURL());
+		_putAuth(select_5_Id);
+		log.info(" > Api {} created", select_5_Id);
+	}
+	
+	@Test
+	public void EXEC23_ExecSelectLimitOffset() throws Exception {
+		log.info("#{}", name.getMethodName());
+
+		// Test select with limit
+		// after this, the query should return 10 items
+		log.trace("Running select_5 API {}", select_5_Id);
+		String json = executor.execute(builder
+				.buildGetRequest(
+						new URIBuilder("/basil/" + select_5_Id + "/api.json").addParameter("limit", "10").addParameter("offset", "11").toString())
+				.withRedirects(true)).assertStatus(200).assertContentType("application/json").getContent();
+		log.info(" > (read: expected 10 items) {}", json);
+
+		JsonParser p = new JsonParser();
+		int size = p.parse(json).getAsJsonObject().get("items").getAsJsonArray().size();
+		log.info(" > (read: got {} items)", size);
+		Assert.assertTrue(size == 10);
+	}
+
+	@Test
+	public void EXEC24_ExecDeleteAll() throws Exception {
+		log.info("#{}", name.getMethodName());
+		// Before closing, we delete everything
+		_performDeleteAll();
+	}
+
 }
