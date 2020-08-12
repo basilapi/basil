@@ -15,11 +15,21 @@ public class BasilServerEnvironment extends IniWebEnvironment implements BasilEn
 		Ini ini = Ini.fromResourcePath(iniPath);
 		setIni(ini);
 
-		jdbcConnectionUrl = new StringBuilder().append("jdbc:mysql://").append(getIni().get("").get("ds.serverName"))
+		StringBuilder sb = new StringBuilder().append("jdbc:mysql://").append(getIni().get("").get("ds.serverName"))
 				.append(":").append(getIni().get("").get("ds.port")).append("/")
 				.append(getIni().get("").get("ds.databaseName")).append("?user=")
 				.append(getIni().get("").get("ds.user")).append("&password=")
-				.append(getIni().get("").get("ds.password")).toString();
+				.append(getIni().get("").get("ds.password"));
+
+		if(getIni().get("").get("ds.verifyServerCertificate") != null){
+			sb.append("&verifyServerCertificate=");
+			sb.append(getIni().get("").get("ds.verifyServerCertificate"));
+		}
+		if(getIni().get("").get("ds.useSSL") != null){
+			sb.append("&useSSL=");
+			sb.append(getIni().get("").get("ds.useSSL"));
+		}
+		jdbcConnectionUrl =  sb.toString();
 	}
 
 	@Override

@@ -203,7 +203,7 @@ public class BasilTestServer {
 	public static String getServerBaseUrl() {
 		return serverBaseUrl;
 	}
-	
+
 //	public static CloseableHttpResponse authenticate(String username, String password, HttpClientContext httpClientContext) throws Exception {
 //		log.trace("Authenticating {}", username);
 //		HttpPost post = new HttpPost(BasilTestServer.getServerBaseUrl() + "/basil/auth/login");
@@ -225,13 +225,26 @@ public class BasilTestServer {
 			throw new Exception("Cannot use basil configuration file: " + f);
 		}
 		Ini ini = Ini.fromResourcePath(f.getAbsolutePath());
-		jdbcConnectionUrl = new StringBuilder().append("jdbc:mysql://").append(ini.get("").get("ds.serverName"))
-				.append(":").append(ini.get("").get("ds.port")).append("/").toString();
+		StringBuilder sb = new StringBuilder().append("jdbc:mysql://").append(ini.get("").get("ds.serverName"))
+				.append(":").append(ini.get("").get("ds.port")).append("/");
+
+		sb.append("?");
+
+		if(ini.get("").get("ds.verifyServerCertificate") != null){
+			sb.append("&verifyServerCertificate=");
+			sb.append(ini.get("").get("ds.verifyServerCertificate"));
+		}
+		if(ini.get("").get("ds.useSSL") != null){
+			sb.append("&useSSL=");
+			sb.append(ini.get("").get("ds.useSSL"));
+		}
+		jdbcConnectionUrl = sb.toString();
+
 		databaseName = ini.get("").get("ds.databaseName") + dbPostfix;
 		user = ini.get("").get("ds.user");
 		password = ini.get("").get("ds.password");
 
-		log.info("Attemp to init a test db {}", databaseName);
+		log.info("XXX Attemp to init a test db {} - {}", databaseName, jdbcConnectionUrl);
 
 		Class.forName("com.mysql.jdbc.Driver");
 		try (Connection conn = DriverManager.getConnection(jdbcConnectionUrl, user, password)) {
