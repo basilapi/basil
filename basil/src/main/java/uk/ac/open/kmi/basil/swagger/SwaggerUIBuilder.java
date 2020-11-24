@@ -1,17 +1,18 @@
 package uk.ac.open.kmi.basil.swagger;
 
-import javax.ws.rs.core.UriInfo;
+
+import java.net.URI;
 
 /**
  * Created by Luca Panziera on 22/05/15.
  */
 public class SwaggerUIBuilder {
-    public static String build(UriInfo swaggerUri) {
+    public static String build(URI swaggerUri) {
     	// Base URL
     	StringBuilder bb = new StringBuilder();
-    	bb.append(swaggerUri.getBaseUri().getHost());
-    	if(swaggerUri.getBaseUri().getPort() > 0){
-    		bb.append(":").append(swaggerUri.getBaseUri().getPort());
+    	bb.append(swaggerUri.getHost());
+    	if(swaggerUri.getPort() > 0){
+    		bb.append(":").append(swaggerUri.getPort());
     	}
         String base = bb.toString();
     	
@@ -41,8 +42,10 @@ public class SwaggerUIBuilder {
         html.append("\n");
         html.append("  <script type=\"text/javascript\">\n");
         html.append("    $(function () {\n");
+        html.append("      var lar = window.location.href.split('/');  \n");
+        html.append("      var base = lar[0] + '//' + lar[2];  \n");
         html.append("      window.swaggerUi = new SwaggerUi({\n");
-        html.append("        url: \"").append(swaggerUri.getRequestUri().toString()).append("\",\n");
+        html.append("        url: base + \"").append(swaggerUri.getPath().toString()).append("\",\n");
         html.append("        dom_id: \"swagger-ui-container\",\n");
         html.append("        supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],\n");
         html.append("        onFailure: function(data) {\n");

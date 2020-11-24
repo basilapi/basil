@@ -37,7 +37,7 @@ public class ApiDocsResource extends AbstractResource {
 			}
 
 			 if (accept.contains("text/html")) {
-				String msg = SwaggerUIBuilder.build(requestUri);
+				String msg = SwaggerUIBuilder.build(requestUri.getRequestUri());
 				ResponseBuilder builder = Response.ok(msg);
 				addHeaders(builder, id);
 				return builder.build();
