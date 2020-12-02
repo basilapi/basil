@@ -21,7 +21,7 @@
 		<log4j.version>2.13.3</log4j.version>
 		<!-- jetty -->
 		<!-- org.eclipse.jetty.version>9.2.3.v20140905</org.eclipse.jetty.version -->
-		<org.eclipse.jetty.version>9.4.34.v20201102</org.eclipse.jetty.version>
+		<org.eclipse.jetty.version>9.4.35.v20201120</org.eclipse.jetty.version>
 
 		<shiro.version>1.4.2</shiro.version>
 
