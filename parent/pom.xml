@@ -255,22 +255,6 @@
 	</dependencyManagement>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>com.github.github</groupId>
-				<artifactId>site-maven-plugin</artifactId>
-				<executions>
-					<!-- run site-maven-plugin's 'site' target as part of the build's normal 
-						'deploy' phase -->
-					<execution>
-						<goals>
-							<goal>site</goal>
-						</goals>
-						<phase>deploy</phase>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -313,6 +297,7 @@
 						<altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
 					</configuration>
 				</plugin>
+
 			</plugins>
 		</pluginManagement>
 	</build>
