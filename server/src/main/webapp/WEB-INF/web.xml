@@ -44,12 +44,12 @@
 
     <context-param>
         <param-name>shiroEnvironmentClass</param-name>
-        <param-value>uk.ac.open.kmi.basil.server.BasilServerEnvironment</param-value>
+        <param-value>io.github.basilapi.basil.server.BasilServerEnvironment</param-value>
     </context-param>
 
     <context-param>
         <param-name>basilEnvironmentClass</param-name>
-        <param-value>uk.ac.open.kmi.basil.server.BasilServerEnvironment</param-value>
+        <param-value>io.github.basilapi.basil.server.BasilServerEnvironment</param-value>
     </context-param>
 
     <listener>
@@ -75,7 +75,7 @@
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>javax.ws.rs.Application</param-name>
-            <param-value>uk.ac.open.kmi.basil.rest.BasilApplication</param-value>
+            <param-value>io.github.basilapi.basil.rest.BasilApplication</param-value>
 		</init-param>
         <init-param>
             <param-name>jersey.config.server.wadl.disableWadl</param-name>
@@ -109,12 +109,12 @@
     </servlet>
 
 	<listener>
-        <listener-class>uk.ac.open.kmi.basil.rest.BasilApplication</listener-class>
+        <listener-class>io.github.basilapi.basil.rest.BasilApplication</listener-class>
 	</listener>
 
     <servlet>
         <servlet-name>Bootstrap</servlet-name>
-        <servlet-class>uk.ac.open.kmi.basil.swagger.Bootstrap</servlet-class>
+        <servlet-class>io.github.basilapi.basil.swagger.Bootstrap</servlet-class>
         <load-on-startup>2</load-on-startup>
     </servlet>
 

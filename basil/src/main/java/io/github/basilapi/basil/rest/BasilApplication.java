@@ -1,9 +1,15 @@
-package uk.ac.open.kmi.basil.rest;
+package io.github.basilapi.basil.rest;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import io.github.basilapi.basil.alias.AliasMemCache;
+import io.github.basilapi.basil.core.auth.JDBCUserManager;
+import io.github.basilapi.basil.invoke.DirectExecutor;
+import io.github.basilapi.basil.invoke.QueryExecutor;
+import io.github.basilapi.basil.mysql.MySQLStore;
+import io.github.basilapi.basil.server.BasilEnvironment;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.secnod.shiro.jersey.AuthInjectionBinder;
 import org.secnod.shiro.jersey.AuthorizationFilterFeature;
@@ -14,13 +20,6 @@ import org.slf4j.LoggerFactory;
 import com.wordnik.swagger.jersey.listing.ApiListingResourceJSON;
 import com.wordnik.swagger.jersey.listing.JerseyApiDeclarationProvider;
 import com.wordnik.swagger.jersey.listing.JerseyResourceListingProvider;
-
-import uk.ac.open.kmi.basil.alias.AliasMemCache;
-import uk.ac.open.kmi.basil.core.auth.JDBCUserManager;
-import uk.ac.open.kmi.basil.invoke.DirectExecutor;
-import uk.ac.open.kmi.basil.invoke.QueryExecutor;
-import uk.ac.open.kmi.basil.mysql.MySQLStore;
-import uk.ac.open.kmi.basil.server.BasilEnvironment;
 
 /**
  * Created by Luca Panziera on 09/01/15.

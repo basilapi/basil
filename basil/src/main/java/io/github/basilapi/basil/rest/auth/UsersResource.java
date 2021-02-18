@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rest.auth;
+package io.github.basilapi.basil.rest.auth;
 
 import java.net.URI;
 import java.util.Set;
@@ -13,10 +13,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import uk.ac.open.kmi.basil.core.auth.User;
-import uk.ac.open.kmi.basil.doc.Doc;
-import uk.ac.open.kmi.basil.doc.Doc.Field;
-import uk.ac.open.kmi.basil.rest.core.AbstractResource;
+import io.github.basilapi.basil.core.auth.User;
+import io.github.basilapi.basil.doc.Doc;
+import io.github.basilapi.basil.rest.core.AbstractResource;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -28,7 +27,7 @@ import com.google.gson.JsonPrimitive;
  */
 
 @Path("users")
-public class UsersResource extends AbstractResource{
+public class UsersResource extends AbstractResource {
 
     @Context
     protected UriInfo requestUri;
@@ -79,7 +78,7 @@ public class UsersResource extends AbstractResource{
             	JsonObject object = new JsonObject();
     			Doc doc = getApiManager().getDoc(api);
     			object.add("id", new JsonPrimitive(api));
-    			object.add("name", new JsonPrimitive(String.valueOf(doc.get(Field.NAME))));
+    			object.add("name", new JsonPrimitive(String.valueOf(doc.get(Doc.Field.NAME))));
     			object.add("createdby", new JsonPrimitive(username));
     			//object.add("description", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
     			object.add("location", new JsonPrimitive(String.valueOf(requestUri.getBaseUriBuilder().path(api))));

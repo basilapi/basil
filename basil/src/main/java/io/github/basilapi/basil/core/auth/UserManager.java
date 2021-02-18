@@ -1,7 +1,7 @@
-package uk.ac.open.kmi.basil.core.auth;
+package io.github.basilapi.basil.core.auth;
 
-import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
-import uk.ac.open.kmi.basil.core.auth.exceptions.UserCreationException;
+import io.github.basilapi.basil.core.auth.exceptions.UserApiMappingException;
+import io.github.basilapi.basil.core.auth.exceptions.UserCreationException;
 
 import java.util.Set;
 

@@ -1,6 +1,6 @@
-package uk.ac.open.kmi.basil.sparql;
+package io.github.basilapi.basil.sparql;
 
-import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
+import io.github.basilapi.basil.core.exceptions.SpecificationParsingException;
 
 public class UnknownQueryTypeException extends SpecificationParsingException {
 

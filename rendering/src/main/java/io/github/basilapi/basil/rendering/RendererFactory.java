@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rendering;
+package io.github.basilapi.basil.rendering;
 
 import org.apache.http.HttpResponse;
 import org.apache.jena.query.ResultSet;

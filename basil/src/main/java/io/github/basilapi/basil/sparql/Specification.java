@@ -1,13 +1,10 @@
-package uk.ac.open.kmi.basil.sparql;
+package io.github.basilapi.basil.sparql;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.jena.query.QueryException;
-import org.apache.jena.query.QueryFactory;
 
 public class Specification implements Serializable {
 	private static final long serialVersionUID = 9010724117224824994L;

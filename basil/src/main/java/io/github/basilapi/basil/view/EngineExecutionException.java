@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.view;
+package io.github.basilapi.basil.view;
 
 public class EngineExecutionException extends Exception {
 	/**

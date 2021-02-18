@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.mysql;
+package io.github.basilapi.basil.mysql;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -20,6 +20,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import io.github.basilapi.basil.core.ApiInfo;
+import io.github.basilapi.basil.doc.Doc;
+import io.github.basilapi.basil.search.Query;
+import io.github.basilapi.basil.search.Result;
+import io.github.basilapi.basil.search.SearchProvider;
+import io.github.basilapi.basil.sparql.Specification;
+import io.github.basilapi.basil.sparql.SpecificationFactory;
+import io.github.basilapi.basil.sparql.UnknownQueryTypeException;
+import io.github.basilapi.basil.store.Store;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.jena.query.QueryException;
 import org.apache.jena.query.QueryFactory;
@@ -28,18 +37,9 @@ import org.apache.jena.update.UpdateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.basil.core.ApiInfo;
-import uk.ac.open.kmi.basil.doc.Doc;
-import uk.ac.open.kmi.basil.search.Query;
-import uk.ac.open.kmi.basil.search.Result;
-import uk.ac.open.kmi.basil.search.SearchProvider;
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
-import uk.ac.open.kmi.basil.sparql.UnknownQueryTypeException;
-import uk.ac.open.kmi.basil.store.Store;
-import uk.ac.open.kmi.basil.view.Engine;
-import uk.ac.open.kmi.basil.view.View;
-import uk.ac.open.kmi.basil.view.Views;
+import io.github.basilapi.basil.view.Engine;
+import io.github.basilapi.basil.view.View;
+import io.github.basilapi.basil.view.Views;
 
 public class MySQLStore implements Store, SearchProvider {
 

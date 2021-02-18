@@ -1,11 +1,11 @@
-package uk.ac.open.kmi.basil.rest.core;
+package io.github.basilapi.basil.rest.core;
 
 import com.google.gson.JsonObject;
 import com.wordnik.swagger.annotations.*;
-import uk.ac.open.kmi.basil.doc.Doc;
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.swagger.SwaggerJsonBuilder;
-import uk.ac.open.kmi.basil.swagger.SwaggerUIBuilder;
+import io.github.basilapi.basil.doc.Doc;
+import io.github.basilapi.basil.sparql.Specification;
+import io.github.basilapi.basil.swagger.SwaggerJsonBuilder;
+import io.github.basilapi.basil.swagger.SwaggerUIBuilder;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;

@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.sparql;
+package io.github.basilapi.basil.sparql;
 
 import org.apache.jena.datatypes.BaseDatatype;
 import org.apache.jena.query.ParameterizedSparqlString;

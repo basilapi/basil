@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.server;
+package io.github.basilapi.basil.server;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;

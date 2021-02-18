@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.sparql;
+package io.github.basilapi.basil.sparql;
 
 import java.util.HashMap;
 import java.util.HashSet;

@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.sparql;
+package io.github.basilapi.basil.sparql;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

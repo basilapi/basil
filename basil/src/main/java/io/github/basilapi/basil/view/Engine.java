@@ -1,14 +1,13 @@
-package uk.ac.open.kmi.basil.view;
+package io.github.basilapi.basil.view;
 
 import java.io.StringReader;
 import java.io.Writer;
 
+import io.github.basilapi.basil.view.rhino.RhinoMediator;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-
-import uk.ac.open.kmi.basil.view.rhino.RhinoMediator;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;

@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rest.msg;
+package io.github.basilapi.basil.rest.msg;
 
 public interface Message {
 	void setText(String text);

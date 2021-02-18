@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rest.auth;
+package io.github.basilapi.basil.rest.auth;
 
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -13,6 +13,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import io.github.basilapi.basil.core.auth.User;
+import io.github.basilapi.basil.rest.core.AbstractResource;
+import io.github.basilapi.basil.rest.core.Headers;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
@@ -27,10 +30,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import uk.ac.open.kmi.basil.core.auth.User;
-import uk.ac.open.kmi.basil.rest.core.AbstractResource;
-import uk.ac.open.kmi.basil.rest.core.Headers;
-import uk.ac.open.kmi.basil.rest.msg.ErrorMessage;
+import io.github.basilapi.basil.rest.msg.ErrorMessage;
 
 /**
  * Created by Luca Panziera on 26/06/15.

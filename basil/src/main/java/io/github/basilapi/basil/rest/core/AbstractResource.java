@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rest.core;
+package io.github.basilapi.basil.rest.core;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -12,22 +12,21 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import io.github.basilapi.basil.alias.AliasCache;
+import io.github.basilapi.basil.core.ApiManager;
+import io.github.basilapi.basil.core.ApiManagerImpl;
+import io.github.basilapi.basil.core.auth.UserManager;
+import io.github.basilapi.basil.invoke.QueryExecutor;
+import io.github.basilapi.basil.search.SearchProvider;
+import io.github.basilapi.basil.store.Store;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.basil.alias.AliasCache;
-import uk.ac.open.kmi.basil.alias.AliasMemCache;
-import uk.ac.open.kmi.basil.core.ApiManager;
-import uk.ac.open.kmi.basil.core.ApiManagerImpl;
-import uk.ac.open.kmi.basil.core.auth.UserManager;
-import uk.ac.open.kmi.basil.invoke.QueryExecutor;
-import uk.ac.open.kmi.basil.rest.BasilApplication;
-import uk.ac.open.kmi.basil.rest.auth.StatelessBasicAuth;
-import uk.ac.open.kmi.basil.rest.msg.ErrorMessage;
-import uk.ac.open.kmi.basil.search.SearchProvider;
-import uk.ac.open.kmi.basil.store.Store;
+import io.github.basilapi.basil.rest.BasilApplication;
+import io.github.basilapi.basil.rest.auth.StatelessBasicAuth;
+import io.github.basilapi.basil.rest.msg.ErrorMessage;
 
 public class AbstractResource {
 

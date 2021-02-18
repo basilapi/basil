@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.core.auth;
+package io.github.basilapi.basil.core.auth;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,10 +8,9 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.github.basilapi.basil.core.auth.exceptions.UserApiMappingException;
+import io.github.basilapi.basil.core.auth.exceptions.UserCreationException;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
-
-import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
-import uk.ac.open.kmi.basil.core.auth.exceptions.UserCreationException;
 
 /**
  * Created by Luca Panziera on 26/06/15.

@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.search;
+package io.github.basilapi.basil.search;
 
 public interface Query {
 	public void setText(String text);

@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.view;
+package io.github.basilapi.basil.view;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.github.basilapi.basil.sparql.TestUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -20,10 +21,9 @@ import org.mozilla.javascript.Scriptable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.sparql.TestUtils;
-import uk.ac.open.kmi.basil.sparql.VariablesBinder;
-import uk.ac.open.kmi.basil.view.rhino.RhinoMediator;
+import io.github.basilapi.basil.sparql.Specification;
+import io.github.basilapi.basil.sparql.VariablesBinder;
+import io.github.basilapi.basil.view.rhino.RhinoMediator;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;

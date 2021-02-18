@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.core.auth;
+package io.github.basilapi.basil.core.auth;
 
 /**
  * Created by Luca Panziera on 26/06/15.

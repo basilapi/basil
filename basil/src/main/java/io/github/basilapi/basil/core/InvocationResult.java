@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.core;
+package io.github.basilapi.basil.core;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.update.UpdateRequest;

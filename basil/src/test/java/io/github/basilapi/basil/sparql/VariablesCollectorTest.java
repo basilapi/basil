@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.sparql;
+package io.github.basilapi.basil.sparql;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -6,13 +6,9 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryException;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementWalker;
-import org.apache.jena.update.Update;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateRequest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

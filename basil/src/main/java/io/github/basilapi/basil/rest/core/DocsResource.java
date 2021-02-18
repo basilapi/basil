@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rest.core;
+package io.github.basilapi.basil.rest.core;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import io.github.basilapi.basil.doc.Doc;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
@@ -28,9 +29,6 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-
-import uk.ac.open.kmi.basil.doc.Doc;
-import uk.ac.open.kmi.basil.doc.Doc.Field;
 
 /**
  * 
@@ -65,7 +63,7 @@ public class DocsResource extends AbstractResource {
 			if (doc.isEmpty()) {
 				builder = Response.noContent();
 			} else {
-				builder = Response.ok(doc.get(Field.DESCRIPTION));
+				builder = Response.ok(doc.get(Doc.Field.DESCRIPTION));
 				builder.header(Headers.Name, doc.get(Doc.Field.NAME));
 			}
 			addHeaders(builder, id);

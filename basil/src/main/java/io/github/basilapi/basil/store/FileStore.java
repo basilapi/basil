@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.store;
+package io.github.basilapi.basil.store;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,15 +16,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.github.basilapi.basil.core.ApiInfo;
+import io.github.basilapi.basil.doc.Doc;
+import io.github.basilapi.basil.sparql.Specification;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.basil.core.ApiInfo;
-import uk.ac.open.kmi.basil.doc.Doc;
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.view.Views;
+import io.github.basilapi.basil.view.Views;
 
 public class FileStore implements Store {
 	private Logger log = LoggerFactory.getLogger(FileStore.class);

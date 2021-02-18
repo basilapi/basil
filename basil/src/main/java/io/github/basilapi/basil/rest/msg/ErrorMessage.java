@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rest.msg;
+package io.github.basilapi.basil.rest.msg;
 
 public class ErrorMessage extends SimpleMessage {
 

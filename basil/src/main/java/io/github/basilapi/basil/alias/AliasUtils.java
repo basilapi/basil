@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.alias;
+package io.github.basilapi.basil.alias;
 
 import java.util.Set;
 import java.util.regex.Pattern;

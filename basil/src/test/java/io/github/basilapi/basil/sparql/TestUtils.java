@@ -1,8 +1,8 @@
-package uk.ac.open.kmi.basil.sparql;
+package io.github.basilapi.basil.sparql;
 
 import org.apache.commons.io.IOUtils;
-import uk.ac.open.kmi.basil.rest.core.Headers;
-import uk.ac.open.kmi.basil.sparql.QueryParameter.Type;
+import io.github.basilapi.basil.rest.core.Headers;
+import io.github.basilapi.basil.sparql.QueryParameter.Type;
 
 import java.io.IOException;
 

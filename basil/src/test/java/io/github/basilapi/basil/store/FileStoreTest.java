@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.store;
+package io.github.basilapi.basil.store;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.github.basilapi.basil.sparql.TestUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,12 +20,11 @@ import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.basil.sparql.QueryParameter;
-import uk.ac.open.kmi.basil.sparql.QueryParameter.Type;
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.sparql.SpecificationFactory;
-import uk.ac.open.kmi.basil.sparql.TestUtils;
-import uk.ac.open.kmi.basil.sparql.UnknownQueryTypeException;
+import io.github.basilapi.basil.sparql.QueryParameter;
+import io.github.basilapi.basil.sparql.QueryParameter.Type;
+import io.github.basilapi.basil.sparql.Specification;
+import io.github.basilapi.basil.sparql.SpecificationFactory;
+import io.github.basilapi.basil.sparql.UnknownQueryTypeException;
 
 public class FileStoreTest {
 

@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rest.core;
+package io.github.basilapi.basil.rest.core;
 
 import java.util.Collection;
 import java.util.Map.Entry;
@@ -10,13 +10,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import io.github.basilapi.basil.core.ApiInfo;
+import io.github.basilapi.basil.doc.Doc;
+import io.github.basilapi.basil.search.Result;
+import io.github.basilapi.basil.search.SimpleQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.open.kmi.basil.core.ApiInfo;
-import uk.ac.open.kmi.basil.doc.Doc;
-import uk.ac.open.kmi.basil.search.Result;
-import uk.ac.open.kmi.basil.search.SimpleQuery;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

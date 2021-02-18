@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rest.core;
+package io.github.basilapi.basil.rest.core;
 
 public final class Headers {
 	public static final String PREFIX = "X-Basil-";

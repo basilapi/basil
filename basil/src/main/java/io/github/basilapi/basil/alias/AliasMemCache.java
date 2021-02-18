@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.alias;
+package io.github.basilapi.basil.alias;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -37,7 +37,7 @@ public class AliasMemCache implements AliasCache {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see uk.ac.open.kmi.basil.alias.AliasCache#set(java.lang.String,
+	 * @see AliasCache#set(java.lang.String,
 	 * java.lang.String)
 	 */
 	@Override
@@ -48,7 +48,7 @@ public class AliasMemCache implements AliasCache {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see uk.ac.open.kmi.basil.alias.AliasCache#containsAlias(java.lang.String)
+	 * @see AliasCache#containsAlias(java.lang.String)
 	 */
 	@Override
 	public boolean containsAlias(String alias) {
@@ -58,7 +58,7 @@ public class AliasMemCache implements AliasCache {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see uk.ac.open.kmi.basil.alias.AliasCache#getId(java.lang.String)
+	 * @see AliasCache#getId(java.lang.String)
 	 */
 	@Override
 	public String getId(String alias) {
@@ -68,7 +68,7 @@ public class AliasMemCache implements AliasCache {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see uk.ac.open.kmi.basil.alias.AliasCache#removeAll(java.lang.String)
+	 * @see AliasCache#removeAll(java.lang.String)
 	 */
 	@Override
 	public void removeAll(String id) {

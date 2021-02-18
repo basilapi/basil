@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rest.core;
+package io.github.basilapi.basil.rest.core;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import io.github.basilapi.basil.core.ApiInfo;
 import org.apache.jena.query.QueryParseException;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
@@ -29,9 +30,8 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
-import uk.ac.open.kmi.basil.core.ApiInfo;
-import uk.ac.open.kmi.basil.rest.auth.AuthResource;
-import uk.ac.open.kmi.basil.rest.msg.SimpleMessage;
+import io.github.basilapi.basil.rest.auth.AuthResource;
+import io.github.basilapi.basil.rest.msg.SimpleMessage;
 
 @Path("/")
 @Api(value = "/basil", description = "BASIL operations")

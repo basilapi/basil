@@ -1,13 +1,12 @@
-package uk.ac.open.kmi.basil.swagger;
+package io.github.basilapi.basil.swagger;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import uk.ac.open.kmi.basil.doc.Doc;
-import uk.ac.open.kmi.basil.doc.Doc.Field;
-import uk.ac.open.kmi.basil.rendering.MoreMediaType;
-import uk.ac.open.kmi.basil.sparql.QueryParameter;
-import uk.ac.open.kmi.basil.sparql.Specification;
+import io.github.basilapi.basil.doc.Doc;
+import io.github.basilapi.basil.rendering.MoreMediaType;
+import io.github.basilapi.basil.sparql.QueryParameter;
+import io.github.basilapi.basil.sparql.Specification;
 
 import javax.ws.rs.core.MediaType;
 
@@ -29,7 +28,7 @@ public class SwaggerJsonBuilder {
 		JsonObject op = new JsonObject();
 		op.add("method", new JsonPrimitive("GET"));
 		op.add("nickname", new JsonPrimitive("API"));
-		op.add("summary", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
+		op.add("summary", new JsonPrimitive(doc.get(Doc.Field.DESCRIPTION)));
 		op.add("type", new JsonPrimitive("void"));
 		JsonArray produces = new JsonArray();
 		for (MediaType kt : MoreMediaType.extensions.values()) {
@@ -66,7 +65,7 @@ public class SwaggerJsonBuilder {
 		JsonObject op2 = new JsonObject();
 		op2.add("method", new JsonPrimitive("GET"));
 		op2.add("nickname", new JsonPrimitive("APIext"));
-		op2.add("summary", new JsonPrimitive(doc.get(Field.DESCRIPTION)));
+		op2.add("summary", new JsonPrimitive(doc.get(Doc.Field.DESCRIPTION)));
 		op2.add("type", new JsonPrimitive("void"));
 		op2.add("produces", produces);
 

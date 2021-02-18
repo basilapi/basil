@@ -1,17 +1,14 @@
-package uk.ac.open.kmi.basil.invoke;
+package io.github.basilapi.basil.invoke;
 
+import io.github.basilapi.basil.core.InvocationResult;
+import io.github.basilapi.basil.core.exceptions.ApiInvocationException;
 import org.apache.jena.atlas.web.auth.HttpAuthenticator;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.riot.WebContent;
 import org.apache.jena.riot.web.HttpOp;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
-
-import uk.ac.open.kmi.basil.core.InvocationResult;
-import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
 
 /**
  * 

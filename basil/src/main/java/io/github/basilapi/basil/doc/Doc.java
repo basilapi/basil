@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.doc;
+package io.github.basilapi.basil.doc;
 
 import java.io.Serializable;
 import java.util.HashMap;

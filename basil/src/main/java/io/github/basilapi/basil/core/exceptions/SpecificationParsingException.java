@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.core.exceptions;
+package io.github.basilapi.basil.core.exceptions;
 
 /**
  * Created by Luca Panziera on 15/06/15.

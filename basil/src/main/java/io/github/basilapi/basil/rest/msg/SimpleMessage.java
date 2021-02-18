@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rest.msg;
+package io.github.basilapi.basil.rest.msg;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;

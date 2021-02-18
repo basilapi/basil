@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.sparql;
+package io.github.basilapi.basil.sparql;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,9 +12,6 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.open.kmi.basil.sparql.ParameterException;
-import uk.ac.open.kmi.basil.sparql.VariableParser;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.vocabulary.XSD;

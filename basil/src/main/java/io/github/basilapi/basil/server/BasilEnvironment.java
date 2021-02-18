@@ -1,6 +1,6 @@
-package uk.ac.open.kmi.basil.server;
+package io.github.basilapi.basil.server;
 
-import uk.ac.open.kmi.basil.invoke.QueryExecutor;
+import io.github.basilapi.basil.invoke.QueryExecutor;
 
 public interface BasilEnvironment {
 

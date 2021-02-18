@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.server;
+package io.github.basilapi.basil.server;
 
 import java.io.PrintStream;
 

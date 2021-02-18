@@ -1,15 +1,15 @@
-package uk.ac.open.kmi.basil.rest.core;
+package io.github.basilapi.basil.rest.core;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import io.github.basilapi.basil.sparql.QueryParameter;
+import io.github.basilapi.basil.sparql.Specification;
+import io.github.basilapi.basil.sparql.VariablesBinder;
 import org.apache.jena.query.Query;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-import uk.ac.open.kmi.basil.sparql.QueryParameter;
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.sparql.VariablesBinder;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;

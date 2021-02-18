@@ -1,5 +1,6 @@
-package uk.ac.open.kmi.basil.test;
+package io.github.basilapi.basil.test;
 
+import io.github.basilapi.basil.sparql.TestUtils;
 import org.apache.shiro.config.Ini;
 import org.junit.Assert;
 import org.junit.Before;
@@ -8,8 +9,6 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.open.kmi.basil.sparql.TestUtils;
 
 public class ConfigTest {
 	private static Logger log = LoggerFactory.getLogger(ConfigTest.class);

@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.view.rhino;
+package io.github.basilapi.basil.view.rhino;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -13,7 +13,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.basil.view.Items;
+import io.github.basilapi.basil.view.Items;
 
 public class RhinoMediator extends ScriptableObject {
 	private static Logger log = LoggerFactory.getLogger(RhinoMediator.class);

@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.swagger;
+package io.github.basilapi.basil.swagger;
 
 import org.junit.Assert;
 import org.junit.Test;

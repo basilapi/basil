@@ -1,10 +1,10 @@
-package uk.ac.open.kmi.basil.server;
+package io.github.basilapi.basil.server;
 
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.web.env.IniWebEnvironment;
 
-import uk.ac.open.kmi.basil.invoke.DirectExecutor;
-import uk.ac.open.kmi.basil.invoke.QueryExecutor;
+import io.github.basilapi.basil.invoke.DirectExecutor;
+import io.github.basilapi.basil.invoke.QueryExecutor;
 
 public class BasilServerEnvironment extends IniWebEnvironment implements BasilEnvironment {
 

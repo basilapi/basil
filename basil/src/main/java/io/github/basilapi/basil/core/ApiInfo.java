@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.core;
+package io.github.basilapi.basil.core;
 
 import java.util.Date;
 import java.util.Set;

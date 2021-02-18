@@ -1,20 +1,19 @@
-package uk.ac.open.kmi.basil.rest.core;
+package io.github.basilapi.basil.rest.core;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.wordnik.swagger.annotations.*;
 
+import io.github.basilapi.basil.doc.Doc;
+import io.github.basilapi.basil.view.Engine;
+import io.github.basilapi.basil.view.View;
+import io.github.basilapi.basil.view.Views;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.open.kmi.basil.doc.Doc.Field;
-import uk.ac.open.kmi.basil.view.Engine;
-import uk.ac.open.kmi.basil.view.View;
-import uk.ac.open.kmi.basil.view.Views;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -145,7 +144,7 @@ public class ViewResource extends AbstractResource {
 				r = Response.ok(arr.toString());
 			}
 			addHeaders(r, id);
-			r.header(Headers.Name, getApiManager().getDoc(id).get(Field.NAME));
+			r.header(Headers.Name, getApiManager().getDoc(id).get(Doc.Field.NAME));
 			return r.build();
 		} catch (Exception e) {
 			log.error("", e);

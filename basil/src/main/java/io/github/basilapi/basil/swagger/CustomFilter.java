@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.swagger;
+package io.github.basilapi.basil.swagger;
 
 import com.wordnik.swagger.core.filter.SwaggerSpecFilter;
 import com.wordnik.swagger.model.ApiDescription;

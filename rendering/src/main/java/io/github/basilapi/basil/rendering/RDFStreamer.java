@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.rendering;
+package io.github.basilapi.basil.rendering;
 
 import java.io.OutputStream;
 import java.util.Iterator;

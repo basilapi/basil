@@ -1,10 +1,9 @@
-package uk.ac.open.kmi.basil.rest.core;
+package io.github.basilapi.basil.rest.core;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +23,18 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Variant;
 
+import io.github.basilapi.basil.core.InvocationResult;
+import io.github.basilapi.basil.core.exceptions.ApiInvocationException;
+import io.github.basilapi.basil.core.exceptions.SpecificationParsingException;
+import io.github.basilapi.basil.doc.Doc;
+import io.github.basilapi.basil.rendering.CannotRenderException;
+import io.github.basilapi.basil.rendering.MoreMediaType;
+import io.github.basilapi.basil.rendering.Renderer;
+import io.github.basilapi.basil.rendering.RendererFactory;
+import io.github.basilapi.basil.sparql.Specification;
+import io.github.basilapi.basil.view.Items;
+import io.github.basilapi.basil.view.View;
+import io.github.basilapi.basil.view.Views;
 import org.apache.http.HttpResponse;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.query.ResultSet;
@@ -40,20 +51,8 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
-import uk.ac.open.kmi.basil.core.InvocationResult;
-import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
-import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
-import uk.ac.open.kmi.basil.doc.Doc.Field;
-import uk.ac.open.kmi.basil.rendering.CannotRenderException;
-import uk.ac.open.kmi.basil.rendering.MoreMediaType;
-import uk.ac.open.kmi.basil.rendering.Renderer;
-import uk.ac.open.kmi.basil.rendering.RendererFactory;
-import uk.ac.open.kmi.basil.rest.auth.AuthResource;
-import uk.ac.open.kmi.basil.rest.msg.SimpleMessage;
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.view.Items;
-import uk.ac.open.kmi.basil.view.View;
-import uk.ac.open.kmi.basil.view.Views;
+import io.github.basilapi.basil.rest.auth.AuthResource;
+import io.github.basilapi.basil.rest.msg.SimpleMessage;
 
 @Path("{id}")
 @Api(value = "/basil", description = "BASIL operations")
@@ -363,7 +362,7 @@ public class ApiResource extends AbstractResource {
 			}
 			Specification spec = getApiManager().getSpecification(id);
 			ResponseBuilder response = Response.ok();
-			response.header(Headers.Name, getApiManager().getDoc(id).get(Field.NAME));
+			response.header(Headers.Name, getApiManager().getDoc(id).get(Doc.Field.NAME));
 			response.header(Headers.Endpoint, spec.getEndpoint());
 			addHeaders(response, id);
 			response.entity(spec.getQuery());

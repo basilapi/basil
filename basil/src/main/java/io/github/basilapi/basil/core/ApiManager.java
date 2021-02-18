@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.core;
+package io.github.basilapi.basil.core;
 
 import java.io.IOException;
 import java.util.List;
@@ -6,15 +6,14 @@ import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import uk.ac.open.kmi.basil.core.auth.exceptions.UserApiMappingException;
-import uk.ac.open.kmi.basil.core.exceptions.ApiInvocationException;
-import uk.ac.open.kmi.basil.core.exceptions.SpecificationParsingException;
-import uk.ac.open.kmi.basil.doc.Doc;
-import uk.ac.open.kmi.basil.sparql.Specification;
-import uk.ac.open.kmi.basil.sparql.UnknownQueryTypeException;
-import uk.ac.open.kmi.basil.view.Engine;
-import uk.ac.open.kmi.basil.view.View;
-import uk.ac.open.kmi.basil.view.Views;
+import io.github.basilapi.basil.core.auth.exceptions.UserApiMappingException;
+import io.github.basilapi.basil.core.exceptions.ApiInvocationException;
+import io.github.basilapi.basil.core.exceptions.SpecificationParsingException;
+import io.github.basilapi.basil.doc.Doc;
+import io.github.basilapi.basil.sparql.Specification;
+import io.github.basilapi.basil.view.Engine;
+import io.github.basilapi.basil.view.View;
+import io.github.basilapi.basil.view.Views;
 
 /**
  * Created by Luca Panziera on 15/06/15.

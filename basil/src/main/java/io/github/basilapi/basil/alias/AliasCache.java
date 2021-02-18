@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.alias;
+package io.github.basilapi.basil.alias;
 
 public interface AliasCache {
 
