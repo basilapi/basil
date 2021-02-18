@@ -11,6 +11,6 @@
         <Root level="ERROR">
             <AppenderRef ref="STDOUT"/>
         </Root>
-        <Logger name="uk.ac.open.kmi.basil" level="TRACE"/>
+        <Logger name="io.github.basilapi.basil" level="TRACE"/>
     </Loggers>
 </Configuration>
