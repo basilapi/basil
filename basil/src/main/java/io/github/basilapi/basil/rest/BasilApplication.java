@@ -29,7 +29,7 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 
     public BasilApplication(){
         packages("com.wordnik.swagger.jaxrs.json").
-				packages("uk.ac.open.kmi.basil.rest").
+				packages("io.github.basilapi.basil.rest").
 				register(ApiListingResourceJSON.class).
                 register(JerseyApiDeclarationProvider.class).
                 register(JerseyResourceListingProvider.class);
