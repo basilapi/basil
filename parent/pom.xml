@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>basil</groupId>
+	<groupId>io.github.basilapi</groupId>
 	<artifactId>parent</artifactId>
 	<version>0.8.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
@@ -26,7 +26,7 @@
 		<shiro.version>1.4.2</shiro.version>
 
 		<!-- basil version -->
-		<basil.version>0.7.1</basil.version>
+		<basil.version>${project.version}</basil.version>
 
 		<!-- github server corresponds to entry in ~/.m2/settings.xml -->
 		<github.global.server>github</github.global.server>
@@ -332,7 +332,7 @@
 							<exclude>**/basil-server-*</exclude>
 						</excludes>
 						<repositoryName>basil</repositoryName>      <!-- github repo name -->
-						<repositoryOwner>the-open-university</repositoryOwner>    <!-- github username -->
+						<repositoryOwner>basilapi</repositoryOwner>    <!-- github username -->
 					</configuration>
 					<executions>
 						<!-- run site-maven-plugin's 'site' target as part of the build's normal 
@@ -352,14 +352,14 @@
 
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/the-open-university/basil/issues</url>
+		<url>https://github.com/basilapi/basil/issues</url>
 	</issueManagement>
 
 
 	<scm>
-		<url>https://github.com/the-open-university/basil</url>
-		<connection>scm:git:git://github.com/the-open-university/basil.git</connection>
-		<developerConnection>scm:git:git@github.com:the-open-university/basil.git</developerConnection>
+		<url>https://github.com/basilapi/basil</url>
+		<connection>scm:git:git://github.com/basilapi/basil.git</connection>
+		<developerConnection>scm:git:git@github.com:basilapi/basil.git</developerConnection>
 	</scm>
 
 	<developers>
