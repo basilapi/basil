@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>io.github.basilapi</groupId>
+  <artifactId>basil</artifactId>
+  <versioning>
+    <versions>
+      <version>0.8.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20210218175744</lastUpdated>
+  </versioning>
+</metadata>
