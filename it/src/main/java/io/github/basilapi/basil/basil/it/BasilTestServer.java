@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.it;
+package io.github.basilapi.basil.it;
 
 import java.io.File;
 import java.net.MalformedURLException;
