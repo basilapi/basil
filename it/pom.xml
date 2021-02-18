@@ -11,7 +11,7 @@
 	<description>Integration Tests</description>
 
 	<parent>
-		<groupId>basil</groupId>
+		<groupId>io.github.basilapi</groupId>
 		<artifactId>parent</artifactId>
 		<version>0.8.0-SNAPSHOT</version>
 		<relativePath>../parent</relativePath>
@@ -91,7 +91,7 @@
 									<version>3.12.0</version>
 								</artifactItem>
 								<artifactItem>
-									<groupId>basil</groupId>
+									<groupId>io.github.basilapi</groupId>
 									<artifactId>basil-server</artifactId>
 									<version>${basil.version}</version>
 									<type>jar</type>
