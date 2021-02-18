@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.it;
+package io.github.basilapi.basil.it;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

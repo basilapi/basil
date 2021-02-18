@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.it;
+package io.github.basilapi.basil.it;
 
 import org.junit.Rule;
 import org.junit.rules.TestName;

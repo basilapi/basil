@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.basil.it;
+package io.github.basilapi.basil.it;
 
 import org.apache.http.client.methods.HttpPut;
 import org.junit.Rule;
