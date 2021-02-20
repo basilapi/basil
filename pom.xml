@@ -20,6 +20,7 @@
 		<module>rendering</module>
 		<module>basil</module>
 		<module>server</module>
+		<module>sparql</module>
 	</modules>
 	<profiles>
 		<profile>

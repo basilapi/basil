@@ -1,0 +1,10 @@
+# X-Basil-Endpoint: http://dbpedia.org/sparql
+# a delete token in comment
+select ?subject ?label ?nationality where {
+  ?subject a <http://dbpedia.org/ontology/Person> ;
+    <http://www.w3.org/2000/01/rdf-schema#label> ?label ;
+    <http://dbpedia.org/property/dateOfBirth> ?_year_number ;
+    <http://dbpedia.org/ontology/nationality> ?nationality .
+    filter(lang(?label)="en")
+    }
+LIMIT ?_limit_number

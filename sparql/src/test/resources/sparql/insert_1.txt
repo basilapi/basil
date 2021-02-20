@@ -1,0 +1,3 @@
+# X-Basil-Endpoint: http://data.open.ac.uk/sparql
+PREFIX dc: <http://purl.org/dc/elements/1.1/> 
+INSERT { <http://example/egbook> dc:title  ?_title } WHERE {}

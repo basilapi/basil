@@ -1,0 +1,15 @@
+# X-Basil-Endpoint: http://dbpedia.org/sparql
+
+   # a DELETE command should be considered in a comment
+
+	select
+	
+	?insert ?subject ?label ?nationality where { # insert a comment here
+  	
+  	
+  	?subject a <http://dbpedia.org/ontology/Person> ;
+    		<http://www.w3.org/2000/01/rdf-schema#label> ?label ;
+    <http://dbpedia.org/property/dateOfBirth> ?_year_number ;
+    <http://dbpedia.org/ontology/nationality> ?nationality .
+    filter(lang(?label)="en")
+    }

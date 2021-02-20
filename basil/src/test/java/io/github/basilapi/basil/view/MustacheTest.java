@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.basilapi.basil.sparql.TestUtils;
+import io.github.basilapi.basil.TestUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

@@ -1,6 +1,6 @@
 package io.github.basilapi.basil.test;
 
-import io.github.basilapi.basil.sparql.TestUtils;
+import io.github.basilapi.basil.TestUtils;
 import org.apache.shiro.config.Ini;
 import org.junit.Assert;
 import org.junit.Before;

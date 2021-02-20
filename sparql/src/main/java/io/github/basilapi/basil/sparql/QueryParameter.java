@@ -186,4 +186,19 @@ public class QueryParameter implements Serializable {
 		this.datatype = null;
 		this.lang = null;
 	}
+
+	public static QueryParameter buildQueryParameter(String name, QueryParameter.Type type, String lang, String datatype) {
+		QueryParameter qp = new QueryParameter();
+		qp.setName(name);
+		if (type == Type.IRI) {
+			qp.setIri();
+		} else if (type == Type.TypedLiteral) {
+			qp.setDatatype(datatype);
+		} else if (type == Type.LangedLiteral) {
+			qp.setLang(lang);
+		} else if (type == Type.PlainLiteral) {
+			qp.setPlainLiteral();
+		}
+		return qp;
+	}
 }

@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.github.basilapi.basil.sparql.TestUtils;
+import io.github.basilapi.basil.TestUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,7 +55,7 @@ public class FileStoreTest {
 	@Test
 	public void serializeQueryParameter() throws IOException,
 			ClassNotFoundException {
-		QueryParameter param = TestUtils.buildQueryParameter("param1",
+		QueryParameter param = QueryParameter.buildQueryParameter("param1",
 				Type.LangedLiteral, "en", null);
 		store.write(testName.getMethodName(), param, "qp");
 		QueryParameter param2 = (QueryParameter) store.read(
