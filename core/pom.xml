@@ -9,7 +9,7 @@
 		<version>0.8.0-SNAPSHOT</version>
 		<relativePath>../parent</relativePath>
 	</parent>
-	<artifactId>basil</artifactId>
+	<artifactId>core</artifactId>
 	<packaging>jar</packaging>
 
 	<name>BASIL :: Core</name>

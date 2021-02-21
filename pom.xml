@@ -21,6 +21,7 @@
 		<module>core</module>
 		<module>server</module>
 		<module>sparql</module>
+		<module>rest</module>
 	</modules>
 	<profiles>
 		<profile>
