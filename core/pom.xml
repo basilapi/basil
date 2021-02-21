@@ -170,11 +170,6 @@
 			<artifactId>sparql</artifactId>
 			<version>${basil.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>io.github.basilapi</groupId>
-			<artifactId>store</artifactId>
-			<version>${basil.version}</version>
-		</dependency>
 	</dependencies>
 
 </project>

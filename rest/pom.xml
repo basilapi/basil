@@ -34,5 +34,11 @@
             <artifactId>core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.basilapi</groupId>
+            <artifactId>store</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
 </project>
