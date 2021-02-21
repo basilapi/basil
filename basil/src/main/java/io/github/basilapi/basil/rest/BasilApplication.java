@@ -5,10 +5,10 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import io.github.basilapi.basil.alias.AliasMemCache;
-import io.github.basilapi.basil.core.auth.JDBCUserManager;
+import io.github.basilapi.basil.store.mysql.JDBCUserManager;
 import io.github.basilapi.basil.invoke.DirectExecutor;
 import io.github.basilapi.basil.invoke.QueryExecutor;
-import io.github.basilapi.basil.mysql.MySQLStore;
+import io.github.basilapi.basil.store.mysql.MySQLStore;
 import io.github.basilapi.basil.server.BasilEnvironment;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.secnod.shiro.jersey.AuthInjectionBinder;

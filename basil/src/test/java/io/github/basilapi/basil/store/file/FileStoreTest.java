@@ -1,4 +1,4 @@
-package io.github.basilapi.basil.store;
+package io.github.basilapi.basil.store.file;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.github.basilapi.basil.TestUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;

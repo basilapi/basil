@@ -1,4 +1,4 @@
-package io.github.basilapi.basil.mysql;
+package io.github.basilapi.basil.store.mysql;
 
 import java.io.IOException;
 import java.sql.Connection;

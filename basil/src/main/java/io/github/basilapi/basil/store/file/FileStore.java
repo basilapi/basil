@@ -1,4 +1,4 @@
-package io.github.basilapi.basil.store;
+package io.github.basilapi.basil.store.file;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,6 +19,7 @@ import java.util.Set;
 import io.github.basilapi.basil.core.ApiInfo;
 import io.github.basilapi.basil.doc.Doc;
 import io.github.basilapi.basil.sparql.Specification;
+import io.github.basilapi.basil.store.Store;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

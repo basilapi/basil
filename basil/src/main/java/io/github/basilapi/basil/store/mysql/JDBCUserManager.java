@@ -1,4 +1,4 @@
-package io.github.basilapi.basil.core.auth;
+package io.github.basilapi.basil.store.mysql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.github.basilapi.basil.core.auth.User;
+import io.github.basilapi.basil.core.auth.UserManager;
 import io.github.basilapi.basil.core.auth.exceptions.UserApiMappingException;
 import io.github.basilapi.basil.core.auth.exceptions.UserCreationException;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
