@@ -1,4 +1,4 @@
-package io.github.basilapi.basil.rest;
+package io.github.basilapi.basil.server;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -9,7 +9,6 @@ import io.github.basilapi.basil.store.mysql.JDBCUserManager;
 import io.github.basilapi.basil.invoke.DirectExecutor;
 import io.github.basilapi.basil.invoke.QueryExecutor;
 import io.github.basilapi.basil.store.mysql.MySQLStore;
-import io.github.basilapi.basil.server.BasilEnvironment;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.secnod.shiro.jersey.AuthInjectionBinder;
 import org.secnod.shiro.jersey.AuthorizationFilterFeature;

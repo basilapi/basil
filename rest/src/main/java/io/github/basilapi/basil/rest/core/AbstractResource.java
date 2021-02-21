@@ -24,7 +24,7 @@ import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.basilapi.basil.rest.BasilApplication;
+import io.github.basilapi.basil.server.BasilApplication;
 import io.github.basilapi.basil.rest.auth.StatelessBasicAuth;
 import io.github.basilapi.basil.rest.msg.ErrorMessage;
 
