@@ -23,7 +23,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -251,7 +250,7 @@ public class ModelRenderer extends Renderer<Model> {
 				return new String(baos.toByteArray(), "UTF-8");
 			} catch (UnsupportedEncodingException e) {
 				// This will never happen
-				new WebApplicationException(500);
+				new CannotRenderException();
 			}
 		}
 
