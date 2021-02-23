@@ -44,8 +44,8 @@ public class Doc implements Serializable {
 	/**
 	 * Returns an empty string if null
 	 * 
-	 * @param f
-	 * @return
+	 * @param f the field
+	 * @return the value of the field
 	 */
 	public String get(Field f) {
 		String v = doc.get(f);

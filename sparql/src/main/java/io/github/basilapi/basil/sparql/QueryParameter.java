@@ -41,7 +41,7 @@ public class QueryParameter implements Serializable {
 	/**
 	 * Name of the parameter.
 	 * 
-	 * @return
+	 * @return String
 	 */
 	public String getName() {
 		return name;

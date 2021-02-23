@@ -30,8 +30,8 @@ public final class AliasUtils {
 	/**
 	 * An alias is safe if it matches {AliasUtils.REGEX}
 	 * 
-	 * @param alias
-	 * @return
+	 * @param alias the alias name to be tested
+	 * @return whether the value is a safe alias or not
 	 */
 	public static final boolean isSafe(String alias) {
 		return REGEX.matcher(alias).find();

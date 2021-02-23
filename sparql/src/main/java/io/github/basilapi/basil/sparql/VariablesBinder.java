@@ -55,8 +55,8 @@ public class VariablesBinder {
 	 * specialized methods depending on the associated {@link QueryParameter}.
 	 * Defaults to {@link #bindPlainLiteral(String, String)}.
 	 * 
-	 * @param name
-	 * @param value
+	 * @param name The name of the basil variable
+	 * @param value The value to be assigned to this basil variable
 	 * @return a reference to this object.
 	 * @see #bindIri(String, String)
 	 * @see #bindLangedLiteral(String, String, String)
@@ -86,9 +86,9 @@ public class VariablesBinder {
 	/**
 	 * Binds a value as typed literal.
 	 * 
-	 * @param name
-	 * @param value
-	 * @param datatype
+	 * @param name The name of the basil variable
+	 * @param value The value to be assigned to the variable
+	 * @param datatype Teh datatype annotation to attach to the typed literal
 	 * @return a reference to this object.
 	 */
 	public VariablesBinder bindTypedLiteral(String name, String value,
@@ -99,11 +99,10 @@ public class VariablesBinder {
 	}
 
 	/**
-	 * Binds a value as typed literal.
-	 * 
-	 * @param name
-	 * @param value
-	 * @param datatype
+	 * Binds a value as typed literal (xsd:double or xsd:integer).
+	 *
+	 * @param name The name of the basil variable
+	 * @param value The value to be assigned to the variable
 	 * @return a reference to this object.
 	 */
 	public VariablesBinder bindNumber(String name, String value) {
@@ -116,10 +115,10 @@ public class VariablesBinder {
 	}
 
 	/**
-	 * Binds a value as simple literal.
-	 * 
-	 * @param name
-	 * @param value
+	 * Binds a value as plain literal.
+	 *
+	 * @param name The name of the basil variable
+	 * @param value The value to be assigned to the variable
 	 * @return a reference to this object.
 	 */
 	public VariablesBinder bindPlainLiteral(String name, String value) {
@@ -129,9 +128,9 @@ public class VariablesBinder {
 
 	/**
 	 * Alias of {@link #bindPlainLiteral}
-	 * 
-	 * @param name
-	 * @param value
+	 *
+	 * @param name The name of the basil variable
+	 * @param value The value to be assigned to the variable
 	 * @see #bindPlainLiteral
 	 * @return a reference to this object.
 	 */
@@ -141,10 +140,10 @@ public class VariablesBinder {
 
 	/**
 	 * Binds a value as langed literal.
-	 * 
-	 * @param name
-	 * @param value
-	 * @param lang
+	 *
+	 * @param name The name of the basil variable
+	 * @param value The value to be assigned to the literal
+	 * @param lang The language annotation to be attached to the literal
 	 * @return a reference to this object.
 	 */
 	public VariablesBinder bindLangedLiteral(String name, String value,
@@ -155,9 +154,9 @@ public class VariablesBinder {
 
 	/**
 	 * Binds a value as IRI.
-	 * 
-	 * @param name
-	 * @param value
+	 *
+	 * @param name The name of the basil variable
+	 * @param value The value to be assigned to the literal
 	 * @return a reference to this object.
 	 */
 	public VariablesBinder bindIri(String name, String value) {
