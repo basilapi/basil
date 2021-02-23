@@ -323,8 +323,7 @@
 		<system>GitHub Issues</system>
 		<url>https://github.com/basilapi/basil/issues</url>
 	</issueManagement>
-
-
+	
 	<scm>
 		<url>https://github.com/basilapi/basil</url>
 		<connection>scm:git:git://github.com/basilapi/basil.git</connection>
@@ -346,5 +345,12 @@
 		</developer>
 	</developers>
 
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 </project>
 
