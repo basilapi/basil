@@ -3,3 +3,5 @@
 **/.classpath
 **/.settings
 **/.factorypath
+**/.idea
+**/*.iml
