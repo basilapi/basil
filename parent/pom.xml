@@ -22,7 +22,7 @@
 
 	<groupId>io.github.basilapi</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.8.0</version>
+	<version>0.8.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>BASIL :: Parent</name>
@@ -110,7 +110,7 @@
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.4</version>
+				<version>2.7</version>
 				<exclusions>
 					<exclusion>
 						<groupId>log4j</groupId>
