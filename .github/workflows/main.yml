@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Maven build
+name: Maven build JDK 1.8
 
 # Controls when the action will run. 
 on:
