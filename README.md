@@ -1,6 +1,8 @@
 # BASIL #
 
-[![Join the chat at https://gitter.im/the-open-university/basil](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/the-open-university/basil?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![Maven build JDK 1.8](https://github.com/basilapi/basil/actions/workflows/main.yml/badge.svg)
+![MAven build Java 11](https://github.com/basilapi/basil/actions/workflows/mvn-Java11.yml/badge.svg)
+
 BASIL is designed as middleware system that mediates between SPARQL endpoints and applications.
 
 With BASIL you can build Web APIs on top of SPARQL endpoints.
