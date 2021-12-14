@@ -41,3 +41,8 @@ $ java -jar -Dbasil.configurationFile=../basil.ini -Dlog4j.configurationFile=src
 ```
 
 
+## Releasing ##
+The following command will pack a release, sign the artefacts, and push them to maven central.
+```
+mvn deploy -DperformRelease=true
+```
