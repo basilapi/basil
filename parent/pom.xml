@@ -34,7 +34,7 @@
 		<!-- Versions -->
 		<slf4j.version>1.7.7</slf4j.version>
 		<!-- current log4j 2 release -->
-		<log4j.version>2.15.0</log4j.version>
+		<log4j.version>2.16.0</log4j.version>
 		<!-- jetty -->
 		<!-- org.eclipse.jetty.version>9.2.3.v20140905</org.eclipse.jetty.version -->
 		<org.eclipse.jetty.version>9.4.41.v20210516</org.eclipse.jetty.version>
