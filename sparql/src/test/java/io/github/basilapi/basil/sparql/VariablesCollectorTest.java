@@ -177,5 +177,15 @@ public class VariablesCollectorTest {
 		Assert.assertTrue(vars.contains("?_insert"));
 	}
 
-	
+	@Test
+	public void subQuery_1() throws IOException {
+		Set<String> vars = extractVars(loadQuery(testName.getMethodName()));
+		Assert.assertTrue(vars.contains("?_param1"));
+		Assert.assertTrue(vars.contains("?_param2"));
+		Assert.assertTrue(vars.contains("?_param3"));
+		Assert.assertTrue(vars.contains("?_param4"));
+		Assert.assertTrue(vars.contains("?_param5"));
+	}
+
+
 }

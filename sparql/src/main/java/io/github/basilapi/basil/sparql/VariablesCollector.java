@@ -19,6 +19,7 @@ package io.github.basilapi.basil.sparql;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -188,22 +189,30 @@ public class VariablesCollector implements ElementVisitor, UpdateVisitor {
 
 	public void visit(ElementData el) {
 		//
+
 	}
 
 	public void visit(ElementUnion el) {
 		//
+		for (Element ele : el.getElements()){
+			ele.visit(this);
+		}
 	}
 
 	public void visit(ElementOptional el) {
 		//
+		el.getOptionalElement().visit(this);
 	}
 
 	public void visit(ElementGroup el) {
 		//
+		for (Element ele : el.getElements()){
+			ele.visit(this);
+		}
 	}
 
 	public void visit(ElementDataset el) {
-		//
+		el.getElement().visit(this);
 	}
 
 	public void visit(ElementNamedGraph el) {
@@ -212,22 +221,33 @@ public class VariablesCollector implements ElementVisitor, UpdateVisitor {
 
 	public void visit(ElementExists el) {
 		//
+		el.getElement().visit(this);
 	}
 
 	public void visit(ElementNotExists el) {
 		//
+		el.getElement().visit(this);
 	}
 
 	public void visit(ElementMinus el) {
 		//
+		el.getMinusElement().visit(this);
 	}
 
 	public void visit(ElementService el) {
 		//
+		el.getElement().visit(this);
 	}
 
 	public void visit(ElementSubQuery el) {
 		//
+		el.getQuery().getQueryPattern().visit(this);
+		for(Expr ex :el.getQuery().getHavingExprs()){
+			collectFromExpr(ex);
+		}
+		for(Map.Entry<Var,Expr> es : el.getQuery().getProject().getExprs().entrySet()){
+			collectFromExpr(es.getValue());
+		}
 	}
 
 	// UPDATE VISITOR
