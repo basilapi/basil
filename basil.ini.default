@@ -1,5 +1,6 @@
 #
 # BASIL Example Configuration
+basil.namespace = http://basilapi.github.io/data/ns/
 #
 # MySQL Database
 ds = com.mysql.jdbc.jdbc2.optional.MysqlDataSource
