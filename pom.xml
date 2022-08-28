@@ -39,6 +39,7 @@
 		<module>sparql</module>
 		<module>rest</module>
 		<module>store</module>
+		<module>store-tdb2</module>
 	</modules>
 	<profiles>
 		<profile>

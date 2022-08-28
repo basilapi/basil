@@ -40,7 +40,7 @@
 		<org.eclipse.jetty.version>9.4.41.v20210516</org.eclipse.jetty.version>
 
 		<shiro.version>1.8.0</shiro.version>
-
+		<jena.version>3.13.1</jena.version> <!-- was 3.0.1 -->
 		<!-- basil version -->
 		<basil.version>${project.version}</basil.version>
 
@@ -135,7 +135,7 @@
 			<dependency>
 				<groupId>org.apache.jena</groupId>
 				<artifactId>jena-core</artifactId>
-				<version>3.0.1</version>
+				<version>${jena.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>log4j</groupId>
@@ -150,7 +150,22 @@
 			<dependency>
 				<groupId>org.apache.jena</groupId>
 				<artifactId>jena-arq</artifactId>
-				<version>3.0.1</version>
+				<version>${jena.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>log4j</groupId>
+						<artifactId>log4j</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>jena-tdb2</artifactId>
+				<version>${jena.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>log4j</groupId>
@@ -231,7 +246,7 @@
 			<dependency>
 				<groupId>com.google.code.gson</groupId>
 				<artifactId>gson</artifactId>
-				<version>2.8.9</version>
+				<version>2.8.7</version> <!-- was 2.8.9 -->
 			</dependency>
 			<dependency>
 				<groupId>javax.ws.rs</groupId>
