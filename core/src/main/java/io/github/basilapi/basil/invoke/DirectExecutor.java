@@ -18,13 +18,18 @@ package io.github.basilapi.basil.invoke;
 
 import io.github.basilapi.basil.core.InvocationResult;
 import io.github.basilapi.basil.core.exceptions.ApiInvocationException;
-import org.apache.jena.atlas.web.auth.HttpAuthenticator;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.HttpClient;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.riot.WebContent;
 import org.apache.jena.riot.web.HttpOp;
 import org.apache.jena.update.UpdateRequest;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * 
@@ -34,7 +39,7 @@ import org.apache.jena.update.UpdateRequest;
 public class DirectExecutor implements QueryExecutor {
 
 	@Override
-	public InvocationResult execute(Query q, String endpoint, HttpAuthenticator authenticator) throws ApiInvocationException {
+	public InvocationResult execute(Query q, String endpoint, HttpClient authenticator) throws ApiInvocationException {
 		QueryExecution qe = QueryExecutionFactory.sparqlService(endpoint, q, authenticator);
 		if (q.isSelectType()) {
 			return new InvocationResult(qe.execSelect(), q);
@@ -50,9 +55,9 @@ public class DirectExecutor implements QueryExecutor {
 	}
 
 	@Override
-	public InvocationResult execute(UpdateRequest update, String endpoint, HttpAuthenticator authenticator) throws ApiInvocationException {
+	public InvocationResult execute(UpdateRequest update, String endpoint, HttpClient authenticator) throws ApiInvocationException {
 		UpdateHandler handler = new UpdateHandler();
-		HttpOp.execHttpPost(endpoint, WebContent.contentTypeSPARQLUpdate, update.toString(), "",  handler, null, null, authenticator) ;
+		HttpOp.execHttpPost(endpoint, WebContent.contentTypeSPARQLUpdate, update.toString(), authenticator, HttpCoreContext.create()) ;
 		return new InvocationResult(handler.getResponse(), update);
 	}
 }
