@@ -27,7 +27,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.riot.system.StreamOps;
+import org.apache.jena.riot.system.StreamRDFOps;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWriter;
 import org.apache.jena.riot.system.StreamRDFWriterFactory;
@@ -46,7 +46,7 @@ public class RDFStreamer {
 		StreamRDF stream = StreamRDFWriter.getWriterStream(os, format);
 		Iterator<Triple> iter = WrappedIterator.createIteratorIterator(Iter.map(rs, adapter));
 		stream.start();
-		StreamOps.sendTriplesToStream(iter, stream);
+		StreamRDFOps.sendTriplesToStream(iter, stream);
 		stream.finish();
 	}
 	
@@ -55,7 +55,7 @@ public class RDFStreamer {
 		StreamRDF stream = StreamRDFWriter.getWriterStream(os, format);
 		Iterator<Quad> iter = WrappedIterator.createIteratorIterator(Iter.map(rs, adapter));
 		stream.start();
-		StreamOps.sendQuadsToStream(iter, stream);
+		StreamRDFOps.sendQuadsToStream(iter, stream);
 		stream.finish();
 	}
 	

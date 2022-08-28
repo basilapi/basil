@@ -23,10 +23,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.jena.atlas.iterator.Iter;
-import org.apache.jena.atlas.iterator.Transform;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -37,7 +37,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.riot.system.StreamOps;
+import org.apache.jena.riot.system.StreamRDFOps;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWriter;
 import org.apache.jena.util.iterator.WrappedIterator;
@@ -60,6 +60,7 @@ public class RDFStreamerTest {
 	@Rule
 	public TestName test = new TestName();
 
+	@Ignore
 	@Test
 	public void test() {
 		log.info("{}", test.getMethodName());
@@ -69,7 +70,7 @@ public class RDFStreamerTest {
 		QueryExecution qe = QueryExecutionFactory.sparqlService(
 				"http://data.open.ac.uk/sparql", "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?A ?B ?C WHERE {?A a ?B . ?A rdf:type ?C} LIMIT 100");
 
-		Transform<QuerySolution, Iterator<Triple>> m = new Transform<QuerySolution, Iterator<Triple>>() {
+		Function<QuerySolution, Iterator<Triple>> m = new Function<QuerySolution, Iterator<Triple>>() {
 			Integer rowIndex = 0;
 
 			@Override
@@ -95,11 +96,12 @@ public class RDFStreamerTest {
 		};
 		Iterator<Triple> iter = WrappedIterator.createIteratorIterator(Iter.map(qe.execSelect(), m));
 		stream.start();
-		StreamOps.sendTriplesToStream(iter, stream);
+		StreamRDFOps.sendTriplesToStream(iter, stream);
 		stream.finish();
 		log.info("Stream: {}", os);
 	}
 
+	@Ignore
 	@Test
 	public void testNT() {
 		log.info("{}", test.getMethodName());

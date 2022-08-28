@@ -27,7 +27,8 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.riot.out.JsonLDWriter;
+
+import org.apache.jena.riot.writer.JsonLDWriter;
 import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapNull;
 import org.apache.jena.riot.system.PrefixMapStd;
@@ -260,7 +261,8 @@ public class ModelRenderer extends Renderer<Model> {
 			JsonLDWriter jw = new JsonLDWriter(RDFFormat.JSONLD_PRETTY);
 			PrefixMap p = new PrefixMapStd();
 			p.putAll(pref);
-			jw.write(w, new DatasetGraphOne(getInput().getGraph()), p, null, Context.emptyContext);
+
+			jw.write(w, DatasetGraphOne.create(getInput().getGraph()), p, null, Context.emptyContext);
 			return w.toString();
 		}
 
@@ -288,7 +290,7 @@ public class ModelRenderer extends Renderer<Model> {
 		if (MoreMediaType.TEXT_X_NQUADS_TYPE.equals(type)) {
 			StringWriter w = new StringWriter();
 			NQuadsWriter writer = new NQuadsWriter();
-			DatasetGraph dg = DatasetGraphFactory.createMemFixed();
+			DatasetGraph dg = DatasetGraphFactory.create();
 			dg.addGraph(NodeFactory.createURI(graphName), getInput().getGraph());
 			writer.write(w, dg, PrefixMapNull.empty, null, Context.emptyContext);
 			return w.toString();
