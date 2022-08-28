@@ -154,17 +154,23 @@ public class ApiResource extends AbstractResource {
 			}else {
 				prefixMap = r.getQuery().getPrefixMapping().getNsPrefixMap();
 			}
-			
-			Renderer<?> renderer = RendererFactory.getRenderer(r.getResult());
-			ResponseBuilder rb = Response.ok()
-					.entity(renderer.stream(type, requestUri.getRequestUri().toString(), prefixMap));
+			ResponseBuilder rb = null;
+			// XXX UPDATE requests return 204 no content, we keep the old return type 200 for the moment.
+			if(r.getResult() == null){
+				rb = Response.ok();
+			}else {
+				Renderer<?> renderer = RendererFactory.getRenderer(r.getResult());
+				rb = Response.ok()
+						.entity(renderer.stream(type, requestUri.getRequestUri().toString(), prefixMap));
+
+			}
 			addHeaders(rb, id);
 			rb.header("Content-Type", type.withCharset("UTF-8").toString());
 			log.trace("API execution. Return response.");
 			return rb.build();
 		} catch (CannotRenderException e) {
 			log.trace("API execution. Cannot prepare response (not acceptable).");
-			return buildNotAcceptable();
+			return buildNotAcceptable("Cannot render result, problem was: " + e.getMessage());
 		} catch (Exception e) {
 			// Response r =
 			// Response.serverError().entity(e.getMessage()).build();
@@ -174,8 +180,12 @@ public class ApiResource extends AbstractResource {
 	}
 
 	private Response buildNotAcceptable() {
+		return buildNotAcceptable("Not acceptable");
+	}
+
+	private Response buildNotAcceptable(String message) {
 		return packError(Response.notAcceptable(Variant.mediaTypes(MediaType.TEXT_PLAIN_TYPE).add().build()),
-				"Not acceptable").build();
+				message).build();
 	}
 
 	public MediaType getFromExtension(String ext) {

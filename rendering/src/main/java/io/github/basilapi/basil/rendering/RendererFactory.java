@@ -32,6 +32,6 @@ public class RendererFactory {
 		} else if (o instanceof HttpResponse) {
 			return new HttpResponseRenderer((HttpResponse) o);
 		}
-		throw new CannotRenderException();
+		throw new CannotRenderException("response was: " + o);
 	}
 }
