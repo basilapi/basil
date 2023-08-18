@@ -64,6 +64,14 @@ public class TDB2Store implements Store, SearchProvider {
 
     public final static Logger L = LoggerFactory.getLogger(TDB2Store.class);
 
+    private static final String selectApiInfo = "SELECT ?id ?name ?created ?modified " +
+            "WHERE { GRAPH ?apiURI {" +
+            "?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id ; " +
+            "<" + BasilOntology.Term.created.getIRIString() + "> ?created ; " +
+            "<" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
+            "OPTIONAL { ?apiURI <" + BasilOntology.Term.name.getIRIString() + "> ?name } . " +
+            "}}";
+
     public TDB2Store(String location, RDFFactory rdfFactory) {
         toRDF = rdfFactory;
         this.location = location;
@@ -211,56 +219,14 @@ public class TDB2Store implements Store, SearchProvider {
     @Override
     public List<ApiInfo> list() throws IOException {
         List<ApiInfo> specs = new ArrayList<>();
-        String list = "SELECT ?id ?name ?created ?modified " +
-                "WHERE { GRAPH ?apiURI {" +
-                "?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id ; " +
-                "<" + BasilOntology.Term.created.getIRIString() + "> ?created ; " +
-                "<" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
-                "OPTIONAL { ?apiURI <" + BasilOntology.Term.name.getIRIString() + "> ?name } . " +
-                "}}";
+        String list = selectApiInfo;
         L.error("{}", list);
         dataset.begin(ReadWrite.READ);
         try (QueryExecution qe = QueryExecutionFactory.create(list, dataset);) {
             ResultSet rs = qe.execSelect();
             while(rs.hasNext()){
                 QuerySolution qs = rs.next();
-                ApiInfo apiInfo = new ApiInfo(){
-
-                    @Override
-                    public String getId() {
-                        return qs.get("id").asLiteral().getLexicalForm();
-                    }
-
-                    @Override
-                    public String getName() {
-                        if(qs.get("name") != null) {
-                            return qs.get("name").asLiteral().getLexicalForm();
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    public Date created() {
-                        Literal val = qs.get("created").asLiteral();
-                        // Milliseconds timestamp expected
-                        java.util.Date time=new java.util.Date(val.getLong());
-                        return time;
-                    }
-
-                    @Override
-                    public Date modified() {
-                        Literal val = qs.get("modified").asLiteral();
-                        // Milliseconds timestamp expected
-                        java.util.Date time=new java.util.Date(val.getLong());
-                        return time;
-                    }
-
-                    @Override
-                    public Set<String> alias() {
-                        // We do this on demand ...
-                        return getAlias(getId());
-                    }
-                };
+                ApiInfo apiInfo = buildApiInfo(qs);
                 specs.add(apiInfo);
             }
         } finally {
@@ -310,24 +276,104 @@ public class TDB2Store implements Store, SearchProvider {
         return true;
     }
 
-    @Override
-    public Date created(String id) throws IOException {
-        return null;
+
+    private Date createdOrModified(String id, boolean wantCreated) throws IOException {
+        String property;
+        if(wantCreated){
+            property = BasilOntology.Term.created.getIRIString();
+        }else{
+            property = BasilOntology.Term.modified.getIRIString();
+        }
+        Node apiURI = toRDF.api(id);
+        String query = "SELECT ?value WHERE { GRAPH ?apiURI { ?apiURI <"+ property +"> ?value } }";
+        ParameterizedSparqlString pqs = new ParameterizedSparqlString();
+        pqs.setCommandText(query);
+        pqs.setParam("apiURI", apiURI);
+        dataset.begin(ReadWrite.READ);
+        Date value = null;
+        try (QueryExecution qe = QueryExecutionFactory.create(pqs.asQuery(), dataset);) {
+            ResultSet rs = qe.execSelect();
+            if(rs.hasNext()){
+                QuerySolution qs = rs.next();
+                value = new java.util.Date(qs.getLiteral("value").getLong());
+            }
+        } finally {
+            dataset.end();
+        }
+        return value;
     }
 
+    public Date created(String id) throws IOException {
+        return createdOrModified(id, true);
+    }
     @Override
     public Date modified(String id) throws IOException {
-        return null;
+        return createdOrModified(id, false);
     }
 
+    private ApiInfo buildApiInfo(QuerySolution qs){
+        return new ApiInfo(){
+
+            @Override
+            public String getId() {
+                return qs.get("id").asLiteral().getLexicalForm();
+            }
+
+            @Override
+            public String getName() {
+                if(qs.get("name") != null) {
+                    return qs.get("name").asLiteral().getLexicalForm();
+                }
+                return null;
+            }
+
+            @Override
+            public Date created() {
+                Literal val = qs.get("created").asLiteral();
+                // Milliseconds timestamp expected
+                java.util.Date time=new java.util.Date(val.getLong());
+                return time;
+            }
+
+            @Override
+            public Date modified() {
+                Literal val = qs.get("modified").asLiteral();
+                // Milliseconds timestamp expected
+                java.util.Date time=new java.util.Date(val.getLong());
+                return time;
+            }
+
+            @Override
+            public Set<String> alias() {
+                // We do this on demand ...
+                return getAlias(getId());
+            }
+        };
+    }
     @Override
     public ApiInfo info(String id) throws IOException {
-        return null;
+        Node apiURI = toRDF.api(id);
+        ParameterizedSparqlString pqs = new ParameterizedSparqlString();
+        pqs.setCommandText(selectApiInfo);
+        pqs.setParam("apiURI", apiURI);
+        dataset.begin(ReadWrite.READ);
+        ApiInfo info = null;
+        try (QueryExecution qe = QueryExecutionFactory.create(pqs.asQuery(), dataset);) {
+            ResultSet rs = qe.execSelect();
+            if(rs.hasNext()){
+                QuerySolution qs = rs.next();
+                info = buildApiInfo(qs);
+            }
+        } finally {
+            dataset.end();
+        }
+        return info;
     }
 
     @Override
     public void saveAlias(String id, Set<String> alias) throws IOException {
-
+        // clear all aliases
+        // reload all aliases
     }
 
     @Override

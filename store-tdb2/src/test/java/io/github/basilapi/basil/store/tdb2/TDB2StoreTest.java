@@ -39,9 +39,9 @@ public class TDB2StoreTest {
     private TDB2Store X;
 
     @Before
-    public void before(){
+    public void before() {
 
-        if(new File(location).exists()){
+        if (new File(location).exists()) {
             new File(location).delete();
         }
         new File(location).mkdirs();
@@ -50,13 +50,13 @@ public class TDB2StoreTest {
     }
 
     @AfterClass
-    public static void beforeClass(){
+    public static void beforeClass() {
         new File(location).delete();
     }
 
 
     @AfterClass
-    public static void afterClass(){
+    public static void afterClass() {
         new File(location).delete();
     }
 
@@ -110,10 +110,10 @@ public class TDB2StoreTest {
         ApiInfo second = list.get(1);
         ApiInfo info1;
         ApiInfo info2;
-        if(first.getId().equals(id1)){
+        if (first.getId().equals(id1)) {
             info1 = first;
             info2 = second;
-        }else{
+        } else {
             info1 = second;
             info2 = first;
         }
@@ -127,5 +127,18 @@ public class TDB2StoreTest {
         Assert.assertTrue(info1.created().before(info2.created()));
         Assert.assertTrue(info1.modified().before(info2.modified()));
 
+    }
+
+    @Test
+    public void testD_GetApiInfo() throws UnknownQueryTypeException, IOException {
+        // We assume there are still 2 specs
+        Assert.assertEquals(2, X.listSpecs().size());
+
+        // Let's get the second
+        ApiInfo info = X.info("test-spec-id2");
+        Assert.assertTrue(info.getId().equals("test-spec-id2"));
+        Assert.assertNull(info.getName());
+        Assert.assertNotNull(info.created());
+        Assert.assertNotNull(info.modified());
     }
 }
