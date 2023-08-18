@@ -156,7 +156,7 @@ public class TDB2Store implements Store, SearchProvider {
         pqs2.setLiteral("id", id); // redundant but hey...
         L.trace("{}", q);
         dataset.begin(ReadWrite.READ);
-        try (QueryExecution qe = QueryExecutionFactory.create(q, dataset);) {
+        try (QueryExecution qe = QueryExecutionFactory.create(pqs2.asQuery(), dataset);) {
             ResultSet rs = qe.execSelect();
             if(!rs.hasNext()){
                 throw new IOException("Spec id does not exists!");
@@ -233,7 +233,10 @@ public class TDB2Store implements Store, SearchProvider {
 
                     @Override
                     public String getName() {
-                        return qs.get("name").asLiteral().getLexicalForm();
+                        if(qs.get("name") != null) {
+                            return qs.get("name").asLiteral().getLexicalForm();
+                        }
+                        return null;
                     }
 
                     @Override
@@ -293,7 +296,18 @@ public class TDB2Store implements Store, SearchProvider {
 
     @Override
     public boolean deleteSpec(String id) throws IOException {
-        return false;
+        boolean exists = existsSpec(id);
+        if(!exists){
+            return exists;
+        }
+        Node apiURI = toRDF.api(id);
+        String clearStr = "CLEAR GRAPH ?apiURI ";
+        ParameterizedSparqlString pqs = new ParameterizedSparqlString();
+        pqs.setCommandText(clearStr);
+        pqs.setParam("apiURI", apiURI);
+        UpdateRequest clear = pqs.asUpdate();
+        exec(clear);
+        return true;
     }
 
     @Override
