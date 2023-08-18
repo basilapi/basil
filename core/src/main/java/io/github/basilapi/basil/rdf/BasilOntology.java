@@ -40,7 +40,7 @@ public class BasilOntology {
         ;
 
         public String getIRIString(){
-            return NS + name;
+            return NS + name();
         }
 
         public IRI iri(){

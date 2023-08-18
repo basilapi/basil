@@ -86,4 +86,9 @@ public class Specification implements Serializable {
 	public boolean isUpdate() {
 		return isUpdate;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Specification && ((Specification) obj).getEndpoint().equals(this.getEndpoint()) && ((Specification) obj).getQuery().equals(this.getQuery());
+	}
 }

@@ -20,37 +20,88 @@ import io.github.basilapi.basil.core.auth.User;
 import io.github.basilapi.basil.core.auth.UserManager;
 import io.github.basilapi.basil.core.auth.exceptions.UserApiMappingException;
 import io.github.basilapi.basil.core.auth.exceptions.UserCreationException;
+import io.github.basilapi.basil.rdf.BasilOntology;
+import io.github.basilapi.basil.rdf.RDFFactory;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.tdb2.TDB2Factory;
 
+import java.util.Iterator;
 import java.util.Set;
 
 public class TDB2UserManager implements UserManager {
+    private final RDFFactory toRDF;
+
+    private String location;
+
+    private Dataset dataset;
+    public TDB2UserManager(String tdb2location, RDFFactory RDFFactory){
+        this.toRDF = RDFFactory;
+        this.location = tdb2location;
+        this.dataset = TDB2Factory.connectDataset(tdb2location);
+    }
+
+    public RDFFactory getToRDF(){
+        return toRDF;
+    }
+    
     @Override
     public void createUser(User user) throws UserCreationException {
-
+        Graph g = toRDF.toGraph(user);
+        // A named graph foreach user
+        dataset.begin(ReadWrite.WRITE);
+        dataset.asDatasetGraph().addGraph(toRDF.user(user.getUsername()), g);
+        dataset.commit();
     }
 
     @Override
     public void mapUserApi(String username, String apiId) throws UserApiMappingException {
-
+        dataset.begin(ReadWrite.WRITE);
+        dataset.asDatasetGraph().getGraph(toRDF.user(username)).add(
+                new Triple(toRDF.user(username), BasilOntology.Term.api.node(), toRDF.api(apiId))
+        );
+        dataset.commit();
     }
 
     @Override
     public User getUser(String username) {
-        return null;
+        dataset.begin(ReadWrite.READ);
+        Graph g = dataset.asDatasetGraph().getGraph(toRDF.user(username));
+        User u = toRDF.makeUser(g);
+        dataset.end();;
+        return u;
     }
 
     @Override
     public Set<String> getUserApis(String username) {
-        return null;
+        dataset.begin(ReadWrite.READ);
+        Graph g = dataset.asDatasetGraph().getGraph(toRDF.user(username));
+        Set<String> u = toRDF.makeUserApis(g);
+        dataset.end();;
+        return u;
     }
 
     @Override
     public void deleteUserApiMap(String id) throws UserApiMappingException {
-
+        Node user = toRDF.user(getCreatorOfApi(id));
+        dataset.begin(ReadWrite.WRITE);
+        dataset.asDatasetGraph().getGraph(user).remove(user, BasilOntology.Term.api.node(), toRDF.api(id));
+        dataset.commit();
     }
 
     @Override
     public String getCreatorOfApi(String id) {
-        return null;
+        dataset.begin(ReadWrite.READ);
+        Iterator<Quad> it = dataset.asDatasetGraph().find(null, null, BasilOntology.Term.api.node(), toRDF.api(id) );
+        String creator = null;
+        if(it.hasNext()){
+            creator = it.next().asTriple().getSubject().getLocalName();
+        }
+        dataset.end();
+        return creator;
     }
 }

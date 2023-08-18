@@ -29,42 +29,49 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.mem.GraphMem;
 import io.github.basilapi.basil.rdf.BasilOntology.Term;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
-public class ToRDF {
+public class RDFFactory {
     String dataNS;
 
-    public ToRDF(){
+    public RDFFactory(){
         this("http://basilapi.github.io/data/ns/");
     }
 
-    public ToRDF(String dataNamespace){
+    public RDFFactory(String dataNamespace){
         this.dataNS = dataNamespace;
     }
-    private void str(Graph graph, String localName, Term t, String str){
-        str(graph, localName, t.node(), str);
+
+    public String getDataNS(){
+        return dataNS;
     }
-    private void str(Graph graph, String localName, Node p, String str){
+
+    private void str(Graph graph, Node subject, Term t, String str){
+        str(graph, subject, t.node(), str);
+    }
+    private void str(Graph graph, Node s, Node p, String str){
         graph.add(new Triple(
-                NodeFactory.createURI(dataNS + localName),
+                s,
                 p,
                 NodeFactory.createLiteral(str)
         ));
     }
-    private void datetime(Graph graph, String localName, Term t, Date d){
+    private void datetime(Graph graph, Node subject, Term t, Date d){
         graph.add(new Triple(
-                NodeFactory.createURI(dataNS + localName),
+                subject,
                 t.node(),
                 ResourceFactory.createTypedLiteral(d).asNode()
         ));
     }
 
-    private void node(Graph graph, String localName, Term t, Node n){
+    private void node(Graph graph, Node subject, Term t, Node n){
         graph.add(new Triple(
-                NodeFactory.createURI(dataNS + localName),
+                subject,
                 t.node(),
                 n
         ));
@@ -80,13 +87,13 @@ public class ToRDF {
     public Graph toGraph(ApiInfo o) {
         Graph g = new GraphMem();
         g.add(new Triple(NodeFactory.createURI(dataNS + "api/" + o.getId()), RDF.type.asNode(), Term.Api.node()));
-        str(g, "api/" + o.getId(), Term.id, o.getId());
-        str(g, "api/" + o.getId(), Term.name, o.getName());
-        datetime(g, "api/" + o.getId(), Term.created, o.created());
-        datetime(g, "api/" + o.getId(), Term.modified, o.modified());
+        str(g, api(o.getId()), Term.id, o.getId());
+        str(g, api(o.getId()), Term.name, o.getName());
+        datetime(g, api(o.getId()), Term.created, o.created());
+        datetime(g, api(o.getId()), Term.modified, o.modified());
         int c = 0;
         Node aliasContainer = NodeFactory.createBlankNode();
-        node(g, "api/" + o.getId(), Term.alias, aliasContainer);
+        node(g, api(o.getId()), Term.alias, aliasContainer);
         for(String alias: o.alias()){
             c += 1;
             g.add(new Triple(aliasContainer, RDF.li(c).asNode(), NodeFactory.createLiteral(alias)));
@@ -96,37 +103,52 @@ public class ToRDF {
 
     public Graph toGraph(String id, Specification s){
         Graph g = new GraphMem();
-        str(g, "api/" + id, Term.endpoint, s.getEndpoint());
-        str(g, "api/" + id, Term.query, s.getQuery());
+        str(g, api(id), Term.endpoint, s.getEndpoint());
+        str(g, api(id), Term.query, s.getQuery());
         return g;
     }
 
-    public Graph toGraph(User o, Set<String> apis){
+    public Graph toGraph(String userName, Set<String> apis){
         Graph g = new GraphMem();
-        Node s = NodeFactory.createURI(dataNS + "user/" + o.getUsername());
-        g.add(new Triple(s, RDF.type.asNode(), Term.User.node()));
-        str(g, o.getUsername(), Term.username, o.getUsername());
-        str(g, o.getUsername(), Term.password, o.getPassword());
-        str(g, o.getUsername(), Term.email, o.getEmail());
+        Node s = user( userName);
         for(String api: apis){
-            Node a = NodeFactory.createURI(dataNS + "api/" + api);
-            t(g, s, Term.api,a);
+            Node a = api( api);
+            t(g, s, Term.api, a);
         }
         return g;
     }
 
+    public Graph toGraph(User o){
+        Graph g = new GraphMem();
+        Node s = user(o.getUsername());
+        g.add(new Triple(s, RDF.type.asNode(), Term.User.node()));
+        Node u = user(o.getUsername());
+        str(g, u, Term.username, o.getUsername());
+        str(g, u, Term.password, o.getPassword());
+        str(g, u, Term.email, o.getEmail());
+        return g;
+    }
+
+    public Node user(String username){
+        return NodeFactory.createURI(dataNS + "user/" + username);
+    }
+
+    public Node api(String apiId){
+        return NodeFactory.createURI(dataNS + "api/" + apiId);
+    }
+
     public Graph toGraph(String id, Doc d){
         Graph g = new GraphMem();
-        str(g, id, Term.name, d.get(Doc.Field.NAME));
-        str(g, id, Term.description, d.get(Doc.Field.DESCRIPTION));
+        str(g, api(id), Term.name, d.get(Doc.Field.NAME));
+        str(g, api(id), Term.description, d.get(Doc.Field.DESCRIPTION));
         return g;
     }
 
     public Graph toGraph(String apiId, Views views){
         Graph g = new GraphMem();
-        Node s = NodeFactory.createURI(dataNS + apiId);
+        Node s = api(apiId);
         Node viewsContainer = NodeFactory.createBlankNode();
-        node(g, apiId, Term.views, viewsContainer);
+        node(g, s, Term.views, viewsContainer);
         int c = 0;
         for(String name: views.getNames()){
             c += 1;
@@ -139,5 +161,25 @@ public class ToRDF {
             g.add(new Triple(view, Term.template.node(), NodeFactory.createLiteral(data.getTemplate())));
         }
         return g;
+    }
+
+    public User makeUser(Graph g){
+        User user = new User();
+        String username = g.find(null, Term.username.node(), null).next().getObject().getLiteral().getLexicalForm();
+        String password = g.find(null, Term.password.node(), null).next().getObject().getLiteral().getLexicalForm();
+        String email = g.find(null, Term.email.node(), null).next().getObject().getLiteral().getLexicalForm();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setEmail(email);
+        return user;
+    }
+
+    public Set<String> makeUserApis(Graph g) {
+        ExtendedIterator<Triple> it = g.find(null, Term.api.node(), null);
+        Set<String> s = new HashSet<String>();
+        while(it.hasNext()){
+            s.add(it.next().getObject().getURI().substring((dataNS + "api/").length()));
+        }
+        return s;
     }
 }
