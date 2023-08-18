@@ -28,6 +28,10 @@ import io.github.basilapi.basil.sparql.SpecificationFactory;
 import io.github.basilapi.basil.sparql.UnknownQueryTypeException;
 import io.github.basilapi.basil.store.Store;
 import io.github.basilapi.basil.view.Views;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.jena.atlas.lib.DateTimeUtils;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ParameterizedSparqlString;
@@ -36,6 +40,7 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -44,8 +49,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -89,39 +97,63 @@ public class TDB2Store implements Store, SearchProvider {
 
     @Override
     public void saveSpec(String id, Specification spec) throws IOException {
-        Node specURI = toRDF.api(id);
-        L.debug("Save spec {}", specURI);
-        String deleteStr = "DELETE { GRAPH ?specURI { ?specURI ?p ?o }} WHERE { GRAPH ?specURI { ?specURI ?p ?o } }";
+        boolean exists = existsSpec(id);
+        // ApiInfo need to exist!
+        Node apiURI = toRDF.api(id);
+        L.debug("Save API spec {}", apiURI);
+        String deleteStr = "DELETE { GRAPH ?apiURI { " +
+                " ?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id . " +
+                " ?apiURI <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
+                " ?apiURI <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
+                " ?apiURI <" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
+                "}} WHERE { " +
+                "GRAPH ?apiURI { " +
+                " ?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id . " +
+                " ?apiURI <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
+                " ?apiURI <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
+                " ?apiURI <" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
+                " } }";
         ParameterizedSparqlString pqs = new ParameterizedSparqlString();
         pqs.setCommandText(deleteStr);
-        pqs.setParam("specURI", specURI);
+        pqs.setParam("apiURI", apiURI);
         UpdateRequest delete = pqs.asUpdate();
         L.trace("{}", delete.toString());
         //
-        String insertStr = "INSERT DATA { GRAPH ?specURI { " +
-            " ?specURI <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
-            " ?specURI <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
+        String insertStr = "INSERT DATA { GRAPH ?apiURI { " +
+                " ?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id . " +
+                " ?apiURI <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
+                " ?apiURI <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
+                ((!exists) ? " ?apiURI <" + BasilOntology.Term.created.getIRIString() + "> ?created . " : "") +
+                " ?apiURI <" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
             "}} ";
         ParameterizedSparqlString pqs2 = new ParameterizedSparqlString();
         pqs2.setCommandText(insertStr);
-        pqs2.setParam("specURI", specURI);
+        pqs2.setParam("apiURI", apiURI);
         pqs2.setLiteral("endpoint", spec.getEndpoint());
+        pqs2.setLiteral("id", id);
         pqs2.setLiteral("queryText", spec.getQuery());
+        if(!exists){
+            pqs2.setLiteral("created", System.currentTimeMillis());
+        }
+        pqs2.setLiteral("modified", System.currentTimeMillis());
         UpdateRequest insert = pqs2.asUpdate();
-        L.trace("{}", insert.toString());
+        L.error("{}", insert.toString());
         exec( delete, insert);
     }
 
     @Override
     public Specification loadSpec(String id) throws IOException {
         L.debug("Load spec {}", id);
-        String specURI = toRDF.api(id).toString();
+        Node apiURI = toRDF.api(id);
         String q = "SELECT ?endpoint ?queryText WHERE { " +
-                "GRAPH <" + specURI + "> {" +
-                "<" + specURI + "> <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
-                "<" + specURI + "> <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
-                "}" +
-                "}";
+                "GRAPH ?apiURI {" +
+                " ?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id . " +
+                " ?apiURI <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
+                " ?apiURI <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " + "}}";
+        ParameterizedSparqlString pqs2 = new ParameterizedSparqlString();
+        pqs2.setCommandText(q);
+        pqs2.setParam("apiURI", apiURI);
+        pqs2.setLiteral("id", id); // redundant but hey...
         L.trace("{}", q);
         dataset.begin(ReadWrite.READ);
         try (QueryExecution qe = QueryExecutionFactory.create(q, dataset);) {
@@ -142,17 +174,96 @@ public class TDB2Store implements Store, SearchProvider {
 
     @Override
     public boolean existsSpec(String id) {
-        return false;
+        L.debug("Exists API {}", id);
+        Node apiURI = toRDF.api(id);
+        String query = "ASK { GRAPH ?apiURI { [] <"+ BasilOntology.Term.id.getIRIString() +"> [] } }";
+        ParameterizedSparqlString pqs2 = new ParameterizedSparqlString();
+        pqs2.setCommandText(query);
+        pqs2.setParam("apiURI", apiURI);
+        dataset.begin(ReadWrite.READ);
+        org.apache.jena.query.Query qq = pqs2.asQuery();
+        L.error("{}", qq);
+        try (QueryExecution qe = QueryExecutionFactory.create(qq, dataset);) {
+            boolean rs = qe.execAsk();
+            return rs;
+        } finally {
+            dataset.end();
+        }
     }
 
     @Override
     public List<String> listSpecs() throws IOException {
-        return null;
+        List<String> specs = new ArrayList<>();
+        String list = "SELECT ?id WHERE { GRAPH ?g { ?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id }}";
+        dataset.begin(ReadWrite.READ);
+        try (QueryExecution qe = QueryExecutionFactory.create(list, dataset);) {
+            ResultSet rs = qe.execSelect();
+            while(rs.hasNext()){
+                QuerySolution qs = rs.next();
+                specs.add(qs.getLiteral("id").getLexicalForm());
+            }
+        } finally {
+            dataset.end();
+        }
+        return Collections.unmodifiableList(specs);
     }
 
     @Override
     public List<ApiInfo> list() throws IOException {
-        return null;
+        List<ApiInfo> specs = new ArrayList<>();
+        String list = "SELECT ?id ?name ?created ?modified " +
+                "WHERE { GRAPH ?apiURI {" +
+                "?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id ; " +
+                "<" + BasilOntology.Term.created.getIRIString() + "> ?created ; " +
+                "<" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
+                "OPTIONAL { ?apiURI <" + BasilOntology.Term.name.getIRIString() + "> ?name } . " +
+                "}}";
+        L.error("{}", list);
+        dataset.begin(ReadWrite.READ);
+        try (QueryExecution qe = QueryExecutionFactory.create(list, dataset);) {
+            ResultSet rs = qe.execSelect();
+            while(rs.hasNext()){
+                QuerySolution qs = rs.next();
+                ApiInfo apiInfo = new ApiInfo(){
+
+                    @Override
+                    public String getId() {
+                        return qs.get("id").asLiteral().getLexicalForm();
+                    }
+
+                    @Override
+                    public String getName() {
+                        return qs.get("name").asLiteral().getLexicalForm();
+                    }
+
+                    @Override
+                    public Date created() {
+                        Literal val = qs.get("created").asLiteral();
+                        // Milliseconds timestamp expected
+                        java.util.Date time=new java.util.Date(val.getLong());
+                        return time;
+                    }
+
+                    @Override
+                    public Date modified() {
+                        Literal val = qs.get("modified").asLiteral();
+                        // Milliseconds timestamp expected
+                        java.util.Date time=new java.util.Date(val.getLong());
+                        return time;
+                    }
+
+                    @Override
+                    public Set<String> alias() {
+                        // We do this on demand ...
+                        return getAlias(getId());
+                    }
+                };
+                specs.add(apiInfo);
+            }
+        } finally {
+            dataset.end();
+        }
+        return Collections.unmodifiableList(specs);
     }
 
     @Override
@@ -228,5 +339,29 @@ public class TDB2Store implements Store, SearchProvider {
     @Override
     public void deleteCredentials(String id) throws IOException {
 
+    }
+
+    private Set<String> getAlias(String id){
+        L.debug("Load spec {}", id);
+        Node apiURI = toRDF.api(id);
+        String q = "SELECT ?alias WHERE { " +
+                "GRAPH ?apiURI {" +
+                " ?apiURI <" + BasilOntology.Term.alias.getIRIString() + "> ?alias . " + "}}";
+        ParameterizedSparqlString pqs2 = new ParameterizedSparqlString();
+        pqs2.setCommandText(q);
+        pqs2.setParam("apiURI", apiURI);
+        L.trace("{}", q);
+        Set<String> set = new HashSet<String>();
+        dataset.begin(ReadWrite.READ);
+        try (QueryExecution qe = QueryExecutionFactory.create(q, dataset);) {
+            ResultSet rs = qe.execSelect();
+            while(rs.hasNext()){
+                QuerySolution qs = rs.next();
+                set.add(qs.getLiteral("alias").getLexicalForm());
+            }
+        } finally {
+            dataset.end();
+        }
+        return Collections.unmodifiableSet(set);
     }
 }

@@ -28,7 +28,7 @@ public class BasilOntology {
         // ApiInfo
         Api, id, name, created, modified, alias,
         // Specification
-        endpoint, query, update,
+        Specification, endpoint, query, update,
         // User
         User, username, password, email,
         // Doc

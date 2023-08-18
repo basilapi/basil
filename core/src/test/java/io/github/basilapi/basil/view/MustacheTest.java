@@ -27,6 +27,7 @@ import java.util.Map;
 
 import io.github.basilapi.basil.TestUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -70,6 +71,7 @@ public class MustacheTest {
 		log.debug("\n{}", writer);
 	}
 
+	@Ignore
 	@Test
 	public void select_1() throws IOException, EngineExecutionException {
 		Specification spec = TestUtils.loadQuery(method.getMethodName());

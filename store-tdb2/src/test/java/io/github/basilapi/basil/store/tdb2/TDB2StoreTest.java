@@ -52,8 +52,12 @@ public class TDB2StoreTest {
     @Test
     public void testSaveSpec() throws UnknownQueryTypeException, IOException {
         Specification s = SpecificationFactory.create("http://www.example.org/sparql", "SELECT * WHERE { ?a ?b ?c}");
-        X.saveSpec("test-spect-id", s);
-        Specification s1 = X.loadSpec("test-spect-id");
+        String id = "test-spect-id";
+        X.saveSpec(id, s);
+        Specification s1 = X.loadSpec(id);
         Assert.assertTrue(s.equals(s1));
+        Assert.assertEquals(1, X.listSpecs().size());
+        Assert.assertEquals(1, X.list().size());
+        Assert.assertTrue(X.existsSpec(id));
     }
 }
