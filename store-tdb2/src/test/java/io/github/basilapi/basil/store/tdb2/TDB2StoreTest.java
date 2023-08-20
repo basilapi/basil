@@ -22,6 +22,9 @@ import io.github.basilapi.basil.rdf.RDFFactory;
 import io.github.basilapi.basil.sparql.Specification;
 import io.github.basilapi.basil.sparql.SpecificationFactory;
 import io.github.basilapi.basil.sparql.UnknownQueryTypeException;
+import io.github.basilapi.basil.view.Engine;
+import io.github.basilapi.basil.view.View;
+import io.github.basilapi.basil.view.Views;
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -60,7 +63,7 @@ public class TDB2StoreTest {
         }
         File tdb2Loc = new File(location);
         tdb2Loc.mkdirs();
-        X = new TDB2Store(location, new RDFFactory("http://www.example.org/"));
+        X = new TDB2Store(location,new RDFFactory("http://www.example.org/"));
     }
 
     @BeforeClass
@@ -274,6 +277,25 @@ public class TDB2StoreTest {
         String id = "test-spec-id1";
         Graph g = X.getAsMemGraph(id);
         Assert.assertEquals(11, g.size());
+    }
+
+
+    @Test
+    public void testM_Views() throws IOException {
+        String id = "test-spec-id1";
+
+        Views views = new Views();
+        views.put("application/json", ".json", "{}", Engine.MUSTACHE);
+        X.saveViews(id, views);
+        Graph g = X.getAsMemGraph(id);
+        Iterator<Triple> trit = g.find();
+        while(trit.hasNext()){
+            System.err.println( " -- " + trit.next());
+        }
+
+        Views views2 = X.loadViews(id);
+        System.err.println(views2.getNames());
+        Assert.assertTrue(views2.exists(".json"));
     }
 
 

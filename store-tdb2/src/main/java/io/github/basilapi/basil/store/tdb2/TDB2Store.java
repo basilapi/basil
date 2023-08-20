@@ -27,6 +27,8 @@ import io.github.basilapi.basil.sparql.Specification;
 import io.github.basilapi.basil.sparql.SpecificationFactory;
 import io.github.basilapi.basil.sparql.UnknownQueryTypeException;
 import io.github.basilapi.basil.store.Store;
+import io.github.basilapi.basil.view.Engine;
+import io.github.basilapi.basil.view.View;
 import io.github.basilapi.basil.view.Views;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.jena.atlas.lib.DateTimeUtils;
@@ -63,6 +65,7 @@ import java.util.List;
 import java.util.Set;
 
 public class TDB2Store implements Store, SearchProvider {
+    private String dataNS;
     private final String location;
     final Dataset dataset;
     RDFFactory toRDF;
@@ -78,8 +81,8 @@ public class TDB2Store implements Store, SearchProvider {
             "OPTIONAL { ?apiURI <" + BasilOntology.Term.name.getIRIString() + "> ?name } . " +
             "}}";
 
-    public TDB2Store(String location, RDFFactory rdfFactory) {
-        toRDF = rdfFactory;
+    public TDB2Store(String location, RDFFactory factory) {
+        this.toRDF = factory;
         this.location = location;
         this.dataset = TDB2Factory.connectDataset(this.location);
     }
@@ -241,7 +244,37 @@ public class TDB2Store implements Store, SearchProvider {
 
     @Override
     public Views loadViews(String id) throws IOException {
-        return null;
+        Node apiURI = toRDF.api(id);
+        String selectStr = "SELECT ?extension ?mimeType ?engine ?template " +
+                " WHERE {" +
+                "GRAPH ?apiURI {" +
+                " ?apiURI <" + BasilOntology.Term.view.getIRIString() + "> [ " +
+                "    <" + BasilOntology.Term.extension.getIRIString() + "> ?extension ; " +
+                "    <" + BasilOntology.Term.mimeType.getIRIString() + "> ?mimeType ; " +
+                "    <" + BasilOntology.Term.engine.getIRIString() + "> ?engine ; " +
+                "    <" + BasilOntology.Term.template.getIRIString() + "> ?template " +
+                "] . }}";
+
+        ParameterizedSparqlString pqs = new ParameterizedSparqlString();
+        pqs.setCommandText(selectStr);
+        pqs.setParam("apiURI", apiURI);
+        dataset.begin(ReadWrite.READ);
+        Views views = new Views();
+        try (QueryExecution qe = QueryExecutionFactory.create(pqs.asQuery(), dataset);) {
+            ResultSet rs = qe.execSelect();
+            while(rs.hasNext()){
+                QuerySolution qs = rs.next();
+                views.put(
+                        qs.getLiteral("mimeType").getLexicalForm(),
+                        qs.getLiteral("extension").getLexicalForm(),
+                        qs.getLiteral("template").getLexicalForm(),
+                        Engine.valueOf(qs.getLiteral("engine").getLexicalForm())
+                );
+            }
+        } finally {
+            dataset.end();
+        }
+        return views;
     }
 
     @Override
@@ -276,7 +309,62 @@ public class TDB2Store implements Store, SearchProvider {
 
     @Override
     public void saveViews(String id, Views views) throws IOException {
+        Node apiURI = toRDF.api(id);
+        List<UpdateRequest> requests = new ArrayList<>();
+        // DELETE
+        String deleteStr = "DELETE {" +
+                "GRAPH ?apiURI {" +
+                " ?apiURI <"+ BasilOntology.Term.view + "> ?bn ." +
+                " ?bn a <"+ BasilOntology.Term.View + "> ; " +
+                "  <"+ BasilOntology.Term.extension + "> ?extension ; " +
+                "  <"+ BasilOntology.Term.mimeType + "> ?mimeType ; " +
+                "  <"+ BasilOntology.Term.template + "> ?template . " +
+                "" +
+                "}" +
+                "} WHERE {" +
+                "GRAPH ?apiURI {" +
+                " ?apiURI <"+ BasilOntology.Term.view + "> ?bn ." +
+                "?bn  a <"+ BasilOntology.Term.View + "> ; " +
+                "  <"+ BasilOntology.Term.extension + "> ?extension ; " +
+                "  <"+ BasilOntology.Term.engine + "> ?mimeType ; " +
+                "  <"+ BasilOntology.Term.mimeType + "> ?mimeType ; " +
+                "  <"+ BasilOntology.Term.template + "> ?template ." +
+                "" +
+                "}" +
+                "}";
+        // INSERT
+        ParameterizedSparqlString pqs = new ParameterizedSparqlString();
+        pqs.setCommandText(deleteStr);
+        pqs.setParam("apiURI", apiURI);
+        UpdateRequest delete = pqs.asUpdate();
+        L.trace("{}", delete.toString());
+        //
+        requests.add(delete);
+        //
+        for(String viewName : views.getNames()){
+            View view = views.byName(viewName);
+            String insertStr = "INSERT DATA { GRAPH ?apiURI { " +
+                    " ?apiURI <" + BasilOntology.Term.view.getIRIString() + "> [ " +
+                    "     a    <" + BasilOntology.Term.View.getIRIString() + "> ; " +
+                    "         <" + BasilOntology.Term.extension.getIRIString() + "> ?extension ; " +
+                    "         <" + BasilOntology.Term.mimeType.getIRIString() + "> ?mimeType ; " +
+                    "         <" + BasilOntology.Term.engine.getIRIString() + "> ?engine ; " +
+                    "         <" + BasilOntology.Term.template.getIRIString() + "> ?template " +
+                    "] }} ";
+            ParameterizedSparqlString pqs2 = new ParameterizedSparqlString();
+            pqs2.setCommandText(insertStr);
+            pqs2.setParam("apiURI", apiURI);
+            pqs2.setLiteral("extension", view.getName());
+            pqs2.setLiteral("mimeType", view.getMimeType());
+            pqs2.setLiteral("engine", view.getEngine().name());
+            pqs2.setLiteral("template", view.getTemplate());
+            UpdateRequest insert = pqs2.asUpdate();
+            L.trace("{}", insert.toString());
+            requests.add(insert);
+        }
 
+        L.debug("Sending {} update requests", requests.size());
+        exec( requests.toArray(new UpdateRequest[requests.size()]));
     }
 
     private UpdateRequest deleteDoc(Node apiURI){

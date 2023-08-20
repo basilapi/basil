@@ -84,36 +84,6 @@ public class RDFFactory {
         ));
     }
 
-//    public Graph toGraph(ApiInfo o) {
-//        Graph g = new GraphMem();
-//        g.add(new Triple(api(o.getId()), RDF.type.asNode(), Term.Api.node()));
-//        str(g, api(o.getId()), Term.id, o.getId());
-//        str(g, api(o.getId()), Term.name, o.getName());
-//        datetime(g, api(o.getId()), Term.created, o.created());
-//        datetime(g, api(o.getId()), Term.modified, o.modified());
-//        for(String alias: o.alias()){
-//            node(g, api(o.getId()), Term.alias, NodeFactory.createLiteral(alias));
-//        }
-//        return g;
-//    }
-
-//    public Graph toGraph(String id, Specification s){
-//        Graph g = new GraphMem();
-//        str(g, api(id), Term.endpoint, s.getEndpoint());
-//        str(g, api(id), Term.query, s.getQuery());
-//        return g;
-//    }
-
-//    public Graph toGraph(String userName, Set<String> apis){
-//        Graph g = new GraphMem();
-//        Node s = user( userName);
-//        for(String api: apis){
-//            Node a = api( api);
-//            t(g, s, Term.api, a);
-//        }
-//        return g;
-//    }
-
     public Graph toGraph(User o){
         Graph g = new GraphMem();
         Node s = user(o.getUsername());
@@ -131,28 +101,6 @@ public class RDFFactory {
 
     public Node api(String apiId){
         return NodeFactory.createURI(dataNS + "api/" + apiId);
-    }
-
-    public Graph toGraph(String id, Doc d){
-        Graph g = new GraphMem();
-        str(g, api(id), Term.name, d.get(Doc.Field.NAME));
-        str(g, api(id), Term.description, d.get(Doc.Field.DESCRIPTION));
-        return g;
-    }
-
-    public Graph toGraph(String apiId, Views views){
-        Graph g = new GraphMem();
-        Node s = api(apiId);
-        for(String name: views.getNames()){
-            Node view = NodeFactory.createBlankNode();
-            node(g, s, Term.view, view);
-            View data = views.byName(name);
-            g.add(new Triple(view, Term.extension.node(), NodeFactory.createLiteral(data.getName())));
-            g.add(new Triple(view, Term.engine.node(), NodeFactory.createLiteral(data.getEngine().name())));
-            g.add(new Triple(view, Term.mimeType.node(), NodeFactory.createLiteral(data.getMimeType())));
-            g.add(new Triple(view, Term.template.node(), NodeFactory.createLiteral(data.getTemplate())));
-        }
-        return g;
     }
 
     public User makeUser(Graph g){
