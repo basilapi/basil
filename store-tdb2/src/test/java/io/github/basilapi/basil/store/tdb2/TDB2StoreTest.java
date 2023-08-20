@@ -17,6 +17,7 @@
 package io.github.basilapi.basil.store.tdb2;
 
 import io.github.basilapi.basil.core.ApiInfo;
+import io.github.basilapi.basil.doc.Doc;
 import io.github.basilapi.basil.rdf.RDFFactory;
 import io.github.basilapi.basil.sparql.Specification;
 import io.github.basilapi.basil.sparql.SpecificationFactory;
@@ -205,6 +206,67 @@ public class TDB2StoreTest {
         Assert.assertTrue(X.credentials(id).length == 2);
         Assert.assertTrue(X.credentials(id) [0].equals(user));
         Assert.assertTrue(X.credentials(id) [1].equals(password));
+    }
+
+    @Test
+    public void testI_MoreOnCredentials() throws UnknownQueryTypeException, IOException {
+
+        String id = "test-spec-id1";
+        X.deleteCredentials(id);
+        Assert.assertTrue(X.credentials(id).length == 0);
+
+        String user = "my-username2222";
+        String password = "my-password222";
+        X.saveCredentials(id, user, password);
+        Assert.assertTrue(X.credentials(id).length == 2);
+        Assert.assertTrue(X.credentials(id) [0].equals(user));
+        Assert.assertTrue(X.credentials(id) [1].equals(password));
+    }
+
+    @Test
+    public void testJ_Doc() throws UnknownQueryTypeException, IOException {
+
+        String id = "test-spec-id1";
+        String name = "My beatiful web api";
+        String desc = "My beatiful web api description";
+        Doc d = new Doc();
+        d.set(Doc.Field.NAME, name);
+        d.set(Doc.Field.DESCRIPTION, desc);
+        Assert.assertTrue(X.loadDoc(id) == null);
+        X.saveDoc(id, d);
+        Doc d2 = X.loadDoc(id);
+        Assert.assertEquals(name, d.get(Doc.Field.NAME));
+        Assert.assertEquals(desc, d.get(Doc.Field.DESCRIPTION));
+    }
+
+    @Test
+    public void testK_MoreOnDoc() throws UnknownQueryTypeException, IOException {
+
+        String id = "test-spec-id1";
+        String name = "My beatiful web api";
+        String desc = "My beatiful web api description";
+
+        Doc d2 = X.loadDoc(id);
+        Doc d = new Doc();
+        d.set(Doc.Field.NAME, name);
+        d.set(Doc.Field.DESCRIPTION, desc);
+        Assert.assertEquals(name, d.get(Doc.Field.NAME));
+        Assert.assertEquals(desc, d.get(Doc.Field.DESCRIPTION));
+
+        X.deleteDoc(id);
+
+        Assert.assertTrue(X.loadDoc(id) == null);
+
+        name ="Changed name";
+        desc ="Changed desc";
+        d.set(Doc.Field.NAME, name);
+        d.set(Doc.Field.DESCRIPTION, desc);
+
+        X.saveDoc(id, d);
+
+        d2 = X.loadDoc(id);
+        Assert.assertEquals(name, d.get(Doc.Field.NAME));
+        Assert.assertEquals(desc, d.get(Doc.Field.DESCRIPTION));
     }
 
     private void printAll(){

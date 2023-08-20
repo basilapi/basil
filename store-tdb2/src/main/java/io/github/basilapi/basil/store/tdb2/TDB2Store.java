@@ -245,7 +245,32 @@ public class TDB2Store implements Store, SearchProvider {
 
     @Override
     public Doc loadDoc(String id) throws IOException {
-        return null;
+        Node apiURI = toRDF.api(id);
+        String query = "SELECT ?name ?description WHERE { GRAPH ?apiURI { " +
+                " ?apiURI <"+ BasilOntology.Term.id.getIRIString() +"> ?id ; " +
+                "  <"+ BasilOntology.Term.name.getIRIString() +"> ?name ; " +
+                "  <"+ BasilOntology.Term.description.getIRIString() +"> ?description  . " +
+                "}}";
+        ParameterizedSparqlString pqs = new ParameterizedSparqlString();
+        pqs.setCommandText(query);
+        pqs.setParam("apiURI", apiURI);
+        dataset.begin(ReadWrite.READ);
+        Date value = null;
+        try (QueryExecution qe = QueryExecutionFactory.create(pqs.asQuery(), dataset);) {
+            ResultSet rs = qe.execSelect();
+            if(rs.hasNext()){
+                QuerySolution qs = rs.next();
+                String name = qs.getLiteral("name").getLexicalForm();
+                String description = qs.getLiteral("description").getLexicalForm();
+                Doc doc = new Doc();
+                doc.set(Doc.Field.NAME, name);
+                doc.set(Doc.Field.DESCRIPTION, description);
+                return doc;
+            }
+        } finally {
+            dataset.end();
+        }
+        return null; // TODO Check what happens here and if it is correct
     }
 
     @Override
@@ -253,14 +278,49 @@ public class TDB2Store implements Store, SearchProvider {
 
     }
 
+    private UpdateRequest deleteDoc(Node apiURI){
+        String deleteStr = "DELETE { GRAPH ?apiURI { " +
+                " ?apiURI <" + BasilOntology.Term.name.getIRIString() + "> ?name . " +
+                " ?apiURI <" + BasilOntology.Term.description.getIRIString() + "> ?description . " +
+                "}} WHERE { " +
+                "GRAPH ?apiURI { " +
+                " ?apiURI <" + BasilOntology.Term.name.getIRIString() + "> ?name . " +
+                " ?apiURI <" + BasilOntology.Term.description.getIRIString() + "> ?description . " +
+                " } }";
+        ParameterizedSparqlString pqs = new ParameterizedSparqlString();
+        pqs.setCommandText(deleteStr);
+        pqs.setParam("apiURI", apiURI);
+        UpdateRequest delete = pqs.asUpdate();
+        return delete;
+    }
     @Override
     public void saveDoc(String id, Doc doc) throws IOException {
-
+        Node apiURI = toRDF.api(id);
+        String name = doc.get(Doc.Field.NAME);
+        String desc = doc.get(Doc.Field.DESCRIPTION);
+        UpdateRequest delete = deleteDoc(apiURI);
+        L.trace("{}", delete.toString());
+        //
+        String insertStr = "INSERT DATA { GRAPH ?apiURI { " +
+                " ?apiURI <" + BasilOntology.Term.name.getIRIString() + "> ?name . " +
+                " ?apiURI <" + BasilOntology.Term.description.getIRIString() + "> ?description . " +
+                "}} ";
+        ParameterizedSparqlString pqs2 = new ParameterizedSparqlString();
+        pqs2.setCommandText(insertStr);
+        pqs2.setParam("apiURI", apiURI);
+        pqs2.setLiteral("name", name);
+        pqs2.setLiteral("description", desc);
+        UpdateRequest insert = pqs2.asUpdate();
+        L.trace("{}", insert.toString());
+        L.debug("Sending two update requests");
+        exec( delete, insert);
     }
 
     @Override
     public boolean deleteDoc(String id) throws IOException {
-        return false;
+        UpdateRequest delete = deleteDoc(toRDF.api(id));
+        exec(delete);
+        return true; // TODO check if this is correct
     }
 
     @Override
