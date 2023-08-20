@@ -269,6 +269,14 @@ public class TDB2StoreTest {
         Assert.assertEquals(desc, d.get(Doc.Field.DESCRIPTION));
     }
 
+    @Test
+    public void testL_Graph()  {
+        String id = "test-spec-id1";
+        Graph g = X.getAsMemGraph(id);
+        Assert.assertTrue(g.size() == 10);
+    }
+
+
     private void printAll(){
         X.dataset.begin();
         java.util.Iterator<Node> graphs = X.dataset.asDatasetGraph().listGraphNodes();

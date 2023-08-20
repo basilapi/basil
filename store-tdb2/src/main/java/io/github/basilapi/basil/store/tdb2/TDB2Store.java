@@ -32,7 +32,10 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.jena.atlas.lib.DateTimeUtils;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.mem.GraphMem;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.QueryExecution;
@@ -55,6 +58,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -595,5 +599,19 @@ public class TDB2Store implements Store, SearchProvider {
             dataset.end();
         }
         return Collections.unmodifiableSet(set);
+    }
+
+
+
+    public Graph getAsMemGraph(String id){
+        Node apiURI = toRDF.api(id);
+        dataset.begin();
+        Graph g = dataset.asDatasetGraph().getGraph(apiURI);
+        GraphMem gm = new GraphMem();
+        Iterator<Triple> it = g.find();
+        while(it.hasNext())
+            gm.add(it.next());
+        dataset.end();
+        return gm;
     }
 }
