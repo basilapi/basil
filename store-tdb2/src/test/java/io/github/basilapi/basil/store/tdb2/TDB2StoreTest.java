@@ -156,14 +156,55 @@ public class TDB2StoreTest {
     @Test
     public void testE_Alias() throws UnknownQueryTypeException, IOException {
         //printAll();
-        String id1 = "test-spec-id2";
+        String id1 = "test-spec-id1";
         Set<String> alias = new HashSet<String>();
-        String a = "my-alias";
+        String a = "my-alias-for-id1";
         alias.add(a);
         X.saveAlias(id1, alias);
         ApiInfo info = X.info(id1);
         Assert.assertTrue(info.alias().size() == 1);
         Assert.assertTrue(info.alias().iterator().next().equals(a));
+    }
+
+    @Test
+    public void testF_MoreOnAlias() throws UnknownQueryTypeException, IOException {
+        //printAll();
+        String id2 = "test-spec-id2";
+        Set<String> alias = new HashSet<String>();
+        String a2 = "my-alias2";
+        alias.add(a2);
+        String a3 = "my-alias3";
+        alias.add(a3);
+        String a4 = "my-alias4";
+        alias.add(a4);
+        X.saveAlias(id2, alias);
+        Set<String> aliasSet = X.loadAlias(id2);
+        Assert.assertTrue(aliasSet.size() == 4);
+        //Assert.assertTrue(info.alias().iterator().next().equals(a));
+    }
+
+    @Test
+    public void testG_GetIdByAlias() throws UnknownQueryTypeException, IOException {
+//        printAll();
+        String id2 = "test-spec-id2";
+        String a2 = "my-alias2";
+        String a3 = "my-alias3";
+        String a4 = "my-alias4";
+        Assert.assertTrue(X.getIdByAlias(a2).equals(id2));
+        Assert.assertTrue(X.getIdByAlias(a3).equals(id2));
+        Assert.assertTrue(X.getIdByAlias(a4).equals(id2));
+    }
+
+    @Test
+    public void testH_Credentials() throws UnknownQueryTypeException, IOException {
+        String id = "test-spec-id1";
+        String user = "my-username";
+        String password = "my-password";
+        Assert.assertTrue(X.credentials(id).length == 0);
+        X.saveCredentials(id, user, password);
+        Assert.assertTrue(X.credentials(id).length == 2);
+        Assert.assertTrue(X.credentials(id) [0].equals(user));
+        Assert.assertTrue(X.credentials(id) [1].equals(password));
     }
 
     private void printAll(){

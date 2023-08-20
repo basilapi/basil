@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -415,27 +416,101 @@ public class TDB2Store implements Store, SearchProvider {
 
     @Override
     public Set<String> loadAlias(String id) throws IOException {
-        return null;
+        return getAlias(id);
     }
 
     @Override
     public String getIdByAlias(String alias) throws IOException {
-        return null;
+        String qStr = "SELECT ?id WHERE {" +
+                "GRAPH ?any {" +
+                "[] <" + BasilOntology.Term.alias.getIRIString() + "> ?alias ;" +
+                " <" + BasilOntology.Term.id.getIRIString() + "> ?id ." +
+                "}} LIMIT 1";
+        ParameterizedSparqlString psq = new ParameterizedSparqlString();
+        psq.setCommandText(qStr);
+        psq.setLiteral("alias", alias);
+        dataset.begin();
+        org.apache.jena.query.Query query = psq.asQuery();
+        try (QueryExecution qe = QueryExecutionFactory.create(query, dataset);) {
+            ResultSet rs = qe.execSelect();
+            if(rs.hasNext()){
+                return rs.next().getLiteral("id").getLexicalForm();
+            }
+        } finally {
+            dataset.end();
+        }
+        return null; // TODO double check this is correct
     }
 
     @Override
     public String[] credentials(String id) throws IOException {
-        return new String[0];
+        Node apiURI = toRDF.api(id);
+        String qStr = "SELECT ?username ?password WHERE { GRAPH ?apiURI {" +
+                " ?apiURI <" + BasilOntology.Term.username.getIRIString() + "> ?username ; " +
+                "<" + BasilOntology.Term.password.getIRIString() + "> ?password ; " +
+                "}}";
+        ParameterizedSparqlString psq = new ParameterizedSparqlString();
+        psq.setCommandText(qStr);
+        psq.setParam("apiURI", apiURI);
+        dataset.begin();
+        org.apache.jena.query.Query query = psq.asQuery();
+        try (QueryExecution qe = QueryExecutionFactory.create(query, dataset);) {
+            ResultSet rs = qe.execSelect();
+            if(rs.hasNext()){
+                QuerySolution qs =  rs.next();
+                return Arrays.asList(qs.getLiteral("username").getLexicalForm(),
+                        qs.getLiteral("password").getLexicalForm()).toArray(new String[2]);
+            }
+        } finally {
+            dataset.end();
+        }
+
+        return new String[0]; // TODO Check this is correct
+    }
+
+    private UpdateRequest buildDeleteCredentials(Node apiURI){
+        String deleteStr = "DELETE { GRAPH ?apiURI { " +
+                " ?apiURI <" + BasilOntology.Term.username.getIRIString() + "> ?username . " +
+                " ?apiURI <" + BasilOntology.Term.password.getIRIString() + "> ?password . " +
+                "}} WHERE { " +
+                "GRAPH ?apiURI { " +
+                " ?apiURI <" + BasilOntology.Term.username.getIRIString() + "> ?username . " +
+                " ?apiURI <" + BasilOntology.Term.password.getIRIString() + "> ?password . " +
+                " } }";
+        ParameterizedSparqlString pqs = new ParameterizedSparqlString();
+        pqs.setCommandText(deleteStr);
+        pqs.setParam("apiURI", apiURI);
+        UpdateRequest delete = pqs.asUpdate();
+        return delete;
     }
 
     @Override
     public void saveCredentials(String id, String user, String password) throws IOException {
-
+        // DELETE
+        Node apiURI = toRDF.api(id);
+        UpdateRequest delete = buildDeleteCredentials(apiURI);
+        L.trace("{}", delete.toString());
+        // INSERT
+        String insertStr = "INSERT DATA { GRAPH ?apiURI { " +
+                " ?apiURI <" + BasilOntology.Term.username.getIRIString() + "> ?username . " +
+                " ?apiURI <" + BasilOntology.Term.password.getIRIString() + "> ?password . " +
+                "}} ";
+        ParameterizedSparqlString pqs2 = new ParameterizedSparqlString();
+        pqs2.setCommandText(insertStr);
+        pqs2.setParam("apiURI", apiURI);
+        pqs2.setLiteral("username", user);
+        pqs2.setLiteral("password", password);
+        UpdateRequest insert = pqs2.asUpdate();
+        L.trace("{}", insert.toString());
+        L.debug("Sending two update requests");
+        exec( delete, insert);
     }
 
     @Override
     public void deleteCredentials(String id) throws IOException {
-
+        Node apiURI = toRDF.api(id);
+        UpdateRequest delete = buildDeleteCredentials(apiURI);
+        exec(delete);
     }
 
     private Set<String> getAlias(String id){
