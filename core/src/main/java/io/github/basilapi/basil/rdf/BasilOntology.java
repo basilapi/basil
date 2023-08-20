@@ -27,14 +27,13 @@ public class BasilOntology {
     public enum Term {
         // ApiInfo
         Api, id, name, created, modified, alias,
-        // Specification
-        Specification, endpoint, query, update,
+        endpoint, query, update,
         // User
         User, username, password, email,
         // Doc
         description,
         // View
-        views, View, extension, mimeType, template, engine,
+        view, View, extension, mimeType, template, engine,
         // api
         api
         ;

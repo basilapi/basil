@@ -84,39 +84,35 @@ public class RDFFactory {
         ));
     }
 
-    public Graph toGraph(ApiInfo o) {
-        Graph g = new GraphMem();
-        g.add(new Triple(NodeFactory.createURI(dataNS + "api/" + o.getId()), RDF.type.asNode(), Term.Api.node()));
-        str(g, api(o.getId()), Term.id, o.getId());
-        str(g, api(o.getId()), Term.name, o.getName());
-        datetime(g, api(o.getId()), Term.created, o.created());
-        datetime(g, api(o.getId()), Term.modified, o.modified());
-        int c = 0;
-        Node aliasContainer = NodeFactory.createBlankNode();
-        node(g, api(o.getId()), Term.alias, aliasContainer);
-        for(String alias: o.alias()){
-            c += 1;
-            g.add(new Triple(aliasContainer, RDF.li(c).asNode(), NodeFactory.createLiteral(alias)));
-        }
-        return g;
-    }
+//    public Graph toGraph(ApiInfo o) {
+//        Graph g = new GraphMem();
+//        g.add(new Triple(api(o.getId()), RDF.type.asNode(), Term.Api.node()));
+//        str(g, api(o.getId()), Term.id, o.getId());
+//        str(g, api(o.getId()), Term.name, o.getName());
+//        datetime(g, api(o.getId()), Term.created, o.created());
+//        datetime(g, api(o.getId()), Term.modified, o.modified());
+//        for(String alias: o.alias()){
+//            node(g, api(o.getId()), Term.alias, NodeFactory.createLiteral(alias));
+//        }
+//        return g;
+//    }
 
-    public Graph toGraph(String id, Specification s){
-        Graph g = new GraphMem();
-        str(g, api(id), Term.endpoint, s.getEndpoint());
-        str(g, api(id), Term.query, s.getQuery());
-        return g;
-    }
+//    public Graph toGraph(String id, Specification s){
+//        Graph g = new GraphMem();
+//        str(g, api(id), Term.endpoint, s.getEndpoint());
+//        str(g, api(id), Term.query, s.getQuery());
+//        return g;
+//    }
 
-    public Graph toGraph(String userName, Set<String> apis){
-        Graph g = new GraphMem();
-        Node s = user( userName);
-        for(String api: apis){
-            Node a = api( api);
-            t(g, s, Term.api, a);
-        }
-        return g;
-    }
+//    public Graph toGraph(String userName, Set<String> apis){
+//        Graph g = new GraphMem();
+//        Node s = user( userName);
+//        for(String api: apis){
+//            Node a = api( api);
+//            t(g, s, Term.api, a);
+//        }
+//        return g;
+//    }
 
     public Graph toGraph(User o){
         Graph g = new GraphMem();
@@ -147,13 +143,9 @@ public class RDFFactory {
     public Graph toGraph(String apiId, Views views){
         Graph g = new GraphMem();
         Node s = api(apiId);
-        Node viewsContainer = NodeFactory.createBlankNode();
-        node(g, s, Term.views, viewsContainer);
-        int c = 0;
         for(String name: views.getNames()){
-            c += 1;
             Node view = NodeFactory.createBlankNode();
-            g.add(new Triple(viewsContainer, RDF.li(c).asNode(), view));
+            node(g, s, Term.view, view);
             View data = views.byName(name);
             g.add(new Triple(view, Term.extension.node(), NodeFactory.createLiteral(data.getName())));
             g.add(new Triple(view, Term.engine.node(), NodeFactory.createLiteral(data.getEngine().name())));

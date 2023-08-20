@@ -273,7 +273,7 @@ public class TDB2StoreTest {
     public void testL_Graph()  {
         String id = "test-spec-id1";
         Graph g = X.getAsMemGraph(id);
-        Assert.assertTrue(g.size() == 10);
+        Assert.assertEquals(11, g.size());
     }
 
 

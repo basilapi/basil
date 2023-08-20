@@ -71,7 +71,8 @@ public class TDB2Store implements Store, SearchProvider {
 
     private static final String selectApiInfo = "SELECT ?id ?name ?created ?modified " +
             "WHERE { GRAPH ?apiURI {" +
-            "?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id ; " +
+            "?apiURI a <" + BasilOntology.Term.Api.getIRIString() + "> ; " +
+            "<" + BasilOntology.Term.id.getIRIString() + "> ?id ; " +
             "<" + BasilOntology.Term.created.getIRIString() + "> ?created ; " +
             "<" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
             "OPTIONAL { ?apiURI <" + BasilOntology.Term.name.getIRIString() + "> ?name } . " +
@@ -111,17 +112,14 @@ public class TDB2Store implements Store, SearchProvider {
     @Override
     public void saveSpec(String id, Specification spec) throws IOException {
         boolean exists = existsSpec(id);
-        // ApiInfo need to exist!
         Node apiURI = toRDF.api(id);
         L.debug("Save API spec {}", apiURI);
         String deleteStr = "DELETE { GRAPH ?apiURI { " +
-                " ?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id . " +
                 " ?apiURI <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
                 " ?apiURI <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
                 " ?apiURI <" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
                 "}} WHERE { " +
                 "GRAPH ?apiURI { " +
-                " ?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id . " +
                 " ?apiURI <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
                 " ?apiURI <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
                 " ?apiURI <" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
@@ -133,6 +131,7 @@ public class TDB2Store implements Store, SearchProvider {
         L.trace("{}", delete.toString());
         //
         String insertStr = "INSERT DATA { GRAPH ?apiURI { " +
+                " ?apiURI a <" + BasilOntology.Term.Api.getIRIString() + "> ." +
                 " ?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id . " +
                 " ?apiURI <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
                 " ?apiURI <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
@@ -161,13 +160,11 @@ public class TDB2Store implements Store, SearchProvider {
         Node apiURI = toRDF.api(id);
         String q = "SELECT ?endpoint ?queryText WHERE { " +
                 "GRAPH ?apiURI {" +
-                " ?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id . " +
                 " ?apiURI <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
                 " ?apiURI <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " + "}}";
         ParameterizedSparqlString pqs2 = new ParameterizedSparqlString();
         pqs2.setCommandText(q);
         pqs2.setParam("apiURI", apiURI);
-        pqs2.setLiteral("id", id); // redundant but hey...
         L.trace("query {}", q);
         dataset.begin(ReadWrite.READ);
         try (QueryExecution qe = QueryExecutionFactory.create(pqs2.asQuery(), dataset);) {
@@ -190,7 +187,7 @@ public class TDB2Store implements Store, SearchProvider {
     public boolean existsSpec(String id) {
         L.debug("Exists API {}", id);
         Node apiURI = toRDF.api(id);
-        String query = "ASK { GRAPH ?apiURI { [] <"+ BasilOntology.Term.id.getIRIString() +"> [] } }";
+        String query = "ASK { GRAPH ?apiURI { [] a [] } }";
         ParameterizedSparqlString pqs2 = new ParameterizedSparqlString();
         pqs2.setCommandText(query);
         pqs2.setParam("apiURI", apiURI);
@@ -297,6 +294,7 @@ public class TDB2Store implements Store, SearchProvider {
         UpdateRequest delete = pqs.asUpdate();
         return delete;
     }
+
     @Override
     public void saveDoc(String id, Doc doc) throws IOException {
         Node apiURI = toRDF.api(id);
@@ -327,6 +325,13 @@ public class TDB2Store implements Store, SearchProvider {
         return true; // TODO check if this is correct
     }
 
+    /**
+     * This will delete the whole API data!
+     *
+     * @param id
+     * @return
+     * @throws IOException
+     */
     @Override
     public boolean deleteSpec(String id) throws IOException {
         boolean exists = existsSpec(id);
@@ -600,8 +605,6 @@ public class TDB2Store implements Store, SearchProvider {
         }
         return Collections.unmodifiableSet(set);
     }
-
-
 
     public Graph getAsMemGraph(String id){
         Node apiURI = toRDF.api(id);
