@@ -21,37 +21,50 @@ import io.github.basilapi.basil.rdf.RDFFactory;
 import io.github.basilapi.basil.sparql.Specification;
 import io.github.basilapi.basil.sparql.SpecificationFactory;
 import io.github.basilapi.basil.sparql.UnknownQueryTypeException;
+import org.apache.commons.io.FileUtils;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TDB2StoreTest {
+    static final Logger L = LoggerFactory.getLogger(TDB2StoreTest.class);
     private static String location = TDB2UserManagerTest.class.getClassLoader().getResource(".").getPath() + "/tdb2-user";
 
-    private TDB2Store X;
+    private static TDB2Store X;
 
-    @Before
-    public void before() {
 
-        if (new File(location).exists()) {
-            new File(location).delete();
+    public static void setup() throws IOException {
+        L.trace("Setup");
+        File fsLocation = new File(location);
+        if (fsLocation.exists()) {
+            boolean isIt = fsLocation.delete();
+            FileUtils.forceDelete(fsLocation);
         }
-        new File(location).mkdirs();
-
+        File tdb2Loc = new File(location);
+        tdb2Loc.mkdirs();
         X = new TDB2Store(location, new RDFFactory("http://www.example.org/"));
     }
 
-    @AfterClass
-    public static void beforeClass() {
-        new File(location).delete();
+    @BeforeClass
+    public static void beforeClass() throws IOException {
+        setup();
     }
 
 
@@ -95,8 +108,6 @@ public class TDB2StoreTest {
         X.saveSpec(id2, s2);
         Specification s2_2 = X.loadSpec(id2);
         Assert.assertTrue(s2_2.getEndpoint().equals(s2.getEndpoint()));
-        System.err.println(s2_2.getQuery());
-        System.err.println(s2.getQuery());
         Assert.assertTrue(s2_2.getQuery().equals(s2.getQuery()));
         Assert.assertTrue(s2_2.equals(s2));
 
@@ -140,5 +151,32 @@ public class TDB2StoreTest {
         Assert.assertNull(info.getName());
         Assert.assertNotNull(info.created());
         Assert.assertNotNull(info.modified());
+    }
+
+    @Test
+    public void testE_Alias() throws UnknownQueryTypeException, IOException {
+        //printAll();
+        String id1 = "test-spec-id2";
+        Set<String> alias = new HashSet<String>();
+        String a = "my-alias";
+        alias.add(a);
+        X.saveAlias(id1, alias);
+        ApiInfo info = X.info(id1);
+        Assert.assertTrue(info.alias().size() == 1);
+        Assert.assertTrue(info.alias().iterator().next().equals(a));
+    }
+
+    private void printAll(){
+        X.dataset.begin();
+        java.util.Iterator<Node> graphs = X.dataset.asDatasetGraph().listGraphNodes();
+        while(graphs.hasNext()){
+            Node ng = graphs.next();
+            Graph g = X.dataset.asDatasetGraph().getGraph(ng);
+            Iterator<Triple> trit = g.find();
+            while(trit.hasNext()){
+                System.err.println( ng.toString() + " -- " + trit.next());
+            }
+        }
+        X.dataset.end();
     }
 }

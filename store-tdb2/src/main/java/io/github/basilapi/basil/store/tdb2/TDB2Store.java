@@ -59,7 +59,7 @@ import java.util.Set;
 
 public class TDB2Store implements Store, SearchProvider {
     private final String location;
-    private final Dataset dataset;
+    final Dataset dataset;
     RDFFactory toRDF;
 
     public final static Logger L = LoggerFactory.getLogger(TDB2Store.class);
@@ -79,15 +79,15 @@ public class TDB2Store implements Store, SearchProvider {
     }
 
     private void exec(UpdateRequest... updates){
-        L.error("[begin write] {} update request", updates.length);
+        L.debug("[begin write] {} update request", updates.length);
         dataset.begin(ReadWrite.WRITE);
         for(UpdateRequest update : updates) {
-            L.error("{}", update.toString());
+            L.trace("{}", update.toString());
             UpdateProcessor up = UpdateExecutionFactory.create(update, dataset);
             up.execute();
         }
         dataset.commit();
-        L.error("[commit] {} update request", updates.length);
+        L.debug("[commit] {} update request", updates.length);
 //        dataset.begin(ReadWrite.READ);
 //        L.error("{}", dataset.listNames().next());
 //        dataset.end();
@@ -145,7 +145,8 @@ public class TDB2Store implements Store, SearchProvider {
         }
         pqs2.setLiteral("modified", System.currentTimeMillis());
         UpdateRequest insert = pqs2.asUpdate();
-        L.error("{}", insert.toString());
+        L.trace("{}", insert.toString());
+        L.debug("Sending two update requests");
         exec( delete, insert);
     }
 
@@ -162,7 +163,7 @@ public class TDB2Store implements Store, SearchProvider {
         pqs2.setCommandText(q);
         pqs2.setParam("apiURI", apiURI);
         pqs2.setLiteral("id", id); // redundant but hey...
-        L.trace("{}", q);
+        L.trace("query {}", q);
         dataset.begin(ReadWrite.READ);
         try (QueryExecution qe = QueryExecutionFactory.create(pqs2.asQuery(), dataset);) {
             ResultSet rs = qe.execSelect();
@@ -190,7 +191,7 @@ public class TDB2Store implements Store, SearchProvider {
         pqs2.setParam("apiURI", apiURI);
         dataset.begin(ReadWrite.READ);
         org.apache.jena.query.Query qq = pqs2.asQuery();
-        L.error("{}", qq);
+        L.trace("query: {}", qq);
         try (QueryExecution qe = QueryExecutionFactory.create(qq, dataset);) {
             boolean rs = qe.execAsk();
             return rs;
@@ -201,6 +202,7 @@ public class TDB2Store implements Store, SearchProvider {
 
     @Override
     public List<String> listSpecs() throws IOException {
+        L.debug("List specs");
         List<String> specs = new ArrayList<>();
         String list = "SELECT ?id WHERE { GRAPH ?g { ?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id }}";
         dataset.begin(ReadWrite.READ);
@@ -220,7 +222,7 @@ public class TDB2Store implements Store, SearchProvider {
     public List<ApiInfo> list() throws IOException {
         List<ApiInfo> specs = new ArrayList<>();
         String list = selectApiInfo;
-        L.error("{}", list);
+        L.trace("query {}", list);
         dataset.begin(ReadWrite.READ);
         try (QueryExecution qe = QueryExecutionFactory.create(list, dataset);) {
             ResultSet rs = qe.execSelect();
@@ -278,6 +280,7 @@ public class TDB2Store implements Store, SearchProvider {
 
 
     private Date createdOrModified(String id, boolean wantCreated) throws IOException {
+        L.debug("Get info for API {} {}", id, wantCreated ? "[created]" : "[modified]");
         String property;
         if(wantCreated){
             property = BasilOntology.Term.created.getIRIString();
@@ -352,6 +355,7 @@ public class TDB2Store implements Store, SearchProvider {
     }
     @Override
     public ApiInfo info(String id) throws IOException {
+        L.debug("Get info");
         Node apiURI = toRDF.api(id);
         ParameterizedSparqlString pqs = new ParameterizedSparqlString();
         pqs.setCommandText(selectApiInfo);
@@ -373,7 +377,40 @@ public class TDB2Store implements Store, SearchProvider {
     @Override
     public void saveAlias(String id, Set<String> alias) throws IOException {
         // clear all aliases
+        String deleteStr = "DELETE {" +
+                " GRAPH ?apiURI {" +
+                "?apiURI <" + BasilOntology.Term.alias.getIRIString() + "> ?alias " +
+                "}" +
+                "} WHERE {" +
+                " GRAPH ?apiURI {" +
+                " ?apiURI <" + BasilOntology.Term.alias.getIRIString() + "> ?alias " +
+                "}" +
+                "}";
+        Node apiURI = toRDF.api(id);
+        ParameterizedSparqlString psq = new ParameterizedSparqlString();
+        psq.setCommandText(deleteStr);
+        psq.setParam("apiURI", apiURI);
+        UpdateRequest delete = psq.asUpdate();
         // reload all aliases
+        StringBuilder insertStrBld = new StringBuilder();
+        insertStrBld.append("INSERT DATA {" +
+                " GRAPH ?apiURI {");
+        for(String a: alias){
+            if(!a.trim().isEmpty()){
+                insertStrBld.append(
+                        " ?apiURI <" + BasilOntology.Term.alias.getIRIString() + "> "
+                );
+                insertStrBld.append("\"\"\"");
+                insertStrBld.append(a);
+                insertStrBld.append("\"\"\" . ");
+            }
+        }
+        insertStrBld.append("}}");
+        ParameterizedSparqlString psq2 = new ParameterizedSparqlString();
+        psq2.setCommandText(insertStrBld.toString());
+        psq2.setParam("apiURI", apiURI);
+        UpdateRequest insert = psq2.asUpdate();
+        exec(delete, insert);
     }
 
     @Override
