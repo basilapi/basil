@@ -18,10 +18,19 @@ package io.github.basilapi.basil.server;
 
 public class BasilConfiguration {
     private String namespace;
+    private String tdb2location;
     public String getNamespace(){
         return namespace;
     }
+    public String getTdb2Location(){
+        return tdb2location;
+    }
+
     public void setNamespace(String namespace){
         this.namespace = namespace;
     }
+    public void setTdb2Location(String tdb2location){
+        this.tdb2location = tdb2location;
+    }
+
 }

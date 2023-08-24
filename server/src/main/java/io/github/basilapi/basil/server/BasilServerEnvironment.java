@@ -24,28 +24,31 @@ import io.github.basilapi.basil.invoke.QueryExecutor;
 
 public class BasilServerEnvironment extends IniWebEnvironment implements BasilEnvironment {
 
-	private String jdbcConnectionUrl;
+	private String jdbcConnectionUrl = null;
 
 	public BasilServerEnvironment() {
 		String iniPath = System.getProperty("basil.configurationFile");
 		Ini ini = Ini.fromResourcePath(iniPath);
 		setIni(ini);
 
-		StringBuilder sb = new StringBuilder().append("jdbc:mysql://").append(getIni().get("").get("ds.serverName"))
-				.append(":").append(getIni().get("").get("ds.port")).append("/")
-				.append(getIni().get("").get("ds.databaseName")).append("?user=")
-				.append(getIni().get("").get("ds.user")).append("&password=")
-				.append(getIni().get("").get("ds.password"));
+		// We rely on variable ds to decide whether we can setup the JDBC url
+		if(getIni().get("").get("ds") != null) {
+			StringBuilder sb = new StringBuilder().append("jdbc:mysql://").append(getIni().get("").get("ds.serverName"))
+					.append(":").append(getIni().get("").get("ds.port")).append("/")
+					.append(getIni().get("").get("ds.databaseName")).append("?user=")
+					.append(getIni().get("").get("ds.user")).append("&password=")
+					.append(getIni().get("").get("ds.password"));
 
-		if(getIni().get("").get("ds.verifyServerCertificate") != null){
-			sb.append("&verifyServerCertificate=");
-			sb.append(getIni().get("").get("ds.verifyServerCertificate"));
+			if (getIni().get("").get("ds.verifyServerCertificate") != null) {
+				sb.append("&verifyServerCertificate=");
+				sb.append(getIni().get("").get("ds.verifyServerCertificate"));
+			}
+			if (getIni().get("").get("ds.useSSL") != null) {
+				sb.append("&useSSL=");
+				sb.append(getIni().get("").get("ds.useSSL"));
+			}
+			jdbcConnectionUrl = sb.toString();
 		}
-		if(getIni().get("").get("ds.useSSL") != null){
-			sb.append("&useSSL=");
-			sb.append(getIni().get("").get("ds.useSSL"));
-		}
-		jdbcConnectionUrl =  sb.toString();
 	}
 
 	@Override
@@ -57,6 +60,9 @@ public class BasilServerEnvironment extends IniWebEnvironment implements BasilEn
 		return jdbcConnectionUrl;
 	}
 
+	public String getDataNamespace(){
+		return getIni().get("").get("basil.namespace");
+	}
 	@Override
 	public Class<? extends QueryExecutor> getQueryExecutorClass() throws ClassNotFoundException {
 		String clazz = getIni().get("").get("queryExecutor");
@@ -69,5 +75,10 @@ public class BasilServerEnvironment extends IniWebEnvironment implements BasilEn
 			}
 		}
 		return DirectExecutor.class;
+	}
+
+	@Override
+	public String getTDB2Location() {
+		return (String) getIni().get("").get("basil.tdb2location") ;
 	}
 }

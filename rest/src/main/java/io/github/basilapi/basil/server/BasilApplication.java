@@ -21,10 +21,13 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import io.github.basilapi.basil.alias.AliasMemCache;
+import io.github.basilapi.basil.rdf.RDFFactory;
 import io.github.basilapi.basil.store.mysql.JDBCUserManager;
 import io.github.basilapi.basil.invoke.DirectExecutor;
 import io.github.basilapi.basil.invoke.QueryExecutor;
 import io.github.basilapi.basil.store.mysql.MySQLStore;
+import io.github.basilapi.basil.store.tdb2.TDB2Store;
+import io.github.basilapi.basil.store.tdb2.TDB2UserManager;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.secnod.shiro.jersey.AuthInjectionBinder;
 import org.secnod.shiro.jersey.AuthorizationFilterFeature;
@@ -71,10 +74,21 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 		}
 		// JDBC setup
 		ctx.setAttribute(Registry.Environment, environment);
-		ctx.setAttribute(Registry.UserManager, 	new JDBCUserManager(environment.getJdbcConnectionUrl()));
-		MySQLStore store = new MySQLStore(environment.getJdbcConnectionUrl());
-		ctx.setAttribute(Registry.Store, store);
-		ctx.setAttribute(Registry.SearchProvider, store);
+		// If JDBC connection URL is provided, set MySQL as backend, otherwise, fallback to TDB2 as default
+		if(environment.getJdbcConnectionUrl() != null) {
+			ctx.setAttribute(Registry.UserManager, new JDBCUserManager(environment.getJdbcConnectionUrl()));
+			MySQLStore store = new MySQLStore(environment.getJdbcConnectionUrl());
+			ctx.setAttribute(Registry.Store, store);
+			ctx.setAttribute(Registry.SearchProvider, store);
+		}else if(environment.getTDB2Location() != null){
+			RDFFactory tordf = new RDFFactory(environment.getDataNamespace());
+			ctx.setAttribute(Registry.UserManager, new TDB2UserManager(environment.getTDB2Location(), tordf));
+			TDB2Store store = new TDB2Store(environment.getTDB2Location(), tordf);
+			ctx.setAttribute(Registry.Store, store);
+			ctx.setAttribute(Registry.SearchProvider, store);
+		}else{
+			throw new RuntimeException("Neither JDBC nor TDB2 info provided");
+		}
 		ctx.setAttribute(Registry.AliasCache, new AliasMemCache(10000));
 		QueryExecutor exec;
 		try {

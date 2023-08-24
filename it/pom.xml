@@ -35,7 +35,7 @@
 
 	<properties>
 		<!-- Set this to the basil configuration file -->
-		<basil.configurationFile>basil.ini</basil.configurationFile>
+		<basil.configurationFile>basil-tdb2.ini</basil.configurationFile>
 
 		<!-- Create a new test database or use an existing one. When true, a new 
 			database is created using dbname from the config file plus a random postfix. 

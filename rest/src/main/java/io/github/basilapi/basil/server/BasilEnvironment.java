@@ -22,5 +22,9 @@ public interface BasilEnvironment {
 
 	String getJdbcConnectionUrl();
 
+	String getDataNamespace();
+
 	Class<? extends QueryExecutor> getQueryExecutorClass() throws ClassNotFoundException;
+
+	public String getTDB2Location();
 }
