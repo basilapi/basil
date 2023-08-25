@@ -34,15 +34,6 @@
 	</parent>
 
 	<properties>
-		<!-- Set this to the basil configuration file -->
-		<basil.configurationFile>basil-tdb2.ini</basil.configurationFile>
-
-		<!-- Create a new test database or use an existing one. When true, a new 
-			database is created using dbname from the config file plus a random postfix. 
-			After tests, the db is deleted. Note that DB User must have sufficient privileges 
-			to perform this. -->
-		<test.db.init>true</test.db.init>
-
 		<!-- Set this to run the server on a specific port -->
 		<http.port></http.port>
 
@@ -71,7 +62,41 @@
 			tests -->
 		<keepJarRunning>false</keepJarRunning>
 	</properties>
-
+	<profiles>
+		<profile>
+			<id>storeTDB2</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+				<property>
+					<name>store</name>
+					<value>tdb2</value>
+				</property>
+			</activation>
+			<properties>
+				<basil.configurationFile>basil-tdb2.ini</basil.configurationFile>
+			</properties>
+		</profile>
+		<profile>
+			<id>storeMYSQL</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>store</name>
+					<value>mysql</value>
+				</property>
+			</activation>
+			<properties>
+				<!-- Set this to the basil configuration file -->
+				<basil.configurationFile>basil-mysql.ini</basil.configurationFile>
+				<!-- Create a new test database or use an existing one. When true, a new
+			database is created using dbname from the config file plus a random postfix.
+			After tests, the db is deleted. Note that DB User must have sufficient privileges
+			to perform this. -->
+				<test.db.init>true</test.db.init>
+				<test.db.init.script>${project.basedir}/target/dependency/db.sql</test.db.init.script>
+			</properties>
+		</profile>
+	</profiles>
 	<build>
 		<plugins>
 
@@ -165,13 +190,11 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<systemPropertyVariables>
+						<basil.configurationFile>${project.basedir}/target/dependency/${basil.configurationFile}</basil.configurationFile>
 						<test.server.url>${test.server.url}</test.server.url>
 						<test.server.user>${test.server.user}</test.server.user>
 						<test.server.pwd>${test.server.pwd}</test.server.pwd>
-						<test.db.init>${test.db.init}</test.db.init>
-						<basil.configurationFile>${project.basedir}/target/dependency/${basil.configurationFile}</basil.configurationFile>
 						<fuseki.passwordsFile>${project.basedir}/target/dependency/${fuseki.passwordsFile}</fuseki.passwordsFile>
-						<test.db.init.script>${project.basedir}/target/dependency/db.sql</test.db.init.script>
 						<jar.executor.server.port>${basil.http.port}</jar.executor.server.port>
 						<fuseki.jar.executor.server.port>${fuseki.http.port}</fuseki.jar.executor.server.port>
 						<jar.executor.vm.options>${jar.executor.vm.options}</jar.executor.vm.options>
@@ -185,6 +208,9 @@
 						<fuseki.server.ready.timeout.seconds>180</fuseki.server.ready.timeout.seconds>
 						<server.ready.path.1>/basil:[</server.ready.path.1>
 						<fuseki.server.ready.path.1>/fuseki:</fuseki.server.ready.path.1>
+						<!-- Only set when profile MYSQL is active -->
+						<test.db.init>${test.db.init}</test.db.init>
+						<test.db.init.script>${test.db.init.script}</test.db.init.script>
 					</systemPropertyVariables>
 					<excludes>
 

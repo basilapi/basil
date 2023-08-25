@@ -22,6 +22,7 @@ import io.github.basilapi.basil.core.auth.exceptions.UserApiMappingException;
 import io.github.basilapi.basil.core.auth.exceptions.UserCreationException;
 import io.github.basilapi.basil.rdf.BasilOntology;
 import io.github.basilapi.basil.rdf.RDFFactory;
+import org.apache.commons.io.FileUtils;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
@@ -30,6 +31,8 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.tdb2.TDB2Factory;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -42,6 +45,12 @@ public class TDB2UserManager implements UserManager {
     public TDB2UserManager(String tdb2location, RDFFactory RDFFactory){
         this.toRDF = RDFFactory;
         this.location = tdb2location;
+        File f = new File(location);
+        try {
+            FileUtils.forceMkdir(f);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         this.dataset = TDB2Factory.connectDataset(tdb2location);
     }
 

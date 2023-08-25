@@ -34,7 +34,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import java.util.Set;
 
 public class ShiroRealm extends AuthorizingRealm {
-    private BasilConfiguration basil;
+    private BasilConfiguration basilConfiguration;
 
     private TDB2UserManager userManager = null;
 
@@ -68,16 +68,16 @@ public class ShiroRealm extends AuthorizingRealm {
     }
 
     public void setBasilConfiguration(BasilConfiguration conf){
-        this.basil = conf;
+        this.basilConfiguration = conf;
     }
 
     public BasilConfiguration getBasilConfiguration(){
-        return basil;
+        return basilConfiguration;
     }
 
     public TDB2UserManager getUserManager() {
         if(userManager == null){
-            userManager = new TDB2UserManager(basil.getTdb2Location(), new RDFFactory(basil.getNamespace()));
+            userManager = new TDB2UserManager(basilConfiguration.getTdbLocation(), new RDFFactory(basilConfiguration.getNamespace()));
         }
         return userManager;
     }

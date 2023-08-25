@@ -28,6 +28,12 @@ import io.github.basilapi.basil.invoke.QueryExecutor;
 import io.github.basilapi.basil.store.mysql.MySQLStore;
 import io.github.basilapi.basil.store.tdb2.TDB2Store;
 import io.github.basilapi.basil.store.tdb2.TDB2UserManager;
+import org.apache.commons.io.FileUtils;
+import org.apache.jena.query.ARQ;
+import org.apache.jena.sparql.util.Context;
+import org.apache.jena.sys.JenaSystem;
+import org.apache.jena.tdb2.TDB2Factory;
+import org.apache.jena.tdb2.sys.SystemTDB;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.secnod.shiro.jersey.AuthInjectionBinder;
 import org.secnod.shiro.jersey.AuthorizationFilterFeature;
@@ -39,10 +45,17 @@ import com.wordnik.swagger.jersey.listing.ApiListingResourceJSON;
 import com.wordnik.swagger.jersey.listing.JerseyApiDeclarationProvider;
 import com.wordnik.swagger.jersey.listing.JerseyResourceListingProvider;
 
+import java.io.File;
+import java.io.IOException;
 /**
  * Created by Luca Panziera on 09/01/15.
  */
 public class BasilApplication extends ResourceConfig implements ServletContextListener {
+	static {
+		JenaSystem.DEBUG_INIT = true;
+		ARQ.init();
+		SystemTDB.init();
+	}
 	private Logger log = LoggerFactory.getLogger(BasilApplication.class);
 
     public BasilApplication(){
@@ -81,6 +94,22 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 			ctx.setAttribute(Registry.Store, store);
 			ctx.setAttribute(Registry.SearchProvider, store);
 		}else if(environment.getTDB2Location() != null){
+			// Make sure the Jena system is initialised
+			JenaSystem.init();
+			// Make sure location exists
+			try {
+				FileUtils.forceMkdir(new File(environment.getTDB2Location()));
+				System.err.println("EXISTS?????? " + new File(environment.getTDB2Location()).exists());
+			} catch (IOException e) {
+				throw new RuntimeException("Can't create TDB2 location",e);
+			}
+			try{
+				Context ctx2 = ARQ.getContext();
+				System.err.println("CONTEXT!!!!! " + ctx2);
+				ctx2.getAsString(SystemTDB.symFileMode, "default");
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 			RDFFactory tordf = new RDFFactory(environment.getDataNamespace());
 			ctx.setAttribute(Registry.UserManager, new TDB2UserManager(environment.getTDB2Location(), tordf));
 			TDB2Store store = new TDB2Store(environment.getTDB2Location(), tordf);

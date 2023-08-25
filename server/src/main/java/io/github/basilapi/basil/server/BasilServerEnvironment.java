@@ -79,6 +79,6 @@ public class BasilServerEnvironment extends IniWebEnvironment implements BasilEn
 
 	@Override
 	public String getTDB2Location() {
-		return (String) getIni().get("").get("basil.tdb2location") ;
+		return (String) getIni().get("").get("basil.tdbLocation") ;
 	}
 }
