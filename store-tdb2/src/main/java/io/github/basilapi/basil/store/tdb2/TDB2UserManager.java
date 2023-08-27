@@ -38,20 +38,22 @@ import java.util.Set;
 
 public class TDB2UserManager implements UserManager {
     private final RDFFactory toRDF;
-
-    private String location;
-
     private Dataset dataset;
     public TDB2UserManager(String tdb2location, RDFFactory RDFFactory){
-        this.toRDF = RDFFactory;
-        this.location = tdb2location;
-        File f = new File(location);
+
+        File f = new File(tdb2location);
         try {
             FileUtils.forceMkdir(f);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         this.dataset = TDB2Factory.connectDataset(tdb2location);
+        this.toRDF = RDFFactory;
+    }
+
+    public TDB2UserManager(Dataset tdb2dataset, RDFFactory RDFFactory) {
+        this.dataset = tdb2dataset;
+        this.toRDF = RDFFactory;
     }
 
     public RDFFactory getToRDF(){
@@ -65,6 +67,7 @@ public class TDB2UserManager implements UserManager {
         dataset.begin(ReadWrite.WRITE);
         dataset.asDatasetGraph().addGraph(toRDF.user(user.getUsername()), g);
         dataset.commit();
+        dataset.end();
     }
 
     @Override
@@ -74,12 +77,16 @@ public class TDB2UserManager implements UserManager {
                 new Triple(toRDF.user(username), BasilOntology.Term.api.node(), toRDF.api(apiId))
         );
         dataset.commit();
+        dataset.end();
     }
 
     @Override
     public User getUser(String username) {
         dataset.begin(ReadWrite.READ);
         Graph g = dataset.asDatasetGraph().getGraph(toRDF.user(username));
+        if(g.isEmpty()){
+            return null;
+        }
         User u = toRDF.makeUser(g);
         dataset.end();;
         return u;

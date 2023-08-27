@@ -66,20 +66,23 @@
 		<profile>
 			<id>storeTDB2</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>store</name>
 					<value>tdb2</value>
 				</property>
 			</activation>
 			<properties>
+				<test.db.type>TDB2</test.db.type>
 				<basil.configurationFile>basil-tdb2.ini</basil.configurationFile>
+				<test.db.init>true</test.db.init>
+				<test.db.init.script>${project.basedir}/target/dependency/tdb2.sparql</test.db.init.script>
 			</properties>
 		</profile>
 		<profile>
 			<id>storeMYSQL</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<activeByDefault>false</activeByDefault>
 				<property>
 					<name>store</name>
 					<value>mysql</value>
@@ -92,6 +95,7 @@
 			database is created using dbname from the config file plus a random postfix.
 			After tests, the db is deleted. Note that DB User must have sufficient privileges
 			to perform this. -->
+				<test.db.type>MYSQL</test.db.type>
 				<test.db.init>true</test.db.init>
 				<test.db.init.script>${project.basedir}/target/dependency/db.sql</test.db.init.script>
 			</properties>
@@ -208,7 +212,7 @@
 						<fuseki.server.ready.timeout.seconds>180</fuseki.server.ready.timeout.seconds>
 						<server.ready.path.1>/basil:[</server.ready.path.1>
 						<fuseki.server.ready.path.1>/fuseki:</fuseki.server.ready.path.1>
-						<!-- Only set when profile MYSQL is active -->
+						<test.db.type>${test.db.type}</test.db.type>
 						<test.db.init>${test.db.init}</test.db.init>
 						<test.db.init.script>${test.db.init.script}</test.db.init.script>
 					</systemPropertyVariables>
@@ -228,6 +232,31 @@
 	</build>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>io.github.basilapi</groupId>
+			<artifactId>core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.basilapi</groupId>
+			<artifactId>store-tdb2</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-tdb2</artifactId>
+			<version>${jena.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-arq</artifactId>
+			<version>${jena.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -282,6 +311,16 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-arq</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.basilapi</groupId>
+			<artifactId>store-tdb2</artifactId>
+			<version>0.8.4-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 

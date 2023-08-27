@@ -52,7 +52,6 @@ import java.io.IOException;
  */
 public class BasilApplication extends ResourceConfig implements ServletContextListener {
 	static {
-		JenaSystem.DEBUG_INIT = true;
 		ARQ.init();
 		SystemTDB.init();
 	}
@@ -99,16 +98,8 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 			// Make sure location exists
 			try {
 				FileUtils.forceMkdir(new File(environment.getTDB2Location()));
-				System.err.println("EXISTS?????? " + new File(environment.getTDB2Location()).exists());
 			} catch (IOException e) {
 				throw new RuntimeException("Can't create TDB2 location",e);
-			}
-			try{
-				Context ctx2 = ARQ.getContext();
-				System.err.println("CONTEXT!!!!! " + ctx2);
-				ctx2.getAsString(SystemTDB.symFileMode, "default");
-			}catch(Exception e){
-				e.printStackTrace();
 			}
 			RDFFactory tordf = new RDFFactory(environment.getDataNamespace());
 			ctx.setAttribute(Registry.UserManager, new TDB2UserManager(environment.getTDB2Location(), tordf));

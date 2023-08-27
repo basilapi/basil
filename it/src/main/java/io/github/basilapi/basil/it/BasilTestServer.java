@@ -32,6 +32,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TreeSet;
 
+import io.github.basilapi.basil.core.auth.User;
+import io.github.basilapi.basil.rdf.RDFFactory;
+import io.github.basilapi.basil.store.tdb2.TDB2UserManager;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -39,6 +43,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.config.Ini;
 import org.slf4j.Logger;
@@ -62,6 +68,8 @@ public class BasilTestServer {
 
 	// MySQL
 	private static String dbInit = System.getProperty(TEST_DB_INIT_PROP);
+	private static final String TEST_STORE_TYPE = "test.db.type";
+	private static String storeType = System.getProperty(TEST_STORE_TYPE);
 	private static String jdbcConnectionUrl = null;
 	private static String databaseName = null;
 	private static String user = null;
@@ -80,10 +88,16 @@ public class BasilTestServer {
 
 	private static JarExecutor j = null;
 	public static void start() throws Exception {
-		log.debug("Configuration: {}", serverConfiguration);
-		log.debug("Init a test db: {}", dbInit);
+		log.info("Configuration template: {}", serverConfiguration);
+		log.info("Init a test db: {} ({})", dbInit, storeType);
 		if ("true".equals(dbInit)) {
-			serverConfiguration = createTestDb();
+			if(storeType.equals("MYSQL")) {
+				serverConfiguration = createTestMySQLDb();
+			}else if (storeType.equals("TDB2")) {
+				serverConfiguration = createTestTDB2Db();
+
+			}
+			log.info("Server configuration: {}", serverConfiguration);
 		}
 		startServer();
 	}
@@ -190,17 +204,21 @@ public class BasilTestServer {
 			return;
 		}
 		log.info("Cleaning up: dropping db {}", databaseName);
-		try {
-			// Delete the test Database
-			Class.forName("com.mysql.jdbc.Driver");
-			try (Connection conn = DriverManager.getConnection(jdbcConnectionUrl, user, password)) {
-				try (Statement create = conn.createStatement()) {
-					create.executeUpdate("DROP DATABASE `" + databaseName + "`");
-					log.info("Database {} dropped", databaseName);
+		if(storeType.equals("MYSQL")) {
+			try {
+				// Delete the test Database
+				Class.forName("com.mysql.jdbc.Driver");
+				try (Connection conn = DriverManager.getConnection(jdbcConnectionUrl, user, password)) {
+					try (Statement create = conn.createStatement()) {
+						create.executeUpdate("DROP DATABASE `" + databaseName + "`");
+						log.info("Database {} dropped", databaseName);
+					}
 				}
+			} catch (Exception e) {
+				log.error("IGNORED (cannot cleanup test db!)", e);
 			}
-		} catch (Exception e) {
-			log.error("IGNORED (cannot cleanup test db!)", e);
+		}else if (storeType.equals("TDB2")) {
+			// TODO
 		}
 	}
 
@@ -231,7 +249,7 @@ public class BasilTestServer {
 //		return HttpClients.createDefault().execute(post, httpClientContext);
 //	}
 
-	private static String createTestDb() throws Exception {
+	private static String createTestMySQLDb() throws Exception {
 		log.info("Creating test db (once only)");
 		final String inputConfigurationFile = System.getProperty(BASIL_CONFIGURATION_FILE_PROP);
 		String str = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -301,6 +319,73 @@ public class BasilTestServer {
 		return newConfigurationFile;
 	}
 
+	private static String createTestTDB2Db() throws Exception {
+		log.info("Creating test db (once only)");
+		final String inputConfigurationFile = System.getProperty(BASIL_CONFIGURATION_FILE_PROP);
+		String str = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		final String dbPostfix = '_' + RandomStringUtils.random(8, str.toCharArray());
+		File f = new File(inputConfigurationFile);
+		if (!f.exists() || !f.canRead()) {
+			throw new Exception("Cannot use basil configuration file: " + f);
+		}
+		Ini ini = Ini.fromResourcePath(f.getAbsolutePath());
+
+		String tdbLocation = String.valueOf(ini.get("").get("basil.tdbLocation")) + dbPostfix;
+		log.info("Setting up TDB2 at location {}", tdbLocation);
+		Dataset dataset = TDB2Factory.connectDataset(tdbLocation);
+		RDFFactory rdfFactory = new RDFFactory(String.valueOf(ini.get("").get("basil.namespace")));
+		TDB2UserManager manager = new TDB2UserManager(dataset, rdfFactory);
+		// Now init db
+		Resource r = new FileSystemResource(System.getProperty(TEST_DB_INIT_SCRIPT_PROP));
+		log.info("Running init script: {}", r);
+		// XXX Nothing in the script yet... leaving it as placeholder just in case...
+
+		// Create a user
+		log.info("Create a test user: {}", basilUser);
+		User user = new User();
+		user.setEmail(basilUser + "@emailcom");
+		user.setUsername(basilUser);
+		user.setPassword(basilPassword);
+		manager.createUser(user);
+		//
+		// XXX Release Lock
+		// XXX We are sure this process is not going to use that TDB2
+		String lockFile = tdbLocation + "/tdb.lock";
+		String lockFile2 = tdbLocation + "/Data-0001/tdb.lock";
+		log.info("Deleting TDB2 lock files {} and {}", lockFile, lockFile2);
+		FileUtils.forceDelete(new File(lockFile));
+		FileUtils.forceDelete(new File(lockFile2));
+		log.info("Deleted TDB2 lock file? {} and {}",
+				!new File(lockFile).exists(),
+				!new File(lockFile2).exists());
+//		io.github.basilapi.basil.
+//		String insert = "INSERT DATA {" +
+//				" GRAPH " +
+//				"}";
+//			try (Statement usr = conn.createStatement()) {
+//				usr.executeUpdate(
+//						"INSERT INTO users (username, email, password) values ('" + basilUser + "','" + basilUser
+//								+ "@email.com','" + new DefaultPasswordService().encryptPassword(basilPassword) + "')");
+//				usr.executeUpdate(
+//						"insert into users_roles (username, role_name) values ('" + basilUser + "', 'default')");
+//			}
+//
+		String newConfigurationFile = inputConfigurationFile + dbPostfix;
+		log.info("Write configuration file for test server instance: {}", newConfigurationFile);
+		Path from = Paths.get(inputConfigurationFile);
+		Path to = Paths.get(newConfigurationFile);
+		Charset charset = StandardCharsets.UTF_8;
+		String content = new String(Files.readAllBytes(from), charset);
+		content = content.replaceAll("basil.tdbLocation = " + ini.get("").get("basil.tdbLocation"),"basil.tdbLocation = " + tdbLocation);
+		Files.write(to, content.getBytes(charset));
+
+		// Avoid to create again!
+		dbInit = "false";
+
+		// Configuration file
+		return newConfigurationFile;
+	}
+
 	public static synchronized void startServer() throws Exception {
 		log.info("Starting testing server");
 		if (serverBaseUrl != null) {
@@ -322,6 +407,7 @@ public class BasilTestServer {
 			Properties properties = new Properties(System.getProperties());
 			// Add jvm option for basil configuration file
 			String opts = properties.getProperty("jar.executor.vm.options");
+			log.info("Setting up java command using server config: {}", serverConfiguration);
 			opts += " -Dbasil.configurationFile=" + serverConfiguration;
 			properties.setProperty("jar.executor.vm.options", opts);
 			// Set command line args
