@@ -60,12 +60,5 @@
             <artifactId>store-tdb2</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.github.basilapi</groupId>
-            <artifactId>store-tdb2</artifactId>
-            <version>0.8.4-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-
     </dependencies>
 </project>
