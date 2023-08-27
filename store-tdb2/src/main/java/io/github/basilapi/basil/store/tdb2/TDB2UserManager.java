@@ -83,13 +83,16 @@ public class TDB2UserManager implements UserManager {
     @Override
     public User getUser(String username) {
         dataset.begin(ReadWrite.READ);
-        Graph g = dataset.asDatasetGraph().getGraph(toRDF.user(username));
-        if(g.isEmpty()){
-            return null;
+        User u = null;
+        try {
+            Graph g = dataset.asDatasetGraph().getGraph(toRDF.user(username));
+            if (!g.isEmpty()) {
+                u = toRDF.makeUser(g);
+            }
+        } finally {
+            dataset.end();
         }
-        User u = toRDF.makeUser(g);
-        dataset.end();;
-        return u;
+        return u; // XXX shall this be null?
     }
 
     @Override
@@ -97,7 +100,7 @@ public class TDB2UserManager implements UserManager {
         dataset.begin(ReadWrite.READ);
         Graph g = dataset.asDatasetGraph().getGraph(toRDF.user(username));
         Set<String> u = toRDF.makeUserApis(g);
-        dataset.end();;
+        dataset.end();
         return u;
     }
 
@@ -107,6 +110,7 @@ public class TDB2UserManager implements UserManager {
         dataset.begin(ReadWrite.WRITE);
         dataset.asDatasetGraph().getGraph(user).remove(user, BasilOntology.Term.api.node(), toRDF.api(id));
         dataset.commit();
+        dataset.end();
     }
 
     @Override

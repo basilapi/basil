@@ -228,14 +228,14 @@ public class TDB2StoreTest {
 
     @Test
     public void testJ_Doc() throws UnknownQueryTypeException, IOException {
-
         String id = "test-spec-id1";
         String name = "My beatiful web api";
         String desc = "My beatiful web api description";
         Doc d = new Doc();
         d.set(Doc.Field.NAME, name);
         d.set(Doc.Field.DESCRIPTION, desc);
-        Assert.assertTrue(X.loadDoc(id) == null);
+        Assert.assertTrue(X.loadDoc(id).get(Doc.Field.NAME).equals(""));
+        Assert.assertTrue(X.loadDoc(id).get(Doc.Field.DESCRIPTION).equals(""));
         X.saveDoc(id, d);
         Doc d2 = X.loadDoc(id);
         Assert.assertEquals(name, d.get(Doc.Field.NAME));
@@ -258,7 +258,8 @@ public class TDB2StoreTest {
 
         X.deleteDoc(id);
 
-        Assert.assertTrue(X.loadDoc(id) == null);
+        Assert.assertTrue(X.loadDoc(id).get(Doc.Field.NAME).equals(""));
+        Assert.assertTrue(X.loadDoc(id).get(Doc.Field.DESCRIPTION).equals(""));
 
         name ="Changed name";
         desc ="Changed desc";

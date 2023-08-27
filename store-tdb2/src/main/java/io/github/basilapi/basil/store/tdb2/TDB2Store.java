@@ -89,17 +89,18 @@ public class TDB2Store implements Store, SearchProvider {
 
     private void exec(UpdateRequest... updates){
         L.debug("[begin write] {} update request", updates.length);
-        dataset.begin(ReadWrite.WRITE);
-        for(UpdateRequest update : updates) {
-            L.trace("{}", update.toString());
-            UpdateProcessor up = UpdateExecutionFactory.create(update, dataset);
-            up.execute();
+        try {
+            dataset.begin(ReadWrite.WRITE);
+            for (UpdateRequest update : updates) {
+                L.trace("{}", update.toString());
+                UpdateProcessor up = UpdateExecutionFactory.create(update, dataset);
+                up.execute();
+            }
+            dataset.commit();
+            L.debug("[commit] {} update request", updates.length);
+        } finally {
+            dataset.end();
         }
-        dataset.commit();
-        L.debug("[commit] {} update request", updates.length);
-//        dataset.begin(ReadWrite.READ);
-//        L.error("{}", dataset.listNames().next());
-//        dataset.end();
     }
 
     @Override
@@ -117,40 +118,40 @@ public class TDB2Store implements Store, SearchProvider {
         boolean exists = existsSpec(id);
         Node apiURI = toRDF.api(id);
         L.debug("Save API spec {}", apiURI);
-        String deleteStr = "DELETE { GRAPH ?apiURI { " +
-                " ?apiURI <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
-                " ?apiURI <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
-                " ?apiURI <" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
+        String deleteStr = "DELETE { GRAPH ?apiURIXXXXXXX { " +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
                 "}} WHERE { " +
-                "GRAPH ?apiURI { " +
-                " ?apiURI <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
-                " ?apiURI <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
-                " ?apiURI <" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
+                "GRAPH ?apiURIXXXXXXX { " +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
                 " } }";
         ParameterizedSparqlString pqs = new ParameterizedSparqlString();
         pqs.setCommandText(deleteStr);
-        pqs.setParam("apiURI", apiURI);
+        pqs.setParam("apiURIXXXXXXX", apiURI);
         UpdateRequest delete = pqs.asUpdate();
         L.trace("{}", delete.toString());
         //
-        String insertStr = "INSERT DATA { GRAPH ?apiURI { " +
-                " ?apiURI a <" + BasilOntology.Term.Api.getIRIString() + "> ." +
-                " ?apiURI <" + BasilOntology.Term.id.getIRIString() + "> ?id . " +
-                " ?apiURI <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
-                " ?apiURI <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
-                ((!exists) ? " ?apiURI <" + BasilOntology.Term.created.getIRIString() + "> ?created . " : "") +
-                " ?apiURI <" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
+        String insertStr = "INSERT DATA { GRAPH ?apiURIXXXXXXX { " +
+                " ?apiURIXXXXXXX a <" + BasilOntology.Term.Api.getIRIString() + "> ." +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.id.getIRIString() + "> ?idXXXXXXX . " +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpointXXXXXXX . " +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.query.getIRIString() + "> ?queryTextXXXXXXX . " +
+                ((!exists) ? " ?apiURIXXXXXXX <" + BasilOntology.Term.created.getIRIString() + "> ?createdXXXXXXX . " : "") +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.modified.getIRIString() + "> ?modifiedXXXXXXX . " +
             "}} ";
         ParameterizedSparqlString pqs2 = new ParameterizedSparqlString();
         pqs2.setCommandText(insertStr);
-        pqs2.setParam("apiURI", apiURI);
-        pqs2.setLiteral("endpoint", spec.getEndpoint());
-        pqs2.setLiteral("id", id);
-        pqs2.setLiteral("queryText", spec.getQuery());
+        pqs2.setParam("apiURIXXXXXXX", apiURI);
+        pqs2.setLiteral("endpointXXXXXXX", spec.getEndpoint());
+        pqs2.setLiteral("idXXXXXXX", id);
+        pqs2.setLiteral("queryTextXXXXXXX", spec.getQuery());
         if(!exists){
-            pqs2.setLiteral("created", System.currentTimeMillis());
+            pqs2.setLiteral("createdXXXXXXX", System.currentTimeMillis());
         }
-        pqs2.setLiteral("modified", System.currentTimeMillis());
+        pqs2.setLiteral("modifiedXXXXXXX", System.currentTimeMillis());
         UpdateRequest insert = pqs2.asUpdate();
         L.trace("{}", insert.toString());
         L.debug("Sending two update requests");
@@ -169,8 +170,8 @@ public class TDB2Store implements Store, SearchProvider {
         pqs2.setCommandText(q);
         pqs2.setParam("apiURI", apiURI);
         L.trace("query {}", q);
-        dataset.begin(ReadWrite.READ);
         try (QueryExecution qe = QueryExecutionFactory.create(pqs2.asQuery(), dataset);) {
+            dataset.begin(ReadWrite.READ);
             ResultSet rs = qe.execSelect();
             if(!rs.hasNext()){
                 throw new IOException("Spec id does not exists!");
@@ -194,9 +195,10 @@ public class TDB2Store implements Store, SearchProvider {
         ParameterizedSparqlString pqs2 = new ParameterizedSparqlString();
         pqs2.setCommandText(query);
         pqs2.setParam("apiURI", apiURI);
-        dataset.begin(ReadWrite.READ);
+
         org.apache.jena.query.Query qq = pqs2.asQuery();
         L.trace("query: {}", qq);
+        dataset.begin(ReadWrite.READ);
         try (QueryExecution qe = QueryExecutionFactory.create(qq, dataset);) {
             boolean rs = qe.execAsk();
             return rs;
@@ -290,13 +292,14 @@ public class TDB2Store implements Store, SearchProvider {
         pqs.setParam("apiURI", apiURI);
         dataset.begin(ReadWrite.READ);
         Date value = null;
+        Doc doc = new Doc();
         try (QueryExecution qe = QueryExecutionFactory.create(pqs.asQuery(), dataset);) {
             ResultSet rs = qe.execSelect();
             if(rs.hasNext()){
                 QuerySolution qs = rs.next();
                 String name = qs.getLiteral("name").getLexicalForm();
                 String description = qs.getLiteral("description").getLexicalForm();
-                Doc doc = new Doc();
+
                 doc.set(Doc.Field.NAME, name);
                 doc.set(Doc.Field.DESCRIPTION, description);
                 return doc;
@@ -304,7 +307,7 @@ public class TDB2Store implements Store, SearchProvider {
         } finally {
             dataset.end();
         }
-        return null; // TODO Check what happens here and if it is correct
+        return doc; // return an empty doc
     }
 
     @Override
@@ -586,7 +589,7 @@ public class TDB2Store implements Store, SearchProvider {
         ParameterizedSparqlString psq = new ParameterizedSparqlString();
         psq.setCommandText(qStr);
         psq.setLiteral("alias", alias);
-        dataset.begin();
+        dataset.begin(ReadWrite.READ);
         org.apache.jena.query.Query query = psq.asQuery();
         try (QueryExecution qe = QueryExecutionFactory.create(query, dataset);) {
             ResultSet rs = qe.execSelect();

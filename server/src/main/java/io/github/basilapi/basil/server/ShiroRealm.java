@@ -47,15 +47,12 @@ public class ShiroRealm extends AuthorizingRealm {
             throw new AccountException("Null usernames are not allowed by this realm.");
         }
         String password = null;
-        try {
-            System.err.println("USERNAME: " + username);
-            System.err.println("TDB2LOCATION: " + getBasilConfiguration().getTdbLocation());
-            password = getUserManager().getUser(username).getPassword();
-        }catch(Exception e){
-            throw new AuthenticationException(e);
+        if(getUserManager().getUser(username) == null){
+            throw new UnknownAccountException("Cannot find account: " + username);
         }
+        password = getUserManager().getUser(username).getPassword();
         if (password == null) {
-            throw new UnknownAccountException("No account found for user [" + username + "]");
+            throw new UnknownAccountException("No password. Cannot authenticate user [" + username + "]");
         }
         return new SimpleAuthenticationInfo(username, password.toCharArray(), getName());
     }

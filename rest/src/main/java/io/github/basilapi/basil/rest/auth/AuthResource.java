@@ -33,6 +33,7 @@ import io.github.basilapi.basil.core.auth.User;
 import io.github.basilapi.basil.rest.core.AbstractResource;
 import io.github.basilapi.basil.rest.core.Headers;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -80,8 +81,8 @@ public class AuthResource extends AbstractResource {
             m.add("user", new JsonPrimitive(userUri.toASCIIString()));
             return Response.created(userUri).entity(m.toString()).build();
         } catch(IncorrectCredentialsException | UnknownAccountException ice){
-        	log.warn("Authentication failed: {}", ice.getMessage());
-        	return Response.status(Status.FORBIDDEN).entity(new ErrorMessage(ice).asJSON()).build();
+            log.warn("Authentication failed: {}", ice.getMessage());
+            return Response.status(Status.FORBIDDEN).entity(new ErrorMessage(ice).asJSON()).build();
         } catch (Exception e) {
         	log.error("An error occurred", e);
             return Response.serverError().entity(new ErrorMessage(e).asJSON()).build();
