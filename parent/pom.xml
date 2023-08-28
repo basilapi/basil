@@ -39,7 +39,7 @@
 		<!-- org.eclipse.jetty.version>9.2.3.v20140905</org.eclipse.jetty.version -->
 		<org.eclipse.jetty.version>9.4.51.v20230217</org.eclipse.jetty.version>
 
-		<shiro.version>1.8.0</shiro.version>
+		<shiro.version>1.12.0</shiro.version>
 		<jena.version>3.13.1</jena.version> <!-- was 3.0.1 -->
 		<!-- basil version -->
 		<basil.version>${project.version}</basil.version>
