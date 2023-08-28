@@ -625,7 +625,7 @@ public class TDB2Store implements Store, SearchProvider {
             dataset.end();
         }
 
-        return new String[0]; // TODO Check this is correct
+        return null; // XXX Needs to return null if no credentials found
     }
 
     private UpdateRequest buildDeleteCredentials(Node apiURI){

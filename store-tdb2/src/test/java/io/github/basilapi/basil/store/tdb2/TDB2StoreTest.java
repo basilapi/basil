@@ -204,7 +204,7 @@ public class TDB2StoreTest {
         String id = "test-spec-id1";
         String user = "my-username";
         String password = "my-password";
-        Assert.assertTrue(X.credentials(id).length == 0);
+        Assert.assertTrue(X.credentials(id) == null);
         X.saveCredentials(id, user, password);
         Assert.assertTrue(X.credentials(id).length == 2);
         Assert.assertTrue(X.credentials(id) [0].equals(user));
@@ -216,7 +216,7 @@ public class TDB2StoreTest {
 
         String id = "test-spec-id1";
         X.deleteCredentials(id);
-        Assert.assertTrue(X.credentials(id).length == 0);
+        Assert.assertTrue(X.credentials(id) == null);
 
         String user = "my-username2222";
         String password = "my-password222";
