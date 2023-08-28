@@ -44,6 +44,9 @@
 	<profiles>
 		<profile>
 			<id>it</id>
+			<activation>
+      				<activeByDefault>true</activeByDefault>
+    			</activation>
 			<modules>
 				<module>it</module>
 			</modules>
