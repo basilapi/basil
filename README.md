@@ -1,7 +1,8 @@
 # BASIL #
 
-![Maven build JDK 1.8](https://github.com/basilapi/basil/actions/workflows/main.yml/badge.svg)
-![MAven build Java 11](https://github.com/basilapi/basil/actions/workflows/mvn-Java11.yml/badge.svg)
+![Build JDK 1.8](https://github.com/basilapi/basil/actions/workflows/main.yml/badge.svg)
+![Build Java 11](https://github.com/basilapi/basil/actions/workflows/mvn-Java11.yml/badge.svg)
+![Build Java 17](https://github.com/basilapi/basil/actions/workflows/mvn-Java17.yml/badge.svg)
 
 BASIL is designed as middleware system that mediates between SPARQL endpoints and applications.
 
