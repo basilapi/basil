@@ -371,9 +371,9 @@
 
 	<profiles>
 		<profile>
-			<id>java-post9</id>
+			<id>java-post8</id>
 			<activation>
-				<jdk>(8, 17]</jdk>
+				<jdk>[11,21]</jdk>
 			</activation>
 			<dependencies>
 				<!-- API, java.xml.bind module -->
