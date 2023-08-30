@@ -31,6 +31,7 @@ import io.github.basilapi.basil.view.Engine;
 import io.github.basilapi.basil.view.View;
 import io.github.basilapi.basil.view.Views;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.jena.atlas.lib.DateTimeUtils;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
@@ -258,30 +259,31 @@ public class TDB2Store implements Store, SearchProvider {
     }
     @Override
     public Collection<Result> contextSearch(Query query) throws IOException {
-//        Map<String, Result> results = new HashMap<String, Result>();
-//        String q = this._buildSearchQuery(query, false);
-//        try {
-//            Class.forName("com.mysql.jdbc.Driver");
-//            try (Connection connect = DriverManager.getConnection(jdbcUri)) {
-//                try (PreparedStatement stmt = connect.prepareStatement(q)) {
-//                    this._mapSearchParameters(stmt, query);
-//                    java.sql.ResultSet r = stmt.executeQuery();
-//                    while (r.next()) {
-//                        if (!results.containsKey(r.getString(1))) {
-//                            results.put(r.getString(1), new ResultSetResult(r.getString(1)));
-//                        }
-//                        ((ResultSetResult) results.get(r.getString(1))).put(r.getString(2), r.getString(3));
-//                    }
-//                }
-//            }
-//        } catch (ClassNotFoundException e) {
-//            throw new IOException(e);
-//        } catch (Exception e) {
-//            L.error("", e);
-//            throw new IOException(e);
-//        }
-//        return results.values();
-        return null;
+        Map<String, Result> results = new HashMap<String, Result>();
+        String q = this._buildSearchQuery(query, false); // Add context
+        ParameterizedSparqlString psq = new ParameterizedSparqlString();
+        psq.setCommandText(q);
+        this._mapSearchParameters(psq, query);
+        L.trace("query {}", q);
+        try (QueryExecution qe = QueryExecutionFactory.create(psq.asQuery(), dataset);) {
+            dataset.begin(ReadWrite.READ);
+            ResultSet rs = qe.execSelect();
+            while(rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                String apiId = qs.getLiteral("nickname").getLexicalForm();
+                if (!results.containsKey( apiId )) {
+                    results.put(apiId, new QuerySolutionResult(apiId));
+                }
+                // FIXME This will allow only 1 value per property type...
+                //  there are cases where we get more, e.g. aliases...
+                ((QuerySolutionResult) results.get(apiId)).put(qs.get("p").toString(), qs.get("o").toString());
+            }
+        } catch (Exception e) {
+            throw new IOException(e);
+        } finally {
+            dataset.end();
+        }
+        return results.values();
     }
 
     @Override
@@ -322,9 +324,7 @@ public class TDB2Store implements Store, SearchProvider {
         pqs2.setLiteral("endpointXXXXXXX", spec.getEndpoint());
         pqs2.setLiteral("idXXXXXXX", id);
         pqs2.setLiteral("queryTextXXXXXXX", spec.getQuery());
-        org.apache.jena.query.Query expandedQuery = QueryFactory.create(spec.getQuery());
-        expandedQuery.setPrefixMapping(null);
-        pqs2.setLiteral("expandedQueryTextXXXXXXX", expandedQuery.toString());
+        pqs2.setLiteral("expandedQueryTextXXXXXXX", spec.getExpandedQuery());
         if(!exists){
             pqs2.setLiteral("createdXXXXXXX", System.currentTimeMillis());
         }
@@ -884,5 +884,36 @@ public class TDB2Store implements Store, SearchProvider {
             gm.add(it.next());
         dataset.end();
         return gm;
+    }
+
+    static class QuerySolutionResult implements Result {
+
+        private String id;
+        private Map<String, String> context;
+        private int hashCode;
+
+        public QuerySolutionResult(String id) {
+            this.id = id;
+            this.context = new HashMap<String, String>();
+            this.hashCode = new HashCodeBuilder().append(this.id).hashCode();
+        }
+
+        public int hashCode() {
+            return hashCode;
+        };
+
+        @Override
+        public String id() {
+            return id;
+        }
+
+        public void put(String property, String value) {
+            context.put(property, value);
+        }
+
+        @Override
+        public Map<String, String> context() {
+            return Collections.unmodifiableMap(context);
+        }
     }
 }

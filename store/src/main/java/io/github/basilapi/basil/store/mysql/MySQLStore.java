@@ -303,27 +303,7 @@ public class MySQLStore implements Store, SearchProvider {
 		data.put(SPEC_ENDPOINT, spec.getEndpoint());
 		data.put(SPEC_QUERY, spec.getQuery());
 		// Add a copy as expanded query
-
-		String expandedQuery = null;
-		try {
-			org.apache.jena.query.Query q = QueryFactory.create(spec.getQuery());
-			q.setPrefixMapping(null);
-			expandedQuery = q.toString();
-		} catch (QueryException qe) {
-			// may be update
-			try {
-				UpdateRequest q = UpdateFactory.create(spec.getQuery());
-				q.setPrefixMapping(null);
-				expandedQuery = q.toString();
-			} catch (QueryException qe2) {
-				// some parameterized queries are not supported by the SPARQL 1.1 parser (e.g.
-				// Insert data { ?_uri ...)
-				// In those cases we just keep the original syntax
-				expandedQuery = spec.getQuery();
-			}
-
-		}
-		data.put(SPEC_EXPANDED_QUERY, expandedQuery);
+		data.put(SPEC_EXPANDED_QUERY, spec.getExpandedQuery());
 		_saveData(id, data);
 	}
 

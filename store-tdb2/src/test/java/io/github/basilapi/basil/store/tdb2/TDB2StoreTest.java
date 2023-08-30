@@ -20,6 +20,7 @@ import io.github.basilapi.basil.core.ApiInfo;
 import io.github.basilapi.basil.doc.Doc;
 import io.github.basilapi.basil.rdf.RDFFactory;
 import io.github.basilapi.basil.search.Query;
+import io.github.basilapi.basil.search.Result;
 import io.github.basilapi.basil.search.SimpleQuery;
 import io.github.basilapi.basil.sparql.Specification;
 import io.github.basilapi.basil.sparql.SpecificationFactory;
@@ -43,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -357,7 +359,13 @@ public class TDB2StoreTest {
         Assert.assertTrue(results.size() == 3);
 
     }
-
+    @Test
+    public void testQ_ContextSearch() throws IOException {
+        Query q = new SimpleQuery();
+        q.setText("entityUri");
+        Collection<Result> results = X.contextSearch(q);
+        Assert.assertTrue(results.size() == 3);
+    }
 
     private void printAll(){
         X.dataset.begin();
