@@ -16,6 +16,11 @@
 
 package io.github.basilapi.basil.sparql;
 
+import org.apache.jena.query.QueryException;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateRequest;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -85,6 +90,29 @@ public class Specification implements Serializable {
 
 	public boolean isUpdate() {
 		return isUpdate;
+	}
+
+	public String getExpandedQuery(){
+		String expandedQuery = null;
+		try {
+			org.apache.jena.query.Query q = QueryFactory.create(getQuery());
+			q.setPrefixMapping(null);
+			expandedQuery = q.toString();
+		} catch (QueryException qe) {
+			// may be update
+			try {
+				UpdateRequest q = UpdateFactory.create(getQuery());
+				q.setPrefixMapping(null);
+				expandedQuery = q.toString();
+			} catch (QueryException qe2) {
+				// some parameterized queries are not supported by the SPARQL 1.1 parser (e.g.
+				// Insert data { ?_uri ...)
+				// In those cases we just keep the original syntax
+				expandedQuery = getQuery();
+			}
+
+		}
+		return expandedQuery;
 	}
 
 	@Override
