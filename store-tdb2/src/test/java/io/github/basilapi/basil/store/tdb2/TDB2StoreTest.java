@@ -19,6 +19,8 @@ package io.github.basilapi.basil.store.tdb2;
 import io.github.basilapi.basil.core.ApiInfo;
 import io.github.basilapi.basil.doc.Doc;
 import io.github.basilapi.basil.rdf.RDFFactory;
+import io.github.basilapi.basil.search.Query;
+import io.github.basilapi.basil.search.SimpleQuery;
 import io.github.basilapi.basil.sparql.Specification;
 import io.github.basilapi.basil.sparql.SpecificationFactory;
 import io.github.basilapi.basil.sparql.UnknownQueryTypeException;
@@ -229,8 +231,8 @@ public class TDB2StoreTest {
     @Test
     public void testJ_Doc() throws UnknownQueryTypeException, IOException {
         String id = "test-spec-id1";
-        String name = "My beatiful web api";
-        String desc = "My beatiful web api description";
+        String name = "My beautiful web api";
+        String desc = "My beautiful web api description";
         Doc d = new Doc();
         d.set(Doc.Field.NAME, name);
         d.set(Doc.Field.DESCRIPTION, desc);
@@ -246,8 +248,8 @@ public class TDB2StoreTest {
     public void testK_MoreOnDoc() throws UnknownQueryTypeException, IOException {
 
         String id = "test-spec-id1";
-        String name = "My beatiful web api";
-        String desc = "My beatiful web api description";
+        String name = "My beautiful web api";
+        String desc = "My beautiful web api description";
 
         Doc d2 = X.loadDoc(id);
         Doc d = new Doc();
@@ -277,7 +279,7 @@ public class TDB2StoreTest {
     public void testL_Graph()  {
         String id = "test-spec-id1";
         Graph g = X.getAsMemGraph(id);
-        Assert.assertEquals(11, g.size());
+        Assert.assertEquals(12, g.size());
     }
 
 
@@ -297,6 +299,63 @@ public class TDB2StoreTest {
         Views views2 = X.loadViews(id);
         System.err.println(views2.getNames());
         Assert.assertTrue(views2.exists(".json"));
+    }
+
+
+    @Test
+    public void testN_Search() throws IOException {
+        String endpoint = "http://www.example.org/sparql";
+        Query q = new SimpleQuery();
+        q.setEndpoint(endpoint);
+        List<String> results = X.search(q);
+        System.err.println(results);
+        Assert.assertTrue(results.size() == 2);
+    }
+
+    @Test
+    public void testO_Search() throws IOException {
+        Query q = new SimpleQuery();
+        q.setText("example sparql");
+        List<String> results = X.search(q);
+        System.err.println(results);
+        Assert.assertTrue(results.size() == 2);
+    }
+
+    @Test
+    public void testP_Search() throws IOException, UnknownQueryTypeException {
+        Specification s = SpecificationFactory.create("http://www.example.org/query",
+                "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                "PREFIX dct: <http://purl.org/dc/terms/>\n" +
+                "PREFIX ex: <http://www.example.org/>\n" +
+                "SELECT ?label ?name ?Type \n" +
+                "FROM ex:my-graph\n" +
+                "WHERE {\n" +
+                " ?entityUri dct:name ?name ;\n" +
+                "    a ?Type ;\n" +
+                "\trdfs:label ?label .\n\n" +
+                "}");
+        String id = "test-new-search-spec-id";
+        X.saveSpec(id, s);
+
+        Query q = new SimpleQuery();
+        q.setText("entityUri");
+        List<String> results = X.search(q);
+        Assert.assertTrue(results.size() == 1);
+
+        id = "test-new-search-spec-id2";
+        X.saveSpec(id, s);
+        q.setNamespaces("http://www.w3.org/2000/01/rdf-schema#");
+        results = X.search(q);
+        Assert.assertTrue(results.size() == 2);
+
+        id = "test-new-search-spec-id3";
+        q.setResources("http://www.example.org/my-graph");
+        System.err.println(q.getResources()[0]);
+        X.saveSpec(id, s);
+        results = X.search(q);
+        Assert.assertTrue(results.size() == 3);
+
     }
 
 

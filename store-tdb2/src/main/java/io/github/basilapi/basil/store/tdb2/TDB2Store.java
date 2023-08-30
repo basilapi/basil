@@ -42,6 +42,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
@@ -54,14 +55,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class TDB2Store implements Store, SearchProvider {
@@ -102,14 +109,178 @@ public class TDB2Store implements Store, SearchProvider {
             dataset.end();
         }
     }
+    private String _buildSearchQuery(Query query, boolean onlyIds) {
+        StringBuilder qb = new StringBuilder();
+        qb.append("SELECT ?nickname");
+        if (!onlyIds) {
+            qb.append(" ?p ?o ");
+        }
+        qb.append("\nWHERE {\n");
+        qb.append("\tGRAPH ?apiURI { \n");
+        qb.append("\t\t ?apiURI ");
+        qb.append("<");
+        qb.append(BasilOntology.Term.id.getIRIString());
+        qb.append("> ?nickname .\n");
+        if (!onlyIds) {
+            qb.append("\t\t ?apiURI ?p ?o .\n");
+        }
+        // Endpoint
+        if (query.getEndpoint() != null) {
+            qb.append("\t\t ?apiURI ");
+            qb.append("<");
+            qb.append(BasilOntology.Term.endpoint.getIRIString());
+            qb.append("> ?endpoint .\n");
+        }
 
-    @Override
-    public Collection<Result> contextSearch(Query query) throws IOException {
-        return null;
+        if(query.getNamespaces().length > 0 || query.getResources().length > 0) {
+            qb.append("\t\t ?apiURI ");
+            qb.append("<");
+            qb.append(BasilOntology.Term.expandedQuery.getIRIString());
+            qb.append("> ?expandedQuery .\n");
+            // Namespaces
+            if (query.getNamespaces().length > 0) {
+                qb.append("\t\tFILTER (\n");
+                for (int i = 0; i < query.getNamespaces().length; i++) {
+                    if(i > 0){
+                        qb.append(" && ");
+                    }
+                    qb.append("\t\t\tREGEX(");
+                    qb.append("?expandedQuery, ");
+                    qb.append("?nsi");
+                    qb.append(i + 1);
+                    qb.append(", \"i\") \n");
+                }
+                qb.append("\t\t) . \n");
+            }
+            // Resources
+            if (query.getResources().length > 0) {
+                qb.append("\t\tFILTER (\n");
+                for (int i = 0; i < query.getResources().length; i++) {
+                    if(i > 0){
+                        qb.append(" && ");
+                    }
+                    qb.append("\t\t\tREGEX(");
+                    qb.append("?expandedQuery, ");
+                    qb.append("?rsi");
+                    qb.append(i + 1);
+                    qb.append(", \"i\") \n");
+                }
+                qb.append("\t\t) . \n");
+            }
+        }
+
+//        qb.append("");
+
+        String txt = query.getText();
+        if(!txt.trim().isEmpty()) {
+            String[] txts = txt.split(" ");
+            qb.append("\t\tFILTER EXISTS {\n");
+            for (int i = 0; i < txts.length; i++) {
+                if (i > 0) {
+                    qb.append("\t\tUNION\n");
+                }
+                qb.append("\t\t{\n");
+                qb.append("\t\t\t?apiURI ?pExists ?oExists . \n");
+                qb.append("\t\t\tFILTER(REGEX(?oExists, ");
+                qb.append("?txt");
+                qb.append(i+1); // Counter starts from 1
+                qb.append(", \"i\")) .");
+                qb.append("\t\t}\n");
+            }
+            qb.append("\t\t}\n");
+        }
+        qb.append("\t}\n}");
+        String queryStr = qb.toString();
+        L.trace("Search query (prepared): {}",queryStr);
+        System.err.println("query text: " + txt);
+        return queryStr;
+    }
+
+    private void _mapSearchParameters(ParameterizedSparqlString pss, Query query) {
+        String[] txts = query.getText().split(" ");
+        int pos = 1;
+
+        // Endpoint
+        if (query.getEndpoint() != null) {
+            pss.setLiteral("endpoint", query.getEndpoint());
+        }
+        // Namespaces
+        if (query.getNamespaces() != null) {
+            int nsi = 1;
+            for (String t : query.getNamespaces()) {
+                pss.setLiteral("nsi" + String.valueOf(nsi), t);
+                nsi++;
+            }
+        }
+        // Resources
+        if (query.getResources() != null) {
+            int nsi = 1;
+            for (String t : query.getResources()) {
+                pss.setLiteral("rsi" + String.valueOf(nsi), t);
+                nsi++;
+            }
+        }
+
+        // Text
+        int nsi = 1;
+        for (String t : txts) {
+            pss.setLiteral("txt" + String.valueOf(nsi), t);
+            nsi++;
+        }
+        System.err.println(pss.toString());
+        if(L.isTraceEnabled()) {
+            L.trace("Search query (processed): {}", pss.toString());
+        }
     }
 
     @Override
-    public Collection<String> search(Query query) throws IOException {
+    public List<String> search(Query query) throws IOException {
+        List<String> results = new ArrayList<String>();
+        String q = this._buildSearchQuery(query, true);
+        ParameterizedSparqlString psq = new ParameterizedSparqlString();
+        psq.setCommandText(q);
+        this._mapSearchParameters(psq, query);
+        L.trace("query {}", q);
+        try (QueryExecution qe = QueryExecutionFactory.create(psq.asQuery(), dataset);) {
+            dataset.begin(ReadWrite.READ);
+            ResultSet rs = qe.execSelect();
+            while(rs.hasNext()) {
+               QuerySolution qs = rs.next();
+               results.add(qs.getLiteral("nickname").getLexicalForm());
+           }
+        } catch (Exception e) {
+            throw new IOException(e);
+        } finally {
+            dataset.end();
+        }
+
+        return results;
+    }
+    @Override
+    public Collection<Result> contextSearch(Query query) throws IOException {
+//        Map<String, Result> results = new HashMap<String, Result>();
+//        String q = this._buildSearchQuery(query, false);
+//        try {
+//            Class.forName("com.mysql.jdbc.Driver");
+//            try (Connection connect = DriverManager.getConnection(jdbcUri)) {
+//                try (PreparedStatement stmt = connect.prepareStatement(q)) {
+//                    this._mapSearchParameters(stmt, query);
+//                    java.sql.ResultSet r = stmt.executeQuery();
+//                    while (r.next()) {
+//                        if (!results.containsKey(r.getString(1))) {
+//                            results.put(r.getString(1), new ResultSetResult(r.getString(1)));
+//                        }
+//                        ((ResultSetResult) results.get(r.getString(1))).put(r.getString(2), r.getString(3));
+//                    }
+//                }
+//            }
+//        } catch (ClassNotFoundException e) {
+//            throw new IOException(e);
+//        } catch (Exception e) {
+//            L.error("", e);
+//            throw new IOException(e);
+//        }
+//        return results.values();
         return null;
     }
 
@@ -121,11 +292,13 @@ public class TDB2Store implements Store, SearchProvider {
         String deleteStr = "DELETE { GRAPH ?apiURIXXXXXXX { " +
                 " ?apiURIXXXXXXX <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
                 " ?apiURIXXXXXXX <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.expandedQuery.getIRIString() + "> ?expandedQueryText . " +
                 " ?apiURIXXXXXXX <" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
                 "}} WHERE { " +
                 "GRAPH ?apiURIXXXXXXX { " +
                 " ?apiURIXXXXXXX <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpoint . " +
                 " ?apiURIXXXXXXX <" + BasilOntology.Term.query.getIRIString() + "> ?queryText . " +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.expandedQuery.getIRIString() + "> ?expandedQueryText . " +
                 " ?apiURIXXXXXXX <" + BasilOntology.Term.modified.getIRIString() + "> ?modified . " +
                 " } }";
         ParameterizedSparqlString pqs = new ParameterizedSparqlString();
@@ -138,6 +311,7 @@ public class TDB2Store implements Store, SearchProvider {
                 " ?apiURIXXXXXXX a <" + BasilOntology.Term.Api.getIRIString() + "> ." +
                 " ?apiURIXXXXXXX <" + BasilOntology.Term.id.getIRIString() + "> ?idXXXXXXX . " +
                 " ?apiURIXXXXXXX <" + BasilOntology.Term.endpoint.getIRIString() + "> ?endpointXXXXXXX . " +
+                " ?apiURIXXXXXXX <" + BasilOntology.Term.expandedQuery.getIRIString() + "> ?expandedQueryTextXXXXXXX . " +
                 " ?apiURIXXXXXXX <" + BasilOntology.Term.query.getIRIString() + "> ?queryTextXXXXXXX . " +
                 ((!exists) ? " ?apiURIXXXXXXX <" + BasilOntology.Term.created.getIRIString() + "> ?createdXXXXXXX . " : "") +
                 " ?apiURIXXXXXXX <" + BasilOntology.Term.modified.getIRIString() + "> ?modifiedXXXXXXX . " +
@@ -148,6 +322,9 @@ public class TDB2Store implements Store, SearchProvider {
         pqs2.setLiteral("endpointXXXXXXX", spec.getEndpoint());
         pqs2.setLiteral("idXXXXXXX", id);
         pqs2.setLiteral("queryTextXXXXXXX", spec.getQuery());
+        org.apache.jena.query.Query expandedQuery = QueryFactory.create(spec.getQuery());
+        expandedQuery.setPrefixMapping(null);
+        pqs2.setLiteral("expandedQueryTextXXXXXXX", expandedQuery.toString());
         if(!exists){
             pqs2.setLiteral("createdXXXXXXX", System.currentTimeMillis());
         }
