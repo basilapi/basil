@@ -122,7 +122,23 @@ public class TDB2Store implements Store, SearchProvider {
         qb.append("<");
         qb.append(BasilOntology.Term.id.getIRIString());
         qb.append("> ?nickname .\n");
+        BasilOntology.Term[] terms = new BasilOntology.Term[]{
+                BasilOntology.Term.endpoint,
+                BasilOntology.Term.id,
+                BasilOntology.Term.name,
+                BasilOntology.Term.query,
+                BasilOntology.Term.expandedQuery,
+                BasilOntology.Term.description
+        };
         if (!onlyIds) {
+            qb.append("\t\tVALUES ?p {\n");
+            for(BasilOntology.Term term : terms) {
+                qb.append("\t\t\t");
+                qb.append("<");
+                qb.append(term.getIRIString());
+                qb.append("> \n");
+            }
+            qb.append("\t\t}\n");
             qb.append("\t\t ?apiURI ?p ?o .\n");
         }
         // Endpoint
@@ -193,7 +209,7 @@ public class TDB2Store implements Store, SearchProvider {
         qb.append("\t}\n}");
         String queryStr = qb.toString();
         L.trace("Search query (prepared): {}",queryStr);
-        System.err.println("query text: " + txt);
+        //System.err.println("query text: " + txt);
         return queryStr;
     }
 
@@ -228,7 +244,7 @@ public class TDB2Store implements Store, SearchProvider {
             pss.setLiteral("txt" + String.valueOf(nsi), t);
             nsi++;
         }
-        System.err.println(pss.toString());
+        //System.err.println(pss.toString());
         if(L.isTraceEnabled()) {
             L.trace("Search query (processed): {}", pss.toString());
         }
