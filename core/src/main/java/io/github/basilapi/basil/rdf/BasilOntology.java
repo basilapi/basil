@@ -35,8 +35,8 @@ public class BasilOntology {
         // View
         view, View, extension, mimeType, template, engine,
         // api
-        api
-        ;
+        api,
+        expandedQuery;
 
         public String getIRIString(){
             return NS + name();
