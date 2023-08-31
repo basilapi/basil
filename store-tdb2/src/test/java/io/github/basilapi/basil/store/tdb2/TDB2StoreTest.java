@@ -296,11 +296,11 @@ public class TDB2StoreTest {
         Graph g = X.getAsMemGraph(id);
         Iterator<Triple> trit = g.find();
         while(trit.hasNext()){
-            System.err.println( " -- " + trit.next());
+            L.debug( " -- {}", trit.next());
         }
 
         Views views2 = X.loadViews(id);
-        System.err.println(views2.getNames());
+        L.debug(" -- {}",views2.getNames());
         Assert.assertTrue(views2.exists(".json"));
     }
 
@@ -311,7 +311,7 @@ public class TDB2StoreTest {
         Query q = new SimpleQuery();
         q.setEndpoint(endpoint);
         List<String> results = X.search(q);
-        System.err.println(results);
+       L.debug(" -- {} -- ",results);
         Assert.assertTrue(results.size() == 2);
     }
 
@@ -320,7 +320,7 @@ public class TDB2StoreTest {
         Query q = new SimpleQuery();
         q.setText("example sparql");
         List<String> results = X.search(q);
-        System.err.println(results);
+        L.debug(" -- {} -- ",results);
         Assert.assertTrue(results.size() == 2);
     }
 
@@ -354,7 +354,7 @@ public class TDB2StoreTest {
 
         id = "test-new-search-spec-id3";
         q.setResources("http://www.example.org/my-graph");
-        System.err.println(q.getResources()[0]);
+        L.debug("resources: {}",q.getResources()[0]);
         X.saveSpec(id, s);
         results = X.search(q);
         Assert.assertTrue(results.size() == 3);
