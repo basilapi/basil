@@ -26,7 +26,6 @@ import io.github.basilapi.basil.sparql.Specification;
 import io.github.basilapi.basil.sparql.SpecificationFactory;
 import io.github.basilapi.basil.sparql.UnknownQueryTypeException;
 import io.github.basilapi.basil.view.Engine;
-import io.github.basilapi.basil.view.View;
 import io.github.basilapi.basil.view.Views;
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.graph.Graph;
@@ -34,7 +33,6 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -48,7 +46,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
