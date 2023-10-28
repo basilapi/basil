@@ -173,6 +173,21 @@ public class TDB2StoreTest {
         ApiInfo info = X.info(id1);
         Assert.assertTrue(info.alias().size() == 1);
         Assert.assertTrue(info.alias().iterator().next().equals(a));
+
+        String id2 = "test-spec-id2";
+        String a2 = "my-alias-for-id2";
+        Set<String> alias2 = new HashSet<String>();
+        alias2.add(a2);
+        X.saveAlias(id2, alias2);
+
+        ApiInfo info1 = X.info(id1);
+        Assert.assertTrue(info1.alias().size() == 1);
+        Assert.assertTrue(info1.alias().iterator().next().equals(a));
+
+        ApiInfo info2 = X.info(id2);
+        Assert.assertTrue(info2.alias().size() == 1);
+        Assert.assertTrue(info2.alias().iterator().next().equals(a2));
+
     }
 
     @Test
@@ -188,7 +203,7 @@ public class TDB2StoreTest {
         alias.add(a4);
         X.saveAlias(id2, alias);
         Set<String> aliasSet = X.loadAlias(id2);
-        Assert.assertTrue(aliasSet.size() == 4);
+        Assert.assertTrue(aliasSet.size() == 3);
         //Assert.assertTrue(info.alias().iterator().next().equals(a));
     }
 

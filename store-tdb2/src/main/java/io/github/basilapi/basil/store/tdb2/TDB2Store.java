@@ -48,6 +48,8 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateProcessor;
@@ -731,6 +733,7 @@ public class TDB2Store implements Store, SearchProvider {
     @Override
     public void saveAlias(String id, Set<String> alias) throws IOException {
         // clear all aliases
+        //System.out.println("save alias: " + alias.size());
         String deleteStr = "DELETE {" +
                 " GRAPH ?apiURI {" +
                 "?apiURI <" + BasilOntology.Term.alias.getIRIString() + "> ?alias " +
@@ -875,10 +878,10 @@ public class TDB2Store implements Store, SearchProvider {
         ParameterizedSparqlString pqs2 = new ParameterizedSparqlString();
         pqs2.setCommandText(q);
         pqs2.setParam("apiURI", apiURI);
-        L.trace("{}", q);
+        L.trace("{}", pqs2.asQuery().toString());
         Set<String> set = new HashSet<String>();
         dataset.begin(ReadWrite.READ);
-        try (QueryExecution qe = QueryExecutionFactory.create(q, dataset);) {
+        try (QueryExecution qe = QueryExecutionFactory.create(pqs2.asQuery(), dataset);) {
             ResultSet rs = qe.execSelect();
             while(rs.hasNext()){
                 QuerySolution qs = rs.next();
