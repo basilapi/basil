@@ -16,6 +16,7 @@
 
 package io.github.basilapi.basil.rendering;
 
+import java.beans.XMLEncoder;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.jena.riot.RDFFormat;
 
 import com.google.gson.JsonArray;
@@ -35,6 +37,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.sparql.resultset.CSVOutput;
 import org.apache.jena.sparql.resultset.JSONOutput;
 import org.apache.jena.sparql.resultset.XMLOutput;
@@ -129,7 +132,7 @@ public class ResultSetRenderer extends Renderer<ResultSet> {
 					p.append("<");
 					p.append(v);
 					p.append(">");
-					p.append(n.toString());
+					p.append(StringEscapeUtils.escapeXml11(n.toString()));
 					p.append("</");
 					p.append(v);
 					p.append(">");
