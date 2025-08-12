@@ -57,6 +57,12 @@ public class QueryTypeTest {
 	}
 
 	@Test
+	public void QTYPE_SelectIsDescribe() throws IOException {
+		log.info("#{}", name.getMethodName());
+		Assert.assertTrue(queryType(TestUtils.loadQueryString("describe_1")).equals("describe"));
+	}
+
+	@Test
 	public void QTYPE_InsertIsNotSelect() throws IOException {
 		log.info("#{}", name.getMethodName());
 		// insert is not select

@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public enum QueryType {
 
-	SELECT, ASK, CONSTRUCT, INSERT, DELETE;
+	SELECT, ASK, CONSTRUCT, INSERT, DELETE, DESCRIBE;
 
 	private static Logger log = LoggerFactory.getLogger(QueryType.class);
 
@@ -151,7 +151,7 @@ public enum QueryType {
 	public static boolean isUpdate(String query) throws UnknownQueryTypeException {
 		QueryType qt = guessQueryType(query);
 
-		if (qt.equals(SELECT) || qt.equals(ASK) || qt.equals(CONSTRUCT)) {
+		if (qt.equals(SELECT) || qt.equals(ASK) || qt.equals(CONSTRUCT) || qt.equals(DESCRIBE)) {
 			return false;
 		}
 
