@@ -23,6 +23,7 @@ import java.util.function.Function;
 import org.apache.jena.atlas.iterator.Iter;
 //import org.apache.jena.atlas.iterator.Transform;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.query.ARQ;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.riot.Lang;
@@ -32,6 +33,7 @@ import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWriter;
 import org.apache.jena.riot.system.StreamRDFWriterFactory;
 import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.util.Context;
 import org.apache.jena.util.iterator.WrappedIterator;
 
 public class RDFStreamer {
@@ -60,16 +62,21 @@ public class RDFStreamer {
 	}
 	
 	static class StreamRDFXMLWriterFactory implements StreamRDFWriterFactory{
-		@Override
+
 		public StreamRDF create(OutputStream output, RDFFormat format) {
-			return new WriterStreamRDFXML(output);
+			return create(output, format, ARQ.getContext());
+		}
+
+		@Override
+		public StreamRDF create(OutputStream output, RDFFormat format, Context context) {
+			return new WriterStreamRDFXML(output, context);
 		}
 	}
 
 	static class StreamRDFJSONWriterFactory implements StreamRDFWriterFactory{
 		@Override
-		public StreamRDF create(OutputStream output, RDFFormat format) {
-			return new WriterStreamRDFJSON(output);
+		public StreamRDF create(OutputStream output, RDFFormat format, Context context) {
+			return new WriterStreamRDFJSON(output, context);
 		}
 	}
 }

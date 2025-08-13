@@ -26,8 +26,8 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.sparql.resultset.JSONOutput;
-import org.apache.jena.sparql.resultset.XMLOutput;
+import org.apache.jena.riot.resultset.ResultSetLang;
+import org.apache.jena.riot.resultset.rw.ResultsWriter;
 import org.apache.jena.vocabulary.RDF;
 
 import com.google.gson.JsonObject;
@@ -124,24 +124,37 @@ public class BooleanRenderer extends Renderer<Boolean> {
 		// sparql-results+xml
 		if (MoreMediaType.SPARQL_RESULTS_XML_TYPE.equals(type)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			XMLOutput xOut = new XMLOutput(null);
-			xOut.format(baos, getInput());
+			ResultsWriter.create().lang(ResultSetLang.RS_XML).write(baos, getInput());
+//			XMLOutput xOut = new XMLOutput(null);
+//			xOut.format(baos, getInput());
 			return new String(baos.toByteArray());
 		}
 
 		// sparql-results+json
 		if (MoreMediaType.SPARQL_RESULTS_JSON_TYPE.equals(type)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			JSONOutput xOut = new JSONOutput();
-			xOut.format(baos, getInput());
+			ResultsWriter.create().lang(ResultSetLang.RS_JSON).write(baos, getInput());
+//			JSONOutput xOut = new JSONOutput();
+//			xOut.format(baos, getInput());
 			return new String(baos.toByteArray());
 		}
 
 		// text/csv
-		if(MoreMediaType.TEXT_CSV_TYPE.equals(type) || MoreMediaType.TEXT_TSV_TYPE.equals(type)){
-			return Boolean.toString(getInput());
+		if(MoreMediaType.TEXT_CSV_TYPE.equals(type)){
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ResultsWriter.create().lang(ResultSetLang.RS_CSV).write(baos, getInput());
+			return new String(baos.toByteArray());
+//			return Boolean.toString(getInput());
 		}
-		
+
+		// text/tsv
+		if(MoreMediaType.TEXT_TSV_TYPE.equals(type)){
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ResultsWriter.create().lang(ResultSetLang.RS_TSV).write(baos, getInput());
+			return new String(baos.toByteArray());
+//			return Boolean.toString(getInput());
+		}
+
 		throw new CannotRenderException("Cannot render media type " + type.toString());
 	}
 }

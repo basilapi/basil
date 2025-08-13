@@ -26,11 +26,12 @@ import org.apache.jena.riot.writer.WriterStreamRDFBlocks;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.graph.impl.LiteralLabel;
+import org.apache.jena.sparql.util.Context;
 
 class WriterStreamRDFXML extends WriterStreamRDFBlocks {
 	private boolean preamble = true;
-	public WriterStreamRDFXML(OutputStream os) {
-		super(os);
+	public WriterStreamRDFXML(OutputStream os, Context ctx) {
+		super(os, ctx);
 	}
 
 	private Pair<String, String> ns(String uri) {

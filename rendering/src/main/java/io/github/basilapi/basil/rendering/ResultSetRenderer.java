@@ -38,9 +38,8 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.riot.RDFWriter;
-import org.apache.jena.sparql.resultset.CSVOutput;
-import org.apache.jena.sparql.resultset.JSONOutput;
-import org.apache.jena.sparql.resultset.XMLOutput;
+import org.apache.jena.riot.resultset.ResultSetLang;
+import org.apache.jena.riot.resultset.rw.ResultsWriter;
 
 public class ResultSetRenderer extends Renderer<ResultSet> {
 
@@ -175,32 +174,36 @@ public class ResultSetRenderer extends Renderer<ResultSet> {
 		// sparql-results+xml
 		if (MoreMediaType.SPARQL_RESULTS_XML_TYPE.equals(type)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			XMLOutput xOut = new XMLOutput(null);
-			xOut.format(baos, getInput());
+//			XMLOutput xOut = new XMLOutput(null);
+//			xOut.format(baos, getInput());
+			ResultsWriter.create().lang(ResultSetLang.RS_XML).write(baos, getInput());
 			return new String(baos.toByteArray());
 		}
 
 		// sparql-results+json
 		if (MoreMediaType.SPARQL_RESULTS_JSON_TYPE.equals(type)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			JSONOutput xOut = new JSONOutput();
-			xOut.format(baos, getInput());
+			ResultsWriter.create().lang(ResultSetLang.RS_JSON).write(baos, getInput());
+//			JSONOutput xOut = new JSONOutput();
+//			xOut.format(baos, getInput());
 			return new String(baos.toByteArray());
 		}
 
 		// text/csv
 		if (MoreMediaType.TEXT_CSV_TYPE.equals(type)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			CSVOutput xOut = new CSVOutput();
-			xOut.format(baos, getInput());
+			ResultsWriter.create().lang(ResultSetLang.RS_CSV).write(baos, getInput());
+//			CSVOutput xOut = new CSVOutput();
+//			xOut.format(baos, getInput());
 			return new String(baos.toByteArray());
 		}
 
 		// text/tsv
 		if (MoreMediaType.TEXT_TSV_TYPE.equals(type)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			CSVOutput xOut = new CSVOutput();
-			xOut.format(baos, getInput());
+//			CSVOutput xOut = new CSVOutput();
+//			xOut.format(baos, getInput());
+			ResultsWriter.create().lang(ResultSetLang.RS_TSV).write(baos, getInput());
 			return new String(baos.toByteArray());
 		}
 

@@ -28,9 +28,9 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.jena.riot.RDFFormat;
 
+import org.apache.jena.riot.system.PrefixMapZero;
 import org.apache.jena.riot.writer.JsonLDWriter;
 import org.apache.jena.riot.system.PrefixMap;
-import org.apache.jena.riot.system.PrefixMapNull;
 import org.apache.jena.riot.system.PrefixMapStd;
 import org.apache.jena.riot.writer.NQuadsWriter;
 import org.apache.jena.riot.writer.NTriplesWriter;
@@ -292,7 +292,7 @@ public class ModelRenderer extends Renderer<Model> {
 			NQuadsWriter writer = new NQuadsWriter();
 			DatasetGraph dg = DatasetGraphFactory.create();
 			dg.addGraph(NodeFactory.createURI(graphName), getInput().getGraph());
-			writer.write(w, dg, PrefixMapNull.empty, null, Context.emptyContext);
+			writer.write(w, dg, PrefixMapZero.empty, null, Context.emptyContext);
 			return w.toString();
 		}
 

@@ -30,12 +30,13 @@ import org.apache.jena.riot.writer.WriterStreamRDFBlocks;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.graph.impl.LiteralLabel;
+import org.apache.jena.sparql.util.Context;
 
 class WriterStreamRDFJSON extends WriterStreamRDFBlocks {
 	private boolean preamble = true;
 
-	public WriterStreamRDFJSON(OutputStream os) {
-		super(os);
+	public WriterStreamRDFJSON(OutputStream os, Context context) {
+		super(os, context);
 	}
 
 	private void openDescription(String subject) {

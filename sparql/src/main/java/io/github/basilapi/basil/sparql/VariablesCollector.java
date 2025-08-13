@@ -339,13 +339,13 @@ public class VariablesCollector implements ElementVisitor, UpdateVisitor {
 		}
 	}
 
-	@Override
-	public Sink<Quad> createInsertDataSink() {
-		throw new RuntimeException("Method not implemented");
-	}
-
-	@Override
-	public Sink<Quad> createDeleteDataSink() {
-		throw new RuntimeException("Method not implemented");
-	}
+//	@Override
+//	public Sink<Quad> createInsertDataSink() {
+//		throw new RuntimeException("Method not implemented");
+//	}
+//
+//	@Override
+//	public Sink<Quad> createDeleteDataSink() {
+//		throw new RuntimeException("Method not implemented");
+//	}
 }
