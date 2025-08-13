@@ -65,7 +65,7 @@ public class SimpleQuadAdapter implements Function<QuerySolution,Iterator<Quad>>
 		while (cn.hasNext()) {
 			String c = cn.next();
 			property = ResourceFactory.createProperty(new StringBuilder().append(instanceNS).append(propertyNamePrefix).append(c).toString());
-			list.add(new Quad(graph, new Triple( subject.asNode(), property.asNode(), qs.get(c).asNode())));
+			list.add(Quad.create(graph, Triple.create( subject.asNode(), property.asNode(), qs.get(c).asNode())));
 		}
 		return list.iterator();
 	}

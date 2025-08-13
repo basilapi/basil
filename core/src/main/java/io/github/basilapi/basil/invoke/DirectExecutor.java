@@ -18,18 +18,14 @@ package io.github.basilapi.basil.invoke;
 
 import io.github.basilapi.basil.core.InvocationResult;
 import io.github.basilapi.basil.core.exceptions.ApiInvocationException;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.HttpClient;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpCoreContext;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.riot.WebContent;
-import org.apache.jena.riot.web.HttpOp;
+import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
+import org.apache.jena.sparql.exec.http.UpdateExecutionHTTP;
+import org.apache.jena.sparql.exec.http.UpdateExecutionHTTPBuilder;
+import org.apache.jena.sparql.exec.http.UpdateSendMode;
 import org.apache.jena.update.UpdateRequest;
-
-import java.nio.charset.StandardCharsets;
+import java.net.http.HttpClient;
 
 /**
  * 
@@ -40,7 +36,7 @@ public class DirectExecutor implements QueryExecutor {
 
 	@Override
 	public InvocationResult execute(Query q, String endpoint, HttpClient authenticator) throws ApiInvocationException {
-		QueryExecution qe = QueryExecutionFactory.sparqlService(endpoint, q, authenticator);
+		QueryExecution qe = QueryExecutionHTTPBuilder.create().service(endpoint).query(q).httpClient(authenticator).build();
 		if (q.isSelectType()) {
 			return new InvocationResult(qe.execSelect(), q);
 		} else if (q.isConstructType()) {
@@ -50,14 +46,19 @@ public class DirectExecutor implements QueryExecutor {
 		} else if (q.isDescribeType()) {
 			return new InvocationResult(qe.execDescribe(), q);
 		} else {
-			throw new ApiInvocationException("Unsupported query type: " + q.getQueryType());
+			throw new ApiInvocationException("Unsupported query type: " + q.toString());
 		}
 	}
 
 	@Override
 	public InvocationResult execute(UpdateRequest update, String endpoint, HttpClient authenticator) throws ApiInvocationException {
 		UpdateHandler handler = new UpdateHandler();
-		HttpOp.execHttpPost(endpoint, WebContent.contentTypeSPARQLUpdate, update.toString(), authenticator, HttpCoreContext.create()) ;
+		UpdateExecutionHTTP exec = UpdateExecutionHTTPBuilder.create().
+				update(update).endpoint(endpoint).
+				sendMode(UpdateSendMode.asPost).
+				httpClient(authenticator).build();
+		exec.execute();
+		// TODO How to handle the response to check if it went OK?
 		return new InvocationResult(handler.getResponse(), update);
 	}
 }

@@ -22,6 +22,8 @@ import io.github.basilapi.basil.doc.Doc;
 import io.github.basilapi.basil.sparql.Specification;
 import io.github.basilapi.basil.view.View;
 import io.github.basilapi.basil.view.Views;
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -31,7 +33,9 @@ import io.github.basilapi.basil.rdf.BasilOntology.Term;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.XSD;
 
+import javax.xml.datatype.DatatypeFactory;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -55,14 +59,14 @@ public class RDFFactory {
         str(graph, subject, t.node(), str);
     }
     private void str(Graph graph, Node s, Node p, String str){
-        graph.add(new Triple(
+        graph.add(Triple.create(
                 s,
                 p,
-                NodeFactory.createLiteral(str)
+                NodeFactory.createLiteral(str, XSDDatatype.XSDstring)
         ));
     }
     private void datetime(Graph graph, Node subject, Term t, Date d){
-        graph.add(new Triple(
+        graph.add( Triple.create(
                 subject,
                 t.node(),
                 ResourceFactory.createTypedLiteral(d).asNode()
@@ -70,14 +74,14 @@ public class RDFFactory {
     }
 
     private void node(Graph graph, Node subject, Term t, Node n){
-        graph.add(new Triple(
+        graph.add(Triple.create(
                 subject,
                 t.node(),
                 n
         ));
     }
     private void t(Graph graph, Node n1, Term t, Node n2){
-        graph.add(new Triple(
+        graph.add(Triple.create(
                 n1,
                 t.node(),
                 n2
@@ -87,7 +91,7 @@ public class RDFFactory {
     public Graph toGraph(User o){
         Graph g = new GraphMem();
         Node s = user(o.getUsername());
-        g.add(new Triple(s, RDF.type.asNode(), Term.User.node()));
+        g.add(Triple.create(s, RDF.type.asNode(), Term.User.node()));
         Node u = user(o.getUsername());
         str(g, u, Term.username, o.getUsername());
         str(g, u, Term.password, o.getPassword());

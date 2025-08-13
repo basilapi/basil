@@ -56,6 +56,7 @@ import org.apache.jena.sparql.syntax.ElementDataset;
 import org.apache.jena.sparql.syntax.ElementExists;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementLateral;
 import org.apache.jena.sparql.syntax.ElementMinus;
 import org.apache.jena.sparql.syntax.ElementNamedGraph;
 import org.apache.jena.sparql.syntax.ElementNotExists;
@@ -202,6 +203,11 @@ public class VariablesCollector implements ElementVisitor, UpdateVisitor {
 	public void visit(ElementOptional el) {
 		//
 		el.getOptionalElement().visit(this);
+	}
+
+	@Override
+	public void visit(ElementLateral el) {
+		el.getLateralElement().visit(this);
 	}
 
 	public void visit(ElementGroup el) {

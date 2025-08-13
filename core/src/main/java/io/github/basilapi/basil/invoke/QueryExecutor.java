@@ -18,7 +18,7 @@ package io.github.basilapi.basil.invoke;
 
 import io.github.basilapi.basil.core.InvocationResult;
 import io.github.basilapi.basil.core.exceptions.ApiInvocationException;
-import org.apache.http.client.HttpClient;
+import java.net.http.HttpClient;
 import org.apache.jena.query.Query;
 import org.apache.jena.update.UpdateRequest;
 

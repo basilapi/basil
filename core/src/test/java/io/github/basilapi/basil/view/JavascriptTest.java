@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.basilapi.basil.TestUtils;
+import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -134,8 +135,9 @@ public class JavascriptTest {
 		VariablesBinder binder = new VariablesBinder(spec);
 		binder.bind("geoid", "2328926");
 		Query q = binder.toQuery();
-		QueryExecution qe = QueryExecutionFactory.sparqlService(
-				spec.getEndpoint(), q);
+		QueryExecution qe = QueryExecutionHTTPBuilder.create().service(
+				spec.getEndpoint()).query(q).build();
+
 		final ResultSet rs = qe.execSelect();
 		Writer writer = new StringWriter();
 		Engine.RHINO.exec(writer, template, Items.create(rs));

@@ -40,6 +40,7 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.system.StreamRDFOps;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWriter;
+import org.apache.jena.sparql.exec.http.QueryExecutionHTTP;
 import org.apache.jena.util.iterator.WrappedIterator;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -67,7 +68,8 @@ public class RDFStreamerTest {
 		// prefixMappings.setNsPrefixes(prefixes);
 		OutputStream os = new ByteArrayOutputStream();
 		StreamRDF stream = StreamRDFWriter.getWriterStream(os, Lang.RDFTHRIFT);
-		QueryExecution qe = QueryExecutionFactory.sparqlService(
+
+		QueryExecution qe = QueryExecutionHTTP.service(
 				"http://data.open.ac.uk/sparql", "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?A ?B ?C WHERE {?A a ?B . ?A rdf:type ?C} LIMIT 100");
 
 		Function<QuerySolution, Iterator<Triple>> m = new Function<QuerySolution, Iterator<Triple>>() {
@@ -89,7 +91,7 @@ public class RDFStreamerTest {
 				while (cn.hasNext()) {
 					String c = cn.next();
 					property = ResourceFactory.createProperty(pns + c);
-					list.add(new Triple(subject.asNode(), property.asNode(), qs.get(c).asNode()));
+					list.add(Triple.create(subject.asNode(), property.asNode(), qs.get(c).asNode()));
 				}
 				return list.iterator();
 			}
@@ -106,7 +108,7 @@ public class RDFStreamerTest {
 	public void testNT() {
 		log.info("{}", test.getMethodName());
 		OutputStream os = new ByteArrayOutputStream();
-		QueryExecution qe = QueryExecutionFactory.sparqlService(
+		QueryExecution qe = QueryExecutionHTTP.service(
 				"http://data.open.ac.uk/sparql", "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?A ?B ?C WHERE {?A a ?B . ?A rdf:type ?C} LIMIT 100");
 		RDFStreamer.stream(os, qe.execSelect(), RDFFormat.NTRIPLES, new SimpleTripleAdapter("http://www.example.org/test/"));
 	}
@@ -120,7 +122,7 @@ public class RDFStreamerTest {
 	public void testRDFXML() throws IOException {
 		log.info("{}", test.getMethodName());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		QueryExecution qe = QueryExecutionFactory.sparqlService(
+		QueryExecution qe = QueryExecutionHTTP.service(
 				"http://data.open.ac.uk/sparql", "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?A ?B ?C WHERE {?A a ?B . ?A rdf:type ?C} LIMIT 100");
 		RDFStreamer.stream(os, qe.execSelect(), RDFFormat.RDFXML, new SimpleTripleAdapter("http://www.example.org/test/"));
 		InputStream in = new ByteArrayInputStream(os.toByteArray());

@@ -22,7 +22,7 @@
 
 	<groupId>io.github.basilapi</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.9.0</version>
+	<version>1.0-DEV</version>
 	<packaging>pom</packaging>
 
 	<name>BASIL :: Parent</name>
@@ -40,7 +40,7 @@
 		<org.eclipse.jetty.version>9.4.51.v20230217</org.eclipse.jetty.version>
 
 		<shiro.version>1.12.0</shiro.version>
-		<jena.version>4.2.0</jena.version> <!-- was 3.13.1 / 3.0.1 -->
+		<jena.version>5.1.0</jena.version> <!-- 4.2.0 was 3.13.1 / 3.0.1 -->
 		<!-- basil version -->
 		<basil.version>${project.version}</basil.version>
 
@@ -278,6 +278,11 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.4</version>
 		</dependency>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.19.0</version>
+			</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>

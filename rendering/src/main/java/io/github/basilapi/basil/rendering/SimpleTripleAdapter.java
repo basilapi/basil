@@ -56,7 +56,7 @@ public class SimpleTripleAdapter implements Function<QuerySolution,Iterator<Trip
 		while (cn.hasNext()) {
 			String c = cn.next();
 			property = ResourceFactory.createProperty(new StringBuilder().append(instanceNS).append(propertyNamePrefix).append(c).toString());
-			list.add(new Triple(subject.asNode(), property.asNode(), qs.get(c).asNode()));
+			list.add( Triple.create(subject.asNode(), property.asNode(), qs.get(c).asNode()));
 		}
 		return list.iterator();
 	}

@@ -37,9 +37,9 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.riot.resultset.ResultSetLang;
-import org.apache.jena.riot.resultset.rw.ResultsWriter;
+import org.apache.jena.sparql.resultset.ResultsWriter;
+
 
 public class ResultSetRenderer extends Renderer<ResultSet> {
 

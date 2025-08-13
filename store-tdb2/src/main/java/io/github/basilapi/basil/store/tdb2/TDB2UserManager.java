@@ -74,7 +74,7 @@ public class TDB2UserManager implements UserManager {
     public void mapUserApi(String username, String apiId) throws UserApiMappingException {
         dataset.begin(ReadWrite.WRITE);
         dataset.asDatasetGraph().getGraph(toRDF.user(username)).add(
-                new Triple(toRDF.user(username), BasilOntology.Term.api.node(), toRDF.api(apiId))
+                Triple.create(toRDF.user(username), BasilOntology.Term.api.node(), toRDF.api(apiId))
         );
         dataset.commit();
         dataset.end();

@@ -17,9 +17,13 @@
 package io.github.basilapi.basil.core;
 
 import java.io.IOException;
+import java.net.Authenticator;
+import java.net.InetAddress;
+import java.net.PasswordAuthentication;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
 import java.nio.ByteBuffer;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,14 +36,8 @@ import io.github.basilapi.basil.core.auth.UserManager;
 import io.github.basilapi.basil.core.auth.exceptions.UserApiMappingException;
 import io.github.basilapi.basil.core.exceptions.ApiInvocationException;
 import io.github.basilapi.basil.core.exceptions.SpecificationParsingException;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-//import org.apache.jena.atlas.web.auth.HttpAuthenticator;
-//import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.jena.http.auth.AuthLib;
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.update.UpdateRequest;
@@ -156,46 +154,14 @@ public class ApiManagerImpl implements ApiManager {
 	public InvocationResult invokeApi(String id, MultivaluedMap<String, String> parameters)
 			throws IOException, ApiInvocationException {
 		Specification specification = data.loadSpec(id);
-		
-		HttpClientBuilder builder = HttpClientBuilder.create();
+
 		String[] credentials = data.credentials(id);
+		HttpClient.Builder builder = HttpClient.newBuilder();
 		if(credentials != null) {
-			//authenticator = new SimpleAuthenticator(credentials[0], credentials[1].toCharArray());
-			BasicCredentialsProvider provider = new BasicCredentialsProvider();
-			builder
-					.setDefaultCredentialsProvider(new CredentialsProvider() {
-						@Override
-						public void setCredentials(AuthScope authscope, Credentials credentials) {
-
-						}
-
-						@Override
-						public Credentials getCredentials(AuthScope authscope) {
-							return new Credentials() {
-								@Override
-								public Principal getUserPrincipal() {
-									return new Principal() {
-										@Override
-										public String getName() {
-											return  credentials[0];
-										}
-									};
-								}
-
-								@Override
-								public String getPassword() {
-									return credentials[1];
-								}
-							};
-						}
-
-						@Override
-						public void clear() {
-
-						}
-					});
+			builder.authenticator(AuthLib.authenticator(credentials[0], credentials[1]));
 		}
 		HttpClient authenticator = builder.build();
+
 		if (!specification.isUpdate()) {
 			Query q = (Query) rewrite(specification, parameters);
 			return executor.execute(q, specification.getEndpoint(), authenticator);

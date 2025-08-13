@@ -18,14 +18,16 @@ package io.github.basilapi.basil.invoke;
 
 import java.io.IOException;
 
-import org.apache.http.HttpResponse;
-import org.apache.jena.riot.web.HttpResponseHandler;
+import java.net.http.HttpResponse;
 
-public class UpdateHandler implements HttpResponseHandler {
+/**
+ * TODO Check if we need this
+ */
+public class UpdateHandler {
 	HttpResponse response = null;
 	String baseIRI = null;
 
-	@Override
+
 	public void handle(String baseIRI, HttpResponse response) throws IOException {
 		this.response = response;
 		this.baseIRI = baseIRI;

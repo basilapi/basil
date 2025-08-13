@@ -29,7 +29,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.jena.riot.RDFFormat;
 
 import org.apache.jena.riot.system.PrefixMapZero;
-import org.apache.jena.riot.writer.JsonLDWriter;
+import org.apache.jena.riot.writer.JsonLD11Writer;
 import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapStd;
 import org.apache.jena.riot.writer.NQuadsWriter;
@@ -258,11 +258,11 @@ public class ModelRenderer extends Renderer<Model> {
 		// application/ld+json
 		if (MoreMediaType.JSONLD_TYPE.equals(type)) {
 			StringWriter w = new StringWriter();
-			JsonLDWriter jw = new JsonLDWriter(RDFFormat.JSONLD_PRETTY);
+			JsonLD11Writer jw = new JsonLD11Writer(RDFFormat.JSONLD_PRETTY);
 			PrefixMap p = new PrefixMapStd();
 			p.putAll(pref);
 
-			jw.write(w, DatasetGraphOne.create(getInput().getGraph()), p, null, Context.emptyContext);
+			jw.write(w, DatasetGraphOne.create(getInput().getGraph()), p, null, Context.emptyContext());
 			return w.toString();
 		}
 
@@ -272,7 +272,7 @@ public class ModelRenderer extends Renderer<Model> {
 			RDFXMLPlainWriter writer = new RDFXMLPlainWriter();
 			PrefixMap p = new PrefixMapStd();
 			p.putAll(pref);
-			writer.write(w, getInput().getGraph(), p, "", Context.emptyContext);
+			writer.write(w, getInput().getGraph(), p, "", Context.emptyContext());
 			return w.toString();
 		}
 
@@ -282,7 +282,7 @@ public class ModelRenderer extends Renderer<Model> {
 			TurtleWriter writer = new TurtleWriter();
 			PrefixMap p = new PrefixMapStd();
 			p.putAll(pref);
-			writer.write(w, getInput().getGraph(), p, "", Context.emptyContext);
+			writer.write(w, getInput().getGraph(), p, "", Context.emptyContext());
 			return w.toString();
 		}
 
@@ -292,7 +292,7 @@ public class ModelRenderer extends Renderer<Model> {
 			NQuadsWriter writer = new NQuadsWriter();
 			DatasetGraph dg = DatasetGraphFactory.create();
 			dg.addGraph(NodeFactory.createURI(graphName), getInput().getGraph());
-			writer.write(w, dg, PrefixMapZero.empty, null, Context.emptyContext);
+			writer.write(w, dg, PrefixMapZero.empty, null, Context.emptyContext());
 			return w.toString();
 		}
 

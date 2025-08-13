@@ -27,7 +27,8 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.resultset.ResultSetLang;
-import org.apache.jena.riot.resultset.rw.ResultsWriter;
+//import org.apache.jena.riot.resultset.rw.ResultsWriter;
+import org.apache.jena.sparql.resultset.ResultsWriter;
 import org.apache.jena.vocabulary.RDF;
 
 import com.google.gson.JsonObject;
