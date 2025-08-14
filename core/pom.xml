@@ -22,7 +22,7 @@
 	<parent>
 		<groupId>io.github.basilapi</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.0.0-RC1<!-- basil version --></version>
+		<version>1.0-DEV<!-- basil version --></version>
 		<relativePath>../parent</relativePath>
 	</parent>
 	<artifactId>core</artifactId>
