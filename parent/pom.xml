@@ -22,7 +22,7 @@
 
 	<groupId>io.github.basilapi</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.0-DEV</version>
+	<version>1.0.0-RC1<!-- basil version --></version>
 	<packaging>pom</packaging>
 
 	<name>BASIL :: Parent</name>
@@ -405,17 +405,6 @@
 				</property>
 			</activation>
 
-			<distributionManagement>
-				<snapshotRepository>
-					<id>ossrh</id>
-					<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-				</snapshotRepository>
-				<repository>
-					<id>ossrh</id>
-					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-				</repository>
-			</distributionManagement>
-
 			<build>
 				<plugins>
 					<plugin>
@@ -477,15 +466,26 @@
 							</execution>
 						</executions>
 					</plugin>
+
+<!--					<plugin>-->
+<!--						<groupId>org.sonatype.plugins</groupId>-->
+<!--						<artifactId>nexus-staging-maven-plugin</artifactId>-->
+<!--						<version>1.6.14</version>-->
+<!--						<extensions>true</extensions>-->
+<!--						<configuration>-->
+<!--							<serverId>ossrh</serverId>-->
+<!--							<nexusUrl>https://oss.sonatype.org/</nexusUrl>-->
+<!--							<autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+<!--						</configuration>-->
+<!--					</plugin>-->
+
 					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.7</version>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>0.8.0</version>
 						<extensions>true</extensions>
 						<configuration>
-							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+							<publishingServerId>central</publishingServerId>
 						</configuration>
 					</plugin>
 				</plugins>

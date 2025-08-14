@@ -21,7 +21,7 @@
     <parent>
         <artifactId>parent</artifactId>
         <groupId>io.github.basilapi</groupId>
-        <version>1.0-DEV</version>
+        <version>1.0.0-RC1<!-- basil version --></version>
         <relativePath>../parent</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
