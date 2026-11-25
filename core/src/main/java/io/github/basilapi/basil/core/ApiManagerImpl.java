@@ -120,7 +120,11 @@ public class ApiManagerImpl implements ApiManager {
 		for (QueryParameter qp : specification.getParameters()) {
 			if (parameters.containsKey(qp.getName())) {
 				List<String> values = parameters.get(qp.getName());
-				binder.bind(qp.getName(), values.get(0));
+				try {
+					binder.bind(qp.getName(), values.get(0));
+				} catch (IllegalArgumentException e) {
+					throw new ApiInvocationException(e.getMessage());
+				}
 			} else if (!qp.isOptional()) {
 				missing.add(qp.getName());
 			}

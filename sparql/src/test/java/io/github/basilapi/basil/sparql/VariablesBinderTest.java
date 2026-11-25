@@ -98,4 +98,43 @@ public class VariablesBinderTest {
 		Assert.assertFalse(vars.getVariables().contains("?_limit_number"));
 		Assert.assertFalse(vars.getVariables().contains("?_offset_number"));
 	}
+	private static VariablesBinder binderFor(String query) throws Exception {
+		return new VariablesBinder(SpecificationFactory.create("", query));
+	}
+
+	@Test
+	public void issue149_validIri() throws Exception {
+		VariablesBinder b = binderFor("SELECT * WHERE { ?s ?p $_x_iri }");
+		b.bind("x", "http://example.org/a");
+		Assert.assertTrue(b.toString().contains("<http://example.org/a>"));
+	}
+
+	@Test
+	public void issue149_relativeIri() throws Exception {
+		VariablesBinder b = binderFor("BASE <http://example.org/> SELECT * WHERE { ?s ?p $_x_iri }");
+		b.bind("x", "a/b");
+		Assert.assertTrue(b.toString().contains("a/b"));
+	}
+
+	@Test
+	public void issue149_invalidIri() throws Exception {
+		for (String v : new String[] { "http://a b", "http://a>b", "http://a\"b", "http://a{b}" }) {
+			try {
+				binderFor("SELECT * WHERE { ?s ?p $_x_iri }").bind("x", v);
+				Assert.fail("Expected IllegalArgumentException for: " + v);
+			} catch (IllegalArgumentException e) {
+				Assert.assertTrue(e.getMessage(), e.getMessage().contains("parameter 'x'"));
+			}
+		}
+	}
+
+	@Test
+	public void issue149_invalidNumber() throws Exception {
+		try {
+			binderFor("SELECT * WHERE { ?s ?p $_x_number }").bind("x", "abc");
+			Assert.fail("Expected IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			Assert.assertTrue(e.getMessage(), e.getMessage().contains("parameter 'x'"));
+		}
+	}
 }

@@ -20,6 +20,7 @@ import org.apache.jena.datatypes.BaseDatatype;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.Query;
 import org.apache.jena.update.UpdateRequest;
+import java.util.regex.Pattern;
 
 /**
  * To bind parameter values to variables in the SPARQL query.
@@ -28,7 +29,8 @@ import org.apache.jena.update.UpdateRequest;
  *
  */
 public class VariablesBinder {
-
+	// Characters not allowed in a SPARQL IRIREF (between < and >)
+	private static final Pattern INVALID_IRI_CHARS = Pattern.compile("[<>\"{}|^`\\\\\\x00-\\x20]");
 	private ParameterizedSparqlString pss;
 	private Specification spec;
 
@@ -57,6 +59,7 @@ public class VariablesBinder {
 	 * 
 	 * @param name The name of the basil variable
 	 * @param value The value to be assigned to this basil variable
+	 * @throws IllegalArgumentException if the value is not valid for the parameter type (IRI, number)
 	 * @return a reference to this object.
 	 * @see #bindIri(String, String)
 	 * @see #bindLangedLiteral(String, String, String)
@@ -106,10 +109,14 @@ public class VariablesBinder {
 	 * @return a reference to this object.
 	 */
 	public VariablesBinder bindNumber(String name, String value) {
-		if (value.contains(".")) {
-			pss.setLiteral(spec.getVariableOfParameter(name), Double.valueOf(value));	
-		}else{
-			pss.setLiteral(spec.getVariableOfParameter(name), Integer.valueOf(value));
+		try {
+			if (value.contains(".")) {
+				pss.setLiteral(spec.getVariableOfParameter(name), Double.valueOf(value));
+			} else {
+				pss.setLiteral(spec.getVariableOfParameter(name), Integer.valueOf(value));
+			}
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Invalid number for parameter '" + name + "': \"" + value + "\"", e);
 		}
 		return this;
 	}
@@ -160,6 +167,9 @@ public class VariablesBinder {
 	 * @return a reference to this object.
 	 */
 	public VariablesBinder bindIri(String name, String value) {
+		if (INVALID_IRI_CHARS.matcher(value).find()) {
+			throw new IllegalArgumentException("Invalid IRI for parameter '" + name + "': \"" + value + "\"");
+		}
 		pss.setIri(spec.getVariableOfParameter(name), value);
 		return this;
 	}
