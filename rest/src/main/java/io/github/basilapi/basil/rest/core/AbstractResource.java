@@ -35,6 +35,7 @@ import io.github.basilapi.basil.core.auth.UserManager;
 import io.github.basilapi.basil.invoke.QueryExecutor;
 import io.github.basilapi.basil.search.SearchProvider;
 import io.github.basilapi.basil.store.Store;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
 import org.slf4j.Logger;
