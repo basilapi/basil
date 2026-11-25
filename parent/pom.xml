@@ -39,7 +39,7 @@
 		<!-- jetty 12, ee8 environment (javax.servlet) -->
 		<jetty.version>12.1.15</jetty.version>
 
-		<shiro.version>1.13.0</shiro.version>
+		<shiro.version>3.0.0</shiro.version>
 		<jena.version>6.0.0</jena.version> <!-- 4.2.0 was 3.13.1 / 3.0.1 -->
 		<!-- basil version -->
 		<basil.version>${project.version}</basil.version>
