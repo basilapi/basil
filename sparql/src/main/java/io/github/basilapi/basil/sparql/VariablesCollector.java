@@ -83,6 +83,16 @@ public class VariablesCollector implements ElementVisitor, UpdateVisitor {
 		return Collections.unmodifiableSet(variables);
 	}
 
+	private Set<String> serviceVariables = new HashSet<String>();
+
+	/**
+	 * Variables used as the IRI of a SERVICE clause (e.g. SERVICE ?_endpoint_iri).
+	 * They are not included in {@link #getVariables()}.
+	 */
+	public Set<String> getServiceVariables() {
+		return Collections.unmodifiableSet(serviceVariables);
+	}
+
 	/**
 	 * XXX General method supporting query/update and also cases in which
 	 * variables are not allowed (INSERT DATA)
@@ -123,6 +133,7 @@ public class VariablesCollector implements ElementVisitor, UpdateVisitor {
 
 	public void reset() {
 		variables = new HashSet<String>();
+		serviceVariables = new HashSet<String>();
 	}
 
 	private void collectFromTriple(Triple triple) {
@@ -256,7 +267,10 @@ public class VariablesCollector implements ElementVisitor, UpdateVisitor {
 	}
 
 	public void visit(ElementService el) {
-		//
+		Node service = el.getServiceNode();
+		if (service != null && service.isVariable()) {
+			serviceVariables.add(service.toString());
+		}
 		el.getElement().visit(this);
 	}
 

@@ -87,4 +87,28 @@ public class SpecificationFactoryTest {
 		Specification spec = SpecificationFactory.create("", "SELECT ?v WHERE { BIND($_x_ex_money AS ?v) }");
 		Assert.assertTrue(spec.getParameter("x").isPlainLiteral());
 	}
+
+	@Test
+	public void issue148_serviceParameterDisabled() throws Exception {
+		System.clearProperty(SpecificationFactory.SERVICE_PARAMETERS_PROPERTY);
+		Specification spec = SpecificationFactory.create("",
+				"SELECT * WHERE { SERVICE $_endpoint_iri { ?s ?p ?o } }", true);
+		Assert.assertFalse(spec.hasParameter("endpoint"));
+	}
+
+	@Test
+	public void issue148_serviceParameterEnabled() throws Exception {
+		System.setProperty(SpecificationFactory.SERVICE_PARAMETERS_PROPERTY, "true");
+		try {
+			// No suffix: still bound as IRI
+			Specification spec = SpecificationFactory.create("",
+					"SELECT * WHERE { SERVICE $_endpoint { ?s ?p ?o } }", true);
+			Assert.assertTrue(spec.getParameter("endpoint").isIri());
+			VariablesBinder b = new VariablesBinder(spec);
+			b.bind("endpoint", "http://example.org/sparql");
+			Assert.assertTrue(b.toString(), b.toString().contains("SERVICE <http://example.org/sparql>"));
+		} finally {
+			System.clearProperty(SpecificationFactory.SERVICE_PARAMETERS_PROPERTY);
+		}
+	}
 }

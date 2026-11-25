@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.jena.query.QueryException;
 import org.apache.jena.query.QueryFactory;
@@ -30,6 +32,18 @@ public class SpecificationFactory {
 
 	private static final Pattern PREFIX_DECL = Pattern
 			.compile("(?i)PREFIX\\s+([A-Za-z][\\w.-]*)?:\\s*<([^>]*)>");
+
+	private static final Logger log = LoggerFactory.getLogger(SpecificationFactory.class);
+
+	/**
+	 * System property enabling parameters as SERVICE IRI, e.g. SERVICE $_endpoint_iri (#148).
+	 * Default: false. The caller then chooses which endpoint is queried.
+	 */
+	public static final String SERVICE_PARAMETERS_PROPERTY = "basil.sparql.serviceParameters";
+
+	private static boolean serviceParametersEnabled() {
+		return Boolean.parseBoolean(System.getProperty(SERVICE_PARAMETERS_PROPERTY, "false"));
+	}
 
 	/**
 	 * @param strict if true, a parameter in the $_name_prefix_type form whose
@@ -75,6 +89,21 @@ public class SpecificationFactory {
 				if (parser.isDatatypeError()) {
 					datatypeErrors.add(parser.getException().getMessage());
 				}
+			}
+		}
+		for (String var : collector.getServiceVariables()) {
+			VariableParser parser = new VariableParser(var, prefixes);
+			if (!parser.isParameter() || spec.hasVariable(var)) {
+				continue;
+			}
+			if (serviceParametersEnabled()) {
+				// A parameter used as SERVICE IRI is always bound as IRI
+				QueryParameter p = parser.getParameter();
+				p.setIri();
+				spec.map(var, p);
+			} else {
+				log.warn("Parameter {} used as SERVICE IRI is ignored; enable it with -D{}=true",
+						var, SERVICE_PARAMETERS_PROPERTY);
 			}
 		}
 		return spec;
