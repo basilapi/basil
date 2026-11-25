@@ -35,6 +35,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import io.github.basilapi.basil.core.auth.UserManager;
 import io.github.basilapi.basil.core.auth.exceptions.UserApiMappingException;
 import io.github.basilapi.basil.core.exceptions.ApiInvocationException;
+import io.github.basilapi.basil.core.exceptions.ApiParameterException;
 import io.github.basilapi.basil.core.exceptions.SpecificationParsingException;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.http.auth.AuthLib;
@@ -123,7 +124,7 @@ public class ApiManagerImpl implements ApiManager {
 				try {
 					binder.bind(qp.getName(), values.get(0));
 				} catch (IllegalArgumentException e) {
-					throw new ApiInvocationException(e.getMessage());
+					throw new ApiParameterException(e.getMessage());
 				}
 			} else if (!qp.isOptional()) {
 				missing.add(qp.getName());
@@ -138,7 +139,7 @@ public class ApiManagerImpl implements ApiManager {
 				ms.append("\t");
 			}
 			ms.append("\n");
-			throw new ApiInvocationException(ms.toString());
+			throw new ApiParameterException(ms.toString());
 		}
 		if (specification.isUpdate()) {
 			UpdateRequest r = binder.toUpdate();

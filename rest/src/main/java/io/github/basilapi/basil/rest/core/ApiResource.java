@@ -41,6 +41,7 @@ import javax.ws.rs.core.Variant;
 
 import io.github.basilapi.basil.core.InvocationResult;
 import io.github.basilapi.basil.core.exceptions.ApiInvocationException;
+import io.github.basilapi.basil.core.exceptions.ApiParameterException;
 import io.github.basilapi.basil.core.exceptions.SpecificationParsingException;
 import io.github.basilapi.basil.doc.Doc;
 import io.github.basilapi.basil.rendering.CannotRenderException;
@@ -168,6 +169,9 @@ public class ApiResource extends AbstractResource {
 			rb.header("Content-Type", type.withCharset("UTF-8").toString());
 			log.trace("API execution. Return response.");
 			return rb.build();
+		} catch (ApiParameterException e) {
+			log.debug("API execution. Bad parameters: {}", e.getMessage());
+			return packError(Response.status(HttpURLConnection.HTTP_BAD_REQUEST), e).build();
 		} catch (CannotRenderException e) {
 			log.trace("API execution. Cannot prepare response (not acceptable).");
 			return buildNotAcceptable("Cannot render result, problem was: " + e.getMessage());
@@ -283,6 +287,8 @@ public class ApiResource extends AbstractResource {
 			response = Response.seeOther(URI.create(s));
 			addHeaders(response, id);
 			return response.build();
+		} catch (ApiParameterException e) {
+			return packError(Response.status(HttpURLConnection.HTTP_BAD_REQUEST), e).build();
 		} catch (IOException | ApiInvocationException e) {
 			log.error("Error", e);
 			return packError(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR), e).build();
