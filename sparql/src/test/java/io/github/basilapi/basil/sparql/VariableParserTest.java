@@ -214,4 +214,46 @@ public class VariableParserTest {
 				.getParameter().getDatatype()
 				.equals(XSDDatatype.XSDstring.getURI()));
 	}
+
+	@Test
+	public void issue141_anyXsdDatatype() {
+		String xsd = XSD.getURI();
+		Assert.assertEquals(xsd + "decimal", new VariableParser("$_x_decimal").getParameter().getDatatype());
+		Assert.assertEquals(xsd + "float", new VariableParser("$_x_float").getParameter().getDatatype());
+		Assert.assertEquals(xsd + "duration", new VariableParser("$_x_duration").getParameter().getDatatype());
+		Assert.assertEquals(xsd + "decimal", new VariableParser("$_x_xsd_decimal").getParameter().getDatatype());
+		// Unknown single suffix: plain literal, not a datatype error
+		VariableParser vp = new VariableParser("$_first_name");
+		Assert.assertTrue(vp.getParameter().isPlainLiteral());
+		Assert.assertFalse(vp.isDatatypeError());
+	}
+
+	@Test
+	public void issue141_declaredPrefix() {
+		Map<String, String> prefixes = new HashMap<String, String>();
+		prefixes.put("ex", "http://example.org/dt#");
+		Assert.assertEquals("http://example.org/dt#money",
+				new VariableParser("$_x_ex_money", prefixes).getParameter().getDatatype());
+		Assert.assertEquals("http://example.org/dt#amount_due",
+				new VariableParser("$_x_ex_amount_due", prefixes).getParameter().getDatatype());
+		// xsd is always available
+		Assert.assertEquals(XSD.getURI() + "decimal",
+				new VariableParser("$_x_xsd_decimal", prefixes).getParameter().getDatatype());
+		// Language tags unchanged
+		Assert.assertEquals("en", new VariableParser("$_x_en", prefixes).getParameter().getLang());
+	}
+
+	@Test
+	public void issue141_datatypeErrors() {
+		// Undeclared prefix: datatype error, plain literal
+		VariableParser undeclared = new VariableParser("$_x_ex_money");
+		Assert.assertTrue(undeclared.isDatatypeError());
+		Assert.assertTrue(undeclared.getParameter().isPlainLiteral());
+		// Declared prefix (xsd), unknown local name: IRI built as is, no error
+		VariableParser xsdFoo = new VariableParser("$_x_xsd_foo");
+		Assert.assertFalse(xsdFoo.isDatatypeError());
+		Assert.assertEquals(XSD.getURI() + "foo", xsdFoo.getParameter().getDatatype());
+		// Underscore is reserved: $_first_name_en is prefix 'name', local name 'en'
+		Assert.assertTrue(new VariableParser("$_first_name_en").isDatatypeError());
+	}
 }

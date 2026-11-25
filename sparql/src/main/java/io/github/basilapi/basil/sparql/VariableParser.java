@@ -13,114 +13,97 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.github.basilapi.basil.sparql;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.vocabulary.XSD;
 
 public class VariableParser {
+
+	// group 1: _ or __ (optional); group 2: name; group 3: type / lang / prefix;
+	// group 4: datatype local name, which may contain underscores (e.g. amount_due)
+	private static final Pattern PARAMETER = Pattern.compile(
+			"[\\$\\?]([_]{1,2})([^_]+)_?([a-zA-Z0-9]+)?_?([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)?.*$");
+
 	private String variable;
 	private boolean isParameter = false;
-	private Map<String, String> prefixes;
+	private final Map<String, String> prefixes;
 	private boolean isError = false;
+	private boolean isDatatypeError = false;
 	private Exception exception = null;
 	private QueryParameter p = null;
 
 	public VariableParser(String variable) {
-		this.variable = variable;
-		this.prefixes = new HashMap<String, String>();
-		this.prefixes.put("xsd", XSD.getURI());
-		try {
-			parse();
-		} catch (ParameterException e) {
-			this.exception = e;
-			this.isError = true;
-		}
+		this(variable, null);
 	}
 
+	/**
+	 * @param prefixes the query's prefix mapping; xsd is added if not declared
+	 */
 	public VariableParser(String variable, Map<String, String> prefixes) {
 		this.variable = variable;
-		this.prefixes = prefixes;
-		try {
-			parse();
-		} catch (ParameterException e) {
-			this.exception = e;
-			this.isError = true;
+		this.prefixes = new HashMap<String, String>();
+		if (prefixes != null) {
+			this.prefixes.putAll(prefixes);
 		}
+		this.prefixes.putIfAbsent("xsd", XSD.getURI());
+		parse();
 	}
 
-	private void parse() throws ParameterException {
-		Pattern pt = Pattern
-				.compile("[\\$\\?]([_]{1,2})([^_]+)_?([a-zA-Z0-9]+)?_?([a-zA-Z0-9]+)?.*$");
-		Matcher m = pt.matcher(this.variable);
-		if (m.matches()) {
-			this.isParameter = true;
+	private static boolean isKnownDatatype(String uri) {
+		return TypeMapper.getInstance().getTypeByName(uri) != null;
+	}
 
-			this.p = new QueryParameter();
-			p.setOptional(m.group(1).length() == 2);
-			p.setName(m.group(2));
-			if (m.group(3) != null) {
-				if (m.group(3).toLowerCase().equals("iri")) {
-					p.setIri();
-				} else if (m.group(3).toLowerCase().equals("literal")) {
-					p.setPlainLiteral();
-				} else if (m.group(3).toLowerCase().equals("number")) {
-					p.setNumber();
-				} else if (m.group(3).length() == 2 && m.group(4) == null) {
-					// specifies lang
-					p.setLang(m.group(3).toLowerCase());
-				} else if (m.group(4) != null) {
-					String datatypePrefix = m.group(3);
-					String datatypeLocalName = m.group(4);
-					String namespace = prefixes.get(datatypePrefix);
-					if (namespace == null) {
-						exception = new ParameterException("Unknown prefix: "
-								+ datatypePrefix);
-						isError = true;
-					} else {
-						p.setDatatype(namespace + datatypeLocalName);
-					}
-				} else {
-					// Let's check if group(3) is a well known XSD Datatype
-					Set<String> xsdDatatypes = new HashSet<String>();
-					xsdDatatypes.add("string");
-					xsdDatatypes.add("int");
-					xsdDatatypes.add("integer");
-					xsdDatatypes.add("boolean");
-					xsdDatatypes.add("double");
-					xsdDatatypes.add("long");
-					xsdDatatypes.add("anyURI");
-					xsdDatatypes.add("date");
-					xsdDatatypes.add("dateTime");
-					xsdDatatypes.add("gYear");
-					xsdDatatypes.add("gMonth");
-					// TODO add others
-					// ...
-					//
-					if (xsdDatatypes.contains(m.group(3))) {
-						String datatypeLocalName = m.group(3);
-						String datatype = XSD.getURI() + datatypeLocalName;
-						p.setDatatype(datatype);
-					} else {
-						isError = true;
-						this.exception = new ParameterException(
-								"Cannot recognize parameter properties.");
-						p.setPlainLiteral();
-					}
-				}
-			} else {
+	private void error(String message, boolean datatype) {
+		this.isError = true;
+		this.isDatatypeError = datatype;
+		this.exception = new ParameterException(message);
+	}
+
+	private void parse() {
+		Matcher m = PARAMETER.matcher(this.variable);
+		if (!m.matches()) {
+			return; // not a parameter
+		}
+		this.isParameter = true;
+		this.p = new QueryParameter();
+		p.setOptional(m.group(1).length() == 2);
+		p.setName(m.group(2));
+		String g3 = m.group(3);
+		String g4 = m.group(4);
+		if (g3 == null) {
+			p.setPlainLiteral();
+		} else if (g3.equalsIgnoreCase("iri")) {
+			p.setIri();
+		} else if (g3.equalsIgnoreCase("literal")) {
+			p.setPlainLiteral();
+		} else if (g3.equalsIgnoreCase("number")) {
+			p.setNumber();
+		} else if (g3.length() == 2 && g4 == null) {
+			// language tag
+			p.setLang(g3.toLowerCase());
+		} else if (g4 != null) {
+			// $_name_prefix_localName: the prefix must be declared in the query (xsd is default)
+			String namespace = prefixes.get(g3);
+			if (namespace == null) {
+				error("Unknown prefix '" + g3 + "' in parameter " + variable, true);
 				p.setPlainLiteral();
+			} else {
+				// Any local name: the datatype IRI is built as is
+				p.setDatatype(namespace + g4);
 			}
-
+		} else if (isKnownDatatype(XSD.getURI() + g3)) {
+			// $_name_xsdLocalName: any XSD datatype known to Jena
+			p.setDatatype(XSD.getURI() + g3);
 		} else {
-			// It's not a parameter
+			// Unknown single suffix: plain literal, as before (not a datatype error)
+			error("Cannot recognize parameter properties: " + variable, false);
+			p.setPlainLiteral();
 		}
 	}
 
@@ -138,6 +121,13 @@ public class VariableParser {
 
 	public boolean isError() {
 		return this.isError;
+	}
+
+	/**
+	 * True when the $_name_prefix_type form uses a prefix not declared in the query.
+	 */
+	public boolean isDatatypeError() {
+		return this.isDatatypeError;
 	}
 
 	public Exception getException() {

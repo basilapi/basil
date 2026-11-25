@@ -177,7 +177,7 @@ public class ApiManagerImpl implements ApiManager {
 		if (body.equals("")) {
 			throw new SpecificationParsingException("Body cannot be empty");
 		}
-		Specification specification = SpecificationFactory.create(endpoint, body);
+		Specification specification = SpecificationFactory.create(endpoint, body, true);
 		data.saveSpec(id, specification);
 		userManager.mapUserApi(username, id);
 		return id;
@@ -210,7 +210,7 @@ public class ApiManagerImpl implements ApiManager {
 			throw new SpecificationParsingException("Body cannot be empty");
 		}
 		Specification specification;
-		specification = SpecificationFactory.create(endpoint, body);
+		specification = SpecificationFactory.create(endpoint, body, true);
 		data.saveSpec(id, specification);
 	}
 

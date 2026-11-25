@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.github.basilapi.basil.rest.core;
 
 import java.io.IOException;
@@ -48,6 +47,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 
 import io.github.basilapi.basil.rest.auth.AuthResource;
 import io.github.basilapi.basil.rest.msg.SimpleMessage;
+import io.github.basilapi.basil.core.exceptions.SpecificationParsingException;
 
 @Path("/")
 @Api(value = "/basil", description = "BASIL operations")
@@ -95,7 +95,7 @@ public class SpecificationResource extends AbstractResource {
 				addHeaders(response, id);
 				return response.build();
 			}
-		} catch (QueryParseException e) {
+		} catch (QueryParseException | SpecificationParsingException e) {
 			log.error("An error occurred", e);
 			return packError(Response.status(Status.BAD_REQUEST), e).build();
 

@@ -68,5 +68,23 @@ public class SpecificationFactoryTest {
 		Assert.assertTrue(spec.getEndpoint().equals(endpoint));
 		Assert.assertTrue(spec.getQuery().equals(q));
 	}
-	
+	private static final String Q141 = "PREFIX ex: <http://example.org/dt#>\n"
+			+ "SELECT ?v WHERE { BIND($_x_ex_money AS ?v) }";
+
+	@Test
+	public void issue141_prefixFromQuery() throws Exception {
+		Specification spec = SpecificationFactory.create("", Q141, true);
+		Assert.assertEquals("http://example.org/dt#money", spec.getParameter("x").getDatatype());
+	}
+
+	@Test(expected = ParameterParsingException.class)
+	public void issue141_strictUndeclaredPrefix() throws Exception {
+		SpecificationFactory.create("", "SELECT ?v WHERE { BIND($_x_ex_money AS ?v) }", true);
+	}
+
+	@Test
+	public void issue141_lenientUndeclaredPrefix() throws Exception {
+		Specification spec = SpecificationFactory.create("", "SELECT ?v WHERE { BIND($_x_ex_money AS ?v) }");
+		Assert.assertTrue(spec.getParameter("x").isPlainLiteral());
+	}
 }
