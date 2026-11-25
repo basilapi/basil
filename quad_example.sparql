@@ -1,0 +1,1 @@
+select * where {graph ?g {?a ?b ?c} } limit 1000

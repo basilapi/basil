@@ -313,12 +313,10 @@
 					<version>1.10</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.3</version>
+					<version>3.13.0</version>
 					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
+						<release>21</release>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -378,7 +376,7 @@
 		<profile>
 			<id>java-post8</id>
 			<activation>
-				<jdk>[11,21]</jdk>
+				<jdk>[21,]</jdk>
 			</activation>
 			<dependencies>
 				<!-- API, java.xml.bind module -->
@@ -450,7 +448,7 @@
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<version>2.9.1</version>
 						<configuration>
-							<source>7</source>
+							<source>21</source>
 							<detectJavaApiLink>false</detectJavaApiLink>
 						</configuration>
 						<executions>

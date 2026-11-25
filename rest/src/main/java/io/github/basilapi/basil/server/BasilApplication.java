@@ -41,6 +41,18 @@ import org.secnod.shiro.jersey.SubjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.basilapi.basil.rest.auth.AuthResource;
+import io.github.basilapi.basil.rest.auth.UsersResource;
+import io.github.basilapi.basil.rest.core.AliasResource;
+import io.github.basilapi.basil.rest.core.ApiDocsResource;
+import io.github.basilapi.basil.rest.core.ApiResource;
+import io.github.basilapi.basil.rest.core.CredentialsResource;
+import io.github.basilapi.basil.rest.core.DocsResource;
+import io.github.basilapi.basil.rest.core.ExplainResource;
+import io.github.basilapi.basil.rest.core.SearchResource;
+import io.github.basilapi.basil.rest.core.SpecificationResource;
+import io.github.basilapi.basil.rest.core.ViewResource;
+
 import com.wordnik.swagger.jersey.listing.ApiListingResourceJSON;
 import com.wordnik.swagger.jersey.listing.JerseyApiDeclarationProvider;
 import com.wordnik.swagger.jersey.listing.JerseyResourceListingProvider;
@@ -57,12 +69,26 @@ public class BasilApplication extends ResourceConfig implements ServletContextLi
 	}
 	private Logger log = LoggerFactory.getLogger(BasilApplication.class);
 
-    public BasilApplication(){
-        packages("com.wordnik.swagger.jaxrs.json").
-				packages("io.github.basilapi.basil.rest").
-				register(ApiListingResourceJSON.class).
-                register(JerseyApiDeclarationProvider.class).
-                register(JerseyResourceListingProvider.class);
+	public BasilApplication() {
+		// Swagger providers (legacy bytecode, scanning is safe)
+		packages("com.wordnik.swagger.jaxrs.json");
+		register(ApiListingResourceJSON.class);
+		register(JerseyApiDeclarationProvider.class);
+		register(JerseyResourceListingProvider.class);
+		// BASIL resources: registered explicitly, because the ASM bundled
+		// in Jersey 2.14 cannot read Java 21 class files when scanning packages
+		register(AuthResource.class);
+		register(UsersResource.class);
+		register(AliasResource.class);
+		register(ApiDocsResource.class);
+		register(ApiResource.class);
+		register(CredentialsResource.class);
+		register(DocsResource.class);
+		register(ExplainResource.class);
+		register(SearchResource.class);
+		register(SpecificationResource.class);
+		register(ViewResource.class);
+		// Shiro
 		register(new AuthorizationFilterFeature());
 		register(new SubjectFactory());
 		register(new AuthInjectionBinder());
