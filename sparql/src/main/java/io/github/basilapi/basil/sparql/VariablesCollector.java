@@ -62,15 +62,18 @@ import org.apache.jena.sparql.syntax.ElementNamedGraph;
 import org.apache.jena.sparql.syntax.ElementNotExists;
 import org.apache.jena.sparql.syntax.ElementOptional;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementSemiJoin;
 import org.apache.jena.sparql.syntax.ElementService;
 import org.apache.jena.sparql.syntax.ElementSubQuery;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.apache.jena.sparql.syntax.ElementUnfold;
 import org.apache.jena.sparql.syntax.ElementUnion;
 import org.apache.jena.sparql.syntax.ElementVisitor;
 import org.apache.jena.sparql.syntax.ElementWalker;
 import org.apache.jena.update.Update;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
+import org.apache.jena.sparql.syntax.ElementAntiJoin;
 
 public class VariablesCollector implements ElementVisitor, UpdateVisitor {
 
@@ -188,9 +191,15 @@ public class VariablesCollector implements ElementVisitor, UpdateVisitor {
 		collectFromExpr(el.getExpr());
 	}
 
+	@Override
+	public void visit(ElementUnfold el) {
+		// UNFOLD(expr AS ?v1, ?v2): only the expression can hold parameters,
+		// as for BIND. The output variables are not parameters.
+		collectFromExpr(el.getExpr());
+	}
+
 	public void visit(ElementData el) {
 		//
-
 	}
 
 	public void visit(ElementUnion el) {
@@ -210,6 +219,11 @@ public class VariablesCollector implements ElementVisitor, UpdateVisitor {
 		el.getLateralElement().visit(this);
 	}
 
+	@Override
+	public void visit(ElementSemiJoin el) {
+		el.getSubElement().visit(this);
+	}
+
 	public void visit(ElementGroup el) {
 		//
 		for (Element ele : el.getElements()){
@@ -223,6 +237,7 @@ public class VariablesCollector implements ElementVisitor, UpdateVisitor {
 
 	public void visit(ElementNamedGraph el) {
 		//
+		el.getElement().visit(this);
 	}
 
 	public void visit(ElementExists el) {
@@ -344,7 +359,12 @@ public class VariablesCollector implements ElementVisitor, UpdateVisitor {
 			variables.add(update.getGraph().toString());
 		}
 	}
-
+	@Override
+	public void visit(ElementAntiJoin el) {
+		// Added in Jena 6. Sub-elements are reached by ElementWalker,
+		// which drives this visitor in collect() and visit(UpdateModify).
+		el.getSubElement().visit(this);
+	}
 //	@Override
 //	public Sink<Quad> createInsertDataSink() {
 //		throw new RuntimeException("Method not implemented");

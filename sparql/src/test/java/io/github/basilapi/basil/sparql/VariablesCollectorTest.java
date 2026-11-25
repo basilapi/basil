@@ -186,6 +186,12 @@ public class VariablesCollectorTest {
 		Assert.assertTrue(vars.contains("?_param4"));
 		Assert.assertTrue(vars.contains("?_param5"));
 	}
-
+	@Test
+	public void unfold() {
+		// Jena 6: UNFOLD(expr AS ?v). Parameters inside the expression must be collected.
+		String q = "SELECT ?item WHERE { UNFOLD($_list AS ?item) }";
+		Set<String> vars = extractVars(q);
+		Assert.assertTrue(vars.contains("?_list"));
+	}
 
 }

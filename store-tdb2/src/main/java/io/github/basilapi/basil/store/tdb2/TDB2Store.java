@@ -34,7 +34,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.mem.GraphMem;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.QueryExecution;
@@ -797,7 +797,7 @@ public class TDB2Store implements Store, SearchProvider {
         ParameterizedSparqlString psq = new ParameterizedSparqlString();
         psq.setCommandText(qStr);
         psq.setParam("apiURI", apiURI);
-        dataset.begin();
+        dataset.begin(ReadWrite.READ);
         org.apache.jena.query.Query query = psq.asQuery();
         try (QueryExecution qe = QueryExecutionFactory.create(query, dataset);) {
             ResultSet rs = qe.execSelect();
@@ -884,13 +884,16 @@ public class TDB2Store implements Store, SearchProvider {
 
     public Graph getAsMemGraph(String id){
         Node apiURI = toRDF.api(id);
-        dataset.begin();
-        Graph g = dataset.asDatasetGraph().getGraph(apiURI);
-        GraphMem gm = new GraphMem();
-        Iterator<Triple> it = g.find();
-        while(it.hasNext())
-            gm.add(it.next());
-        dataset.end();
+        Graph gm = GraphFactory.createDefaultGraph();
+        dataset.begin(ReadWrite.READ);
+        try {
+            Graph g = dataset.asDatasetGraph().getGraph(apiURI);
+            Iterator<Triple> it = g.find();
+            while(it.hasNext())
+                gm.add(it.next());
+        } finally {
+            dataset.end();
+        }
         return gm;
     }
 

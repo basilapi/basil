@@ -18,8 +18,6 @@ package io.github.basilapi.basil.rdf;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.iri.IRI;
-import org.apache.jena.iri.IRIFactory;
 
 public class BasilOntology {
     public static String NS = "http://basilapi.github.io/ontology/ns#";
@@ -40,10 +38,6 @@ public class BasilOntology {
 
         public String getIRIString(){
             return NS + name();
-        }
-
-        public IRI iri(){
-            return IRIFactory.iriImplementation().construct(getIRIString());
         }
 
         public Node node(){

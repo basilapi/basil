@@ -28,7 +28,7 @@ import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.mem.GraphMem;
+import org.apache.jena.sparql.graph.GraphFactory;
 import io.github.basilapi.basil.rdf.BasilOntology.Term;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.util.iterator.ExtendedIterator;
@@ -62,7 +62,7 @@ public class RDFFactory {
         graph.add(Triple.create(
                 s,
                 p,
-                NodeFactory.createLiteral(str, XSDDatatype.XSDstring)
+                NodeFactory.createLiteralString(str)
         ));
     }
     private void datetime(Graph graph, Node subject, Term t, Date d){
@@ -89,7 +89,7 @@ public class RDFFactory {
     }
 
     public Graph toGraph(User o){
-        Graph g = new GraphMem();
+        Graph g = GraphFactory.createDefaultGraph();
         Node s = user(o.getUsername());
         g.add(Triple.create(s, RDF.type.asNode(), Term.User.node()));
         Node u = user(o.getUsername());
