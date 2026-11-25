@@ -45,6 +45,15 @@
 			<version>${basil.version}</version>
 		</dependency>
 
+		<!-- Jetty 12, ee8 -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.ee8</groupId>
+			<artifactId>jetty-ee8-webapp</artifactId>
+		</dependency>
 
 		<!-- Standalone -->
         <dependency>
@@ -87,21 +96,17 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <!-- <version>9.3.0.M1</version> -->
-                <configuration>
-                    <scanIntervalSeconds>5</scanIntervalSeconds>
-                    <systemProperties>
-                        <systemProperty>
-                            <name>log4j.configurationFile</name>
-                            <value>${project.basedir}/src/test/resources/log4j2-jetty.xml</value>
-                        </systemProperty>
-                    </systemProperties>
-                </configuration>
-            </plugin>
+
+			<plugin>
+				<groupId>org.eclipse.jetty.ee8</groupId>
+				<artifactId>jetty-ee8-maven-plugin</artifactId>
+				<configuration>
+					<scan>5</scan>
+					<systemProperties>
+						<log4j.configurationFile>${project.basedir}/src/test/resources/log4j2-jetty.xml</log4j.configurationFile>
+					</systemProperties>
+				</configuration>
+			</plugin>
 		</plugins>
 		<resources>
 			<resource>

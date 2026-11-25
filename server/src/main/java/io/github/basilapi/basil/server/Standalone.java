@@ -13,13 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.github.basilapi.basil.server;
 
+import org.eclipse.jetty.ee8.webapp.WebAppContext;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.webapp.WebAppContext;
 
 public class Standalone {
 	public static void main(String[] args) {
@@ -30,7 +29,6 @@ public class Standalone {
 		ServerConnector connector = new ServerConnector(server);
 
 		connector.setIdleTimeout(1000 * 60 * 60);
-		connector.setSoLingerTime(-1);
 		connector.setPort(cli.getPort());
 		server.setConnectors(new Connector[] { connector });
 		System.out.println("#2: basil is starting on port " + cli.getPort());
@@ -43,7 +41,7 @@ public class Standalone {
 
 		String resLocation = Standalone.class
 				.getResource("/static").toString();
-		root.setResourceBase(resLocation);
+		root.setBaseResourceAsString(resLocation);
 		root.setParentLoaderPriority(true);
 		server.setHandler(root);
 		System.out.println("#3: resources setup");
