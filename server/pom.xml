@@ -32,6 +32,11 @@
 
 	<description>Server</description>
 
+	<properties>
+		<!-- the artifact is the runnable jar (~65 MB): distributed via GitHub releases, not Maven Central -->
+		<central.skipPublishing>true</central.skipPublishing>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>io.github.basilapi</groupId>

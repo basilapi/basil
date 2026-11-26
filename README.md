@@ -66,20 +66,30 @@ mvn clean install -DskipTests
 ```
 
 ## Releasing ##
+
 1. Set the release version in all poms (they are marked with `<!-- basil version -->`), build, commit and tag:
+
    ```
    grep -rl --include=pom.xml '1.0-DEV<!-- basil version -->' . | xargs sed -i '' 's/1.0-DEV<!-- basil version -->/X.Y.Z<!-- basil version -->/'
    mvn clean install
    git commit -am "Release X.Y.Z" && git tag vX.Y.Z
    ```
-2. Sign and deploy to Maven Central, then push the tag:
+
+2. Sign and deploy to Maven Central, then push the tag. The `server` module is excluded: its artifact is the runnable jar (~65 MB), which is distributed with the GitHub release instead (Maven Central applies a monthly size limit per organisation).
+
    ```
-   mvn deploy -DperformRelease=true
+   mvn deploy -DperformRelease=true -DskipTests -pl '!server'
    git push origin vX.Y.Z
    ```
+
 3. Create the GitHub release with the runnable jar and the example configuration:
+
    ```
    gh release create vX.Y.Z server/target/basil-server-X.Y.Z.jar basil-server.ini server/src/test/resources/log4j2.xml --verify-tag --title "BASIL X.Y.Z" --notes-file notes.md
    ```
+
    (add `--prerelease` for release candidates)
+
 4. Set the development version back (`X.Y.Z` → `1.0-DEV`), commit and push.
+
+

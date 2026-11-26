@@ -30,6 +30,8 @@
 	<description>Tool for Building web Apis SImpLy on top of sparql endpoints</description>
 
 	<properties>
+		<!-- set to true in a module to keep it out of the Maven Central bundle -->
+		<central.skipPublishing>false</central.skipPublishing>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Versions -->
 		<slf4j.version>1.7.7</slf4j.version>
@@ -490,6 +492,7 @@
 						<extensions>true</extensions>
 						<configuration>
 							<publishingServerId>central</publishingServerId>
+							<skipPublishing>${central.skipPublishing}</skipPublishing>
 						</configuration>
 					</plugin>
 				</plugins>
